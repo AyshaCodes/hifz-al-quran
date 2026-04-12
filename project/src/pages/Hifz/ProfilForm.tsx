@@ -1,20 +1,58 @@
 import { BookOpen, Calendar, ChevronRight, Clock, Star } from 'lucide-react';
 import { useState } from 'react';
-import { UserProfile } from '../../types';
+import {
+  formatPagesFr,
+  formatTempsCourt,
+  getPagesPerDayFromMinutes,
+  TEMPS_JOUR_STEPS,
+} from '../../lib/hifzPace';
+import { addDaysISO, getTodayStr } from '../../lib/hifzSchedule';
+import { MemorizationQuality, UserProfile } from '../../types';
 
 interface ProfilFormProps {
   onSubmit: (profile: UserProfile) => void;
 }
 
+const MEMO_OPTIONS: {
+  value: MemorizationQuality;
+  emoji: string;
+  title: string;
+  desc: string;
+}[] = [
+  {
+    value: 'good',
+    emoji: '🟢',
+    title: 'Je me souviens bien',
+    desc: 'Révision légère : viser environ 1 Juz tous les 3 jours dans votre planning.',
+  },
+  {
+    value: 'partial',
+    emoji: '🟡',
+    title: 'Je me souviens partiellement',
+    desc: 'Révision intensive : 1 Juz par jour en cible, la moitié du temps quotidien réservée à la révision des Juz appris.',
+  },
+  {
+    value: 'forgotten',
+    emoji: '🔴',
+    title: "J'ai beaucoup oublié",
+    desc: 'Phase de consolidation : 1 mois de révision uniquement, sans nouvelle mémorisation.',
+  },
+];
+
 export default function ProfilForm({ onSubmit }: ProfilFormProps) {
   const [prenom, setPrenom] = useState('');
   const [juzActuel, setJuzActuel] = useState(1);
   const [objectif, setObjectif] = useState('');
-  const [tempsParJour, setTempsParJour] = useState(30);
+  const [tempsParJour, setTempsParJour] = useState<number>(30);
+  const [memorizationQuality, setMemorizationQuality] = useState<MemorizationQuality>('good');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!prenom.trim() || !objectif) return;
+
+    const today = getTodayStr();
+    const revisionOnlyUntil =
+      memorizationQuality === 'forgotten' ? addDaysISO(today, 30) : undefined;
 
     const profile: UserProfile = {
       prenom: prenom.trim(),
@@ -22,20 +60,18 @@ export default function ProfilForm({ onSubmit }: ProfilFormProps) {
       objectif,
       tempsParJour,
       createdAt: new Date().toISOString(),
+      memorizationQuality,
+      revisionOnlyUntil,
+      urgentReviewPages: [],
     };
     onSubmit(profile);
-  };
-
-  const formatTime = (mins: number) => {
-    if (mins < 60) return `${mins} min`;
-    const h = Math.floor(mins / 60);
-    const m = mins % 60;
-    return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`;
   };
 
   const minDate = new Date();
   minDate.setMonth(minDate.getMonth() + 1);
   const minDateStr = minDate.toISOString().split('T')[0];
+
+  const pagesPreview = getPagesPerDayFromMinutes(tempsParJour);
 
   return (
     <div className="min-h-screen bg-beige-100 dark:bg-gray-950 flex items-center justify-center p-4">
@@ -47,9 +83,7 @@ export default function ProfilForm({ onSubmit }: ProfilFormProps) {
             </div>
             <h1 className="font-arabic text-3xl mb-2">بِرْنَامَجُ الْحِفْظ</h1>
             <p className="font-amiri text-xl text-gold-300 mb-1">Programme de Mémorisation</p>
-            <p className="text-primary-200 text-sm">
-              Créez votre programme personnalisé
-            </p>
+            <p className="text-primary-200 text-sm">Créez votre programme personnalisé</p>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -86,6 +120,39 @@ export default function ProfilForm({ onSubmit }: ProfilFormProps) {
             </div>
 
             <div>
+              <p className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Comment évaluez-vous votre mémorisation des Juz déjà acquis ?
+              </p>
+              <div className="space-y-2">
+                {MEMO_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setMemorizationQuality(opt.value)}
+                    className={`w-full text-left rounded-xl border-2 p-3 transition-all ${
+                      memorizationQuality === opt.value
+                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/25 ring-2 ring-primary-200 dark:ring-primary-800'
+                        : 'border-beige-200 dark:border-gray-700 bg-beige-50/80 dark:bg-gray-800/80 hover:border-beige-300 dark:hover:border-gray-600'
+                    }`}
+                  >
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                      {opt.emoji} {opt.title}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                      {opt.desc}
+                    </p>
+                  </button>
+                ))}
+              </div>
+              {memorizationQuality === 'forgotten' && (
+                <div className="mt-3 rounded-xl bg-gold-50 dark:bg-gold-900/20 border border-gold-200 dark:border-gold-700/50 p-3 text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
+                  L&apos;Ustadh conseille : consolide d&apos;abord ce que tu as, c&apos;est plus précieux
+                  que d&apos;avancer sur du fragile 🤍
+                </div>
+              )}
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Calendar className="w-4 h-4 inline mr-1 text-primary-500" />
                 Objectif — Date de fin souhaitée
@@ -103,38 +170,48 @@ export default function ProfilForm({ onSubmit }: ProfilFormProps) {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 <Clock className="w-4 h-4 inline mr-1 text-primary-500" />
-                Temps disponible par jour:{' '}
+                Temps disponible par jour :{' '}
                 <span className="text-primary-600 dark:text-primary-400 font-semibold">
-                  {formatTime(tempsParJour)}
+                  {formatTempsCourt(tempsParJour)}
                 </span>
               </label>
               <input
                 type="range"
-                min={15}
-                max={120}
+                min={TEMPS_JOUR_STEPS[0]}
+                max={TEMPS_JOUR_STEPS[TEMPS_JOUR_STEPS.length - 1]}
                 step={15}
                 value={tempsParJour}
                 onChange={(e) => setTempsParJour(Number(e.target.value))}
                 className="w-full accent-primary-500"
               />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
-                <span>15 min</span>
-                <span>30 min</span>
-                <span>45 min</span>
-                <span>1h</span>
-                <span>1h30</span>
-                <span>2h</span>
+                {TEMPS_JOUR_STEPS.map((m) => (
+                  <span key={m} className={m === tempsParJour ? 'text-primary-600 font-semibold' : ''}>
+                    {m < 60 ? `${m}m` : m === 60 ? '1h' : m === 90 ? '1h30' : '2h'}
+                  </span>
+                ))}
               </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-3 leading-relaxed bg-beige-50 dark:bg-gray-800/80 rounded-lg p-3 border border-beige-200 dark:border-gray-700">
+                Ce temps inclut <strong>mémorisation et révision</strong>. La révision est aussi
+                importante que la mémorisation — ne jamais l&apos;oublier.
+              </p>
             </div>
 
             <div className="bg-beige-50 dark:bg-gray-800 rounded-xl p-4 border border-beige-200 dark:border-gray-700">
-              <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                Avec <strong className="text-primary-600 dark:text-primary-400">{formatTime(tempsParJour)}</strong> par jour,
-                vous pouvez mémoriser environ{' '}
-                <strong className="text-primary-600 dark:text-primary-400">
-                  {Math.max(1, Math.floor(tempsParJour / 20))} page{tempsParJour >= 20 ? 's' : ''}
-                </strong>{' '}
-                du Coran par jour.
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center leading-relaxed">
+                Avec <strong className="text-primary-600 dark:text-primary-400">{formatTempsCourt(tempsParJour)}</strong> par jour, rythme indicatif : environ{' '}
+                <strong className="text-primary-600 dark:text-primary-400">{formatPagesFr(pagesPreview)}</strong> du Mushaf par jour
+                {memorizationQuality === 'partial' ? (
+                  <>
+                    {' '}
+                    pour la <strong>nouvelle</strong> mémorisation (la moitié du temps reste pour la
+                    révision des Juz appris).
+                  </>
+                ) : memorizationQuality === 'forgotten' ? (
+                  <> pendant la phase normale — les 30 premiers jours seront consacrés à la révision.</>
+                ) : (
+                  <> (mémorisation et révision comprises dans le même créneau).</>
+                )}
               </p>
             </div>
 

@@ -17,19 +17,35 @@ export interface Verse {
   audio?: string;
 }
 
+export type MemorizationQuality = 'good' | 'partial' | 'forgotten';
+
 export interface UserProfile {
   prenom: string;
   juzActuel: number;
   objectif: string;
   tempsParJour: number;
   createdAt: string;
+  /** État des Juz déjà acquis (pédagogie) — absent sur anciens profils = bon */
+  memorizationQuality?: MemorizationQuality;
+  /** Fin (inclusive, format YYYY-MM-DD) : pas de nouvelle mémorisation, révision seule */
+  revisionOnlyUntil?: string;
+  /** Pages à revoir très vite (ex. après évaluation « hésitations ») */
+  urgentReviewPages?: number[];
+  /** L'utilisateur a masqué la carte « 10 Juz » sans activer le mode */
+  tenJuzDismissed?: boolean;
 }
+
+export type PageQuality = 'fluent' | 'hesitant' | 'hard';
 
 export interface DailyProgress {
   date: string;
   pagesDone: number;
   completed: boolean;
   lastReviewedAt?: string;
+  /** Ressenti après la page mémorisée ce jour-là */
+  pageQuality?: PageQuality;
+  /** Temps de session (chrono) ce jour, en secondes */
+  sessionSeconds?: number;
   surahNumber?: number;
   verseFrom?: number;
   verseTo?: number;

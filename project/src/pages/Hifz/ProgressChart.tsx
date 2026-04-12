@@ -25,7 +25,7 @@ function getLast6MonthsData(progress: DailyProgress[]) {
         const pd = new Date(p.date);
         return pd.getFullYear() === year && pd.getMonth() === month && p.completed;
       })
-      .reduce((sum) => sum + 1, 0);
+      .reduce((sum, p) => sum + (p.pagesDone > 0 ? p.pagesDone : 1), 0);
 
     result.push({ label, pages: monthPages, month, year });
   }

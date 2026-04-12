@@ -75,8 +75,8 @@ export default function Signets({ onNavigate }: SignetsProps) {
                     <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-semibold px-2.5 py-1 rounded-full">
                       {bookmark.surahNameArabic}
                     </span>
-                    <span className="text-gray-400 dark:text-gray-500 text-xs">
-                      {bookmark.surahName} — Verset {bookmark.verseNumber}
+                    <span className="text-gray-400 dark:text-gray-500 text-xs font-mono tabular-nums">
+                      {bookmark.surahNumber}:{bookmark.verseNumber} · {bookmark.surahName}
                     </span>
                   </div>
 

@@ -5,6 +5,8 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { fetchSurahWithTranslation } from '../../lib/quranApi';
 import { Bookmark } from '../../types';
 import AudioPlayer from './AudioPlayer';
+import AyahByAyahView from './AyahByAyahView';
+import ReadModeToggle, { ReadMode } from './ReadModeToggle';
 import SurahSidebar from './SurahSidebar';
 import VerseDisplay from './VerseDisplay';
 
@@ -22,6 +24,7 @@ export default function LirePage() {
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [reciterId, setReciterId] = useState('ar.alafasy');
+  const [readMode, setReadMode] = useState<ReadMode>('lecture');
   const [bookmarks, setBookmarks] = useLocalStorage<Bookmark[]>('hifz-bookmarks', []);
 
   const loadSurah = useCallback(async (num: number) => {
@@ -50,9 +53,11 @@ export default function LirePage() {
     );
 
     if (exists) {
-      setBookmarks(bookmarks.filter(
-        (b) => !(b.surahNumber === selectedSurah && b.verseNumber === verse.numberInSurah)
-      ));
+      setBookmarks(
+        bookmarks.filter(
+          (b) => !(b.surahNumber === selectedSurah && b.verseNumber === verse.numberInSurah)
+        )
+      );
     } else {
       const newBookmark: Bookmark = {
         surahNumber: selectedSurah,
@@ -68,6 +73,8 @@ export default function LirePage() {
 
   const currentSurah = SURAHS.find((s) => s.number === selectedSurah);
 
+  const showContent = !loading && !error;
+
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-beige-100 dark:bg-gray-950">
       <SurahSidebar
@@ -78,8 +85,9 @@ export default function LirePage() {
       />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-beige-200 dark:border-gray-800">
+        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-beige-200 dark:border-gray-800 shrink-0">
           <button
+            type="button"
             onClick={() => setSidebarOpen(true)}
             className="md:hidden p-2 rounded-lg hover:bg-beige-100 dark:hover:bg-gray-800 text-gray-500"
           >
@@ -90,26 +98,55 @@ export default function LirePage() {
               <h1 className="font-semibold text-gray-800 dark:text-gray-100">
                 {currentSurah.nameTranslit}
               </h1>
-              <p className="text-xs text-gray-400">{currentSurah.nameFrench} · {currentSurah.verses} versets</p>
+              <p className="text-xs text-gray-400">
+                {currentSurah.nameFrench} · {currentSurah.verses} versets
+              </p>
             </div>
           )}
         </div>
 
-        <VerseDisplay
-          surahNumber={selectedSurah}
-          verses={verses}
-          loading={loading}
-          error={error}
-          bookmarks={bookmarks}
-          onToggleBookmark={handleToggleBookmark}
-        />
+        <ReadModeToggle mode={readMode} onModeChange={setReadMode} />
 
-        <AudioPlayer
-          surahNumber={selectedSurah}
-          verseCount={currentSurah?.verses ?? 0}
-          reciterId={reciterId}
-          onReciterChange={setReciterId}
-        />
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {loading || error ? (
+            <VerseDisplay
+              surahNumber={selectedSurah}
+              verses={[]}
+              loading={loading}
+              error={error}
+              bookmarks={bookmarks}
+              onToggleBookmark={handleToggleBookmark}
+            />
+          ) : readMode === 'lecture' ? (
+            <VerseDisplay
+              surahNumber={selectedSurah}
+              verses={verses}
+              loading={false}
+              error={null}
+              bookmarks={bookmarks}
+              onToggleBookmark={handleToggleBookmark}
+            />
+          ) : (
+            <AyahByAyahView
+              surahNumber={selectedSurah}
+              verses={verses}
+              bookmarks={bookmarks}
+              reciterId={reciterId}
+              onReciterChange={setReciterId}
+              onToggleBookmark={handleToggleBookmark}
+            />
+          )}
+        </div>
+
+        {readMode === 'lecture' && showContent && (
+          <AudioPlayer
+            surahNumber={selectedSurah}
+            verseCount={currentSurah?.verses ?? 0}
+            verses={verses}
+            reciterId={reciterId}
+            onReciterChange={setReciterId}
+          />
+        )}
       </div>
     </div>
   );

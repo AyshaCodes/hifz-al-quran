@@ -43,17 +43,18 @@ export async function fetchSurahWithTranslation(surahNumber: number, reciterId =
   }));
 }
 
-export function buildAudioUrl(surahNumber: number, verseNumber: number, reciterId = 'ar.alafasy') {
-  const paddedSurah = String(surahNumber).padStart(3, '0');
-  const paddedVerse = String(verseNumber).padStart(3, '0');
-  const reciterMap: Record<string, string> = {
-    'ar.alafasy': 'https://cdn.islamic.network/quran/audio/128/ar.alafasy',
-    'ar.abdullahbasfar': 'https://cdn.islamic.network/quran/audio/128/ar.abdullahbasfar',
-    'ar.abdurrahmaansudais': 'https://cdn.islamic.network/quran/audio/128/ar.abdurrahmaansudais',
-    'ar.minshawi': 'https://cdn.islamic.network/quran/audio/128/ar.minshawi',
-    'ar.husary': 'https://cdn.islamic.network/quran/audio/128/ar.husary',
-  };
-  const base = reciterMap[reciterId] ?? reciterMap['ar.alafasy'];
-  const verseKey = parseInt(paddedSurah) * 1000 + parseInt(paddedVerse);
-  return `${base}/${verseKey}.mp3`;
+/**
+ * URL audio par verset : le CDN islamic.network utilise le numéro global d’ayah (alquran.cloud),
+ * pas surah×1000 + verset dans la sourate.
+ */
+export function buildVerseAudioUrl(globalAyahNumber: number, reciterId: string): string {
+  const path = VERSE_AUDIO_PATH[reciterId] ?? VERSE_AUDIO_PATH['ar.alafasy'];
+  return `${path}${globalAyahNumber}.mp3`;
 }
+
+const VERSE_AUDIO_PATH: Record<string, string> = {
+  'ar.alafasy': 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/',
+  'ar.husary': 'https://cdn.islamic.network/quran/audio/128/ar.husary/',
+  'ar.saadghamdi': 'https://cdn.islamic.network/quran/audio/128/ar.saadghamdi/',
+  'ar.abdulsamad': 'https://cdn.islamic.network/quran/audio/64/ar.abdulsamad/',
+};

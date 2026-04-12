@@ -1,10 +1,18 @@
-import { BookOpen, Flame, Star, TrendingUp } from 'lucide-react';
+import { BookOpen, Clock, Flame, Star, TrendingUp } from 'lucide-react';
 
 interface Stats {
   pagesThisMonth: number;
   juzCompleted: number;
   streakDays: number;
   pagesPerDay: number;
+  sessionTodaySeconds: number;
+}
+
+function formatSessionShort(sec: number) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m === 0) return `${s}s`;
+  return `${m}m${s.toString().padStart(2, '0')}`;
 }
 
 interface StatCardsProps {
@@ -45,10 +53,18 @@ export default function StatCards({ stats }: StatCardsProps) {
       color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
       border: 'border-t-blue-400',
     },
+    {
+      icon: Clock,
+      label: "Session aujourd'hui",
+      value: formatSessionShort(stats.sessionTodaySeconds),
+      unit: '',
+      color: 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400',
+      border: 'border-t-teal-400',
+    },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
       {cards.map((card) => {
         const Icon = card.icon;
         return (
@@ -59,7 +75,9 @@ export default function StatCards({ stats }: StatCardsProps) {
             <div className="mt-2">
               <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                 {card.value}
-                <span className="text-sm font-normal text-gray-400 ml-1">{card.unit}</span>
+                {card.unit ? (
+                  <span className="text-sm font-normal text-gray-400 ml-1">{card.unit}</span>
+                ) : null}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{card.label}</p>
             </div>

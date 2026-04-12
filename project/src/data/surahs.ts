@@ -117,10 +117,5 @@ export const SURAHS: Surah[] = [
   { number: 114, nameArabic: 'النَّاس', nameFrench: 'Les Hommes', nameTranslit: 'An-Nas', verses: 6, revelationType: 'mecquoise', pages: 1, juz: 30 },
 ];
 
-export const RECITERS = [
-  { id: 'ar.alafasy', name: 'Mishary Al-Afasy', nameArabic: 'مشاري العفاسي' },
-  { id: 'ar.abdullahbasfar', name: 'Abdullah Basfar', nameArabic: 'عبدالله بصفر' },
-  { id: 'ar.abdurrahmaansudais', name: 'Abdurrahman As-Sudais', nameArabic: 'عبدالرحمن السديس' },
-  { id: 'ar.minshawi', name: 'Mohamed Siddiq Al-Minshawi', nameArabic: 'محمد صديق المنشاوي' },
-  { id: 'ar.husary', name: 'Mahmoud Khalil Al-Husary', nameArabic: 'محمود خليل الحصري' },
-];
+/** @deprecated Utiliser READ_RECITERS depuis ./reciters */
+export { READ_RECITERS as RECITERS } from './reciters';
