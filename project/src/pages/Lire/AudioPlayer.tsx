@@ -27,33 +27,33 @@ export default function AudioPlayer({
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentVerseInSurah, setCurrentVerseInSurah] = useState(1);
+  const [currentVerseNumber, setCurrentVerseNumber] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
 
-  const globalAyah = useMemo(() => {
-    const v = verses.find((x) => x.numberInSurah === currentVerseInSurah);
-    return v?.number;
-  }, [verses, currentVerseInSurah]);
+  const currentVerse = useMemo(
+    () => verses.find((x) => x.number === currentVerseNumber) ?? verses[0],
+    [verses, currentVerseNumber]
+  );
 
-  const getAudioUrl = (verseInSurah: number) => {
-    const v = verses.find((x) => x.numberInSurah === verseInSurah);
+  const getAudioUrl = (verseNumber: number) => {
+    const v = verses.find((x) => x.number === verseNumber);
     if (!v) return '';
     return buildVerseAudioUrl(v.number, reciterId);
   };
 
   useEffect(() => {
     setIsPlaying(false);
-    setCurrentVerseInSurah(1);
+    setCurrentVerseNumber(verses[0]?.number ?? null);
     setProgress(0);
-  }, [surahNumber]);
+  }, [surahNumber, verses]);
 
   useEffect(() => {
-    if (verses.length && !verses.some((v) => v.numberInSurah === currentVerseInSurah)) {
-      setCurrentVerseInSurah(verses[0].numberInSurah);
+    if (verses.length && !verses.some((v) => v.number === currentVerseNumber)) {
+      setCurrentVerseNumber(verses[0].number);
     }
-  }, [verses, currentVerseInSurah]);
+  }, [verses, currentVerseNumber]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -63,11 +63,11 @@ export default function AudioPlayer({
 
   const handlePlayPause = () => {
     const audio = audioRef.current;
-    if (!audio || !globalAyah) return;
+    if (!audio || !currentVerse) return;
     if (isPlaying) {
       audio.pause();
     } else {
-      const url = getAudioUrl(currentVerseInSurah);
+      const url = getAudioUrl(currentVerse.number);
       if (!url) return;
       audio.src = url;
       audio.play().catch(() => setIsPlaying(false));
@@ -76,10 +76,11 @@ export default function AudioPlayer({
   };
 
   const handlePrev = () => {
-    const idx = verses.findIndex((v) => v.numberInSurah === currentVerseInSurah);
+    if (!currentVerse) return;
+    const idx = verses.findIndex((v) => v.number === currentVerse.number);
     if (idx > 0) {
-      const prev = verses[idx - 1].numberInSurah;
-      setCurrentVerseInSurah(prev);
+      const prev = verses[idx - 1].number;
+      setCurrentVerseNumber(prev);
       if (isPlaying && audioRef.current) {
         const url = getAudioUrl(prev);
         if (url) {
@@ -91,10 +92,11 @@ export default function AudioPlayer({
   };
 
   const handleNext = () => {
-    const idx = verses.findIndex((v) => v.numberInSurah === currentVerseInSurah);
+    if (!currentVerse) return;
+    const idx = verses.findIndex((v) => v.number === currentVerse.number);
     if (idx >= 0 && idx < verses.length - 1) {
-      const next = verses[idx + 1].numberInSurah;
-      setCurrentVerseInSurah(next);
+      const next = verses[idx + 1].number;
+      setCurrentVerseNumber(next);
       if (isPlaying && audioRef.current) {
         const url = getAudioUrl(next);
         if (url) {
@@ -106,10 +108,11 @@ export default function AudioPlayer({
   };
 
   const handleEnded = () => {
-    const idx = verses.findIndex((v) => v.numberInSurah === currentVerseInSurah);
+    if (!currentVerse) return;
+    const idx = verses.findIndex((v) => v.number === currentVerse.number);
     if (idx >= 0 && idx < verses.length - 1) {
-      const next = verses[idx + 1].numberInSurah;
-      setCurrentVerseInSurah(next);
+      const next = verses[idx + 1].number;
+      setCurrentVerseNumber(next);
       if (audioRef.current) {
         const url = getAudioUrl(next);
         if (url) {
@@ -148,9 +151,9 @@ export default function AudioPlayer({
     }
   };
 
-  const atStart = verses[0]?.numberInSurah === currentVerseInSurah;
-  const atEnd = verses[verses.length - 1]?.numberInSurah === currentVerseInSurah;
-  const disabled = verses.length === 0 || !globalAyah;
+  const atStart = verses[0]?.number === currentVerse?.number;
+  const atEnd = verses[verses.length - 1]?.number === currentVerse?.number;
+  const disabled = verses.length === 0 || !currentVerse;
 
   return (
     <div className="shrink-0 z-10 border-t-2 border-t-gold-400 bg-white dark:bg-gray-900 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
@@ -209,7 +212,8 @@ export default function AudioPlayer({
               </button>
 
               <span className="text-xs text-gray-500 dark:text-gray-400 min-w-[100px] text-center font-mono tabular-nums">
-                {surahNumber}:{currentVerseInSurah} · {currentVerseInSurah}/{verseCount}
+                {currentVerse?.numberInSurah ? `${surahNumber}:${currentVerse.numberInSurah}` : `${surahNumber}:—`} ·{' '}
+                {currentVerse ? verses.findIndex((v) => v.number === currentVerse.number) + 1 : 0}/{verseCount}
               </span>
             </div>
 

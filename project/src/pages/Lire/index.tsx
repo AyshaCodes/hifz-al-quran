@@ -3,7 +3,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SURAHS } from '../../data/surahs';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { fetchSurahForMushafPage, fetchSurahWithTranslation } from '../../lib/quranApi';
+import {
+  ApiPageVerse,
+  fetchFirstPageForSurah,
+  fetchPageWithTranslation,
+  fetchSurahForMushafPage,
+  fetchSurahWithTranslation,
+} from '../../lib/quranApi';
 import { Bookmark, UserProfile } from '../../types';
 import AudioPlayer from './AudioPlayer';
 import AyahByAyahView from './AyahByAyahView';
@@ -18,6 +24,13 @@ interface Verse {
   translation: string;
 }
 
+interface MushafPageData {
+  pageNumber: number;
+  verses: ApiPageVerse[];
+  juz: number;
+  hizbQuarter: number;
+}
+
 export default function LirePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -25,6 +38,11 @@ export default function LirePage() {
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lecturePages, setLecturePages] = useState<MushafPageData[]>([]);
+  const [mushafPage, setMushafPage] = useState(1);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [loadingMorePages, setLoadingMorePages] = useState(false);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [desktopSidebarVisible, setDesktopSidebarVisible] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -61,6 +79,7 @@ export default function LirePage() {
 
   useEffect(() => {
     if (!targetPage) return;
+    setMushafPage(Math.min(604, Math.max(1, targetPage)));
     let cancelled = false;
     fetchSurahForMushafPage(targetPage)
       .then((surahNum) => {
@@ -76,6 +95,69 @@ export default function LirePage() {
       cancelled = true;
     };
   }, [targetPage]);
+
+  useEffect(() => {
+    if (readMode !== 'lecture') return;
+    let cancelled = false;
+    const loadPage = async () => {
+      setPageLoading(true);
+      setPageError(null);
+      try {
+        const pageData = await fetchPageWithTranslation(mushafPage);
+        if (cancelled) return;
+        setLecturePages([
+          {
+            pageNumber: mushafPage,
+            verses: pageData.ayahs,
+            juz: pageData.juz,
+            hizbQuarter: pageData.hizbQuarter,
+          },
+        ]);
+        if (pageData.ayahs[0]?.surahNumber) {
+          setSelectedSurah(pageData.ayahs[0].surahNumber);
+        }
+      } catch {
+        if (!cancelled) {
+          setPageError('Impossible de charger la page du Mushaf.');
+        }
+      } finally {
+        if (!cancelled) {
+          setPageLoading(false);
+        }
+      }
+    };
+    loadPage();
+    return () => {
+      cancelled = true;
+    };
+  }, [mushafPage, readMode]);
+
+  const loadNextLecturePage = async () => {
+    if (readMode !== 'lecture' || loadingMorePages || pageLoading) return;
+    const lastPage = lecturePages[lecturePages.length - 1]?.pageNumber ?? mushafPage;
+    if (lastPage >= 604) return;
+    setLoadingMorePages(true);
+    try {
+      const nextPageNumber = lastPage + 1;
+      const pageData = await fetchPageWithTranslation(nextPageNumber);
+      setLecturePages((prev) => {
+        if (prev.some((p) => p.pageNumber === nextPageNumber)) return prev;
+        return [
+          ...prev,
+          {
+            pageNumber: nextPageNumber,
+            verses: pageData.ayahs,
+            juz: pageData.juz,
+            hizbQuarter: pageData.hizbQuarter,
+          },
+        ];
+      });
+    } catch {
+      // Ignore load-more failure to preserve current reading.
+    } finally {
+      setLoadingMorePages(false);
+    }
+  };
 
   useEffect(() => {
     const rawProfile = localStorage.getItem('hifz-profile');
@@ -136,7 +218,10 @@ export default function LirePage() {
 
   const currentSurah = SURAHS.find((s) => s.number === selectedSurah);
 
-  const showContent = !loading && !error && verses.length > 0;
+  const showContent =
+    readMode === 'lecture'
+      ? !pageLoading && !pageError && lecturePages.length > 0
+      : !loading && !error && verses.length > 0;
   const sidebarOpen = isMobile ? mobileSidebarOpen : desktopSidebarVisible;
   const toggleSidebar = () => {
     if (isMobile) {
@@ -146,22 +231,42 @@ export default function LirePage() {
     }
   };
 
+  const handleSelectSurah = async (surahNumber: number) => {
+    setSelectedSurah(surahNumber);
+    if (readMode === 'lecture') {
+      try {
+        const firstPage = await fetchFirstPageForSurah(surahNumber);
+        setMushafPage(Math.min(604, Math.max(1, firstPage)));
+      } catch {
+        // Keep current page if mapping fails.
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedSurah || readMode !== 'lecture') return;
+    const params = new URLSearchParams(searchParams);
+    params.set('page', String(mushafPage));
+    if (!params.get('from')) params.set('from', 'reader');
+    navigate(`/lire?${params.toString()}`, { replace: true });
+  }, [mushafPage, readMode]);
+
   useEffect(() => {
     if (!selectedSurah) return;
     const payload = {
       surahNumber: selectedSurah,
-      page: targetPage ?? null,
+      page: mushafPage,
       readMode,
       savedAt: new Date().toISOString(),
     };
     localStorage.setItem('lire-last-position', JSON.stringify(payload));
-  }, [selectedSurah, targetPage, readMode]);
+  }, [selectedSurah, mushafPage, readMode]);
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-beige-100 dark:bg-gray-950">
       <SurahSidebar
         selectedSurah={selectedSurah}
-        onSelectSurah={setSelectedSurah}
+        onSelectSurah={handleSelectSurah}
         isOpen={sidebarOpen}
         onClose={() => (isMobile ? setMobileSidebarOpen(false) : setDesktopSidebarVisible(false))}
         closeOnSelect={isMobile}
@@ -176,7 +281,7 @@ export default function LirePage() {
               onClick={() => navigate('/hifz')}
               className="font-medium hover:underline"
             >
-              ← Retour à Mon Hifz — Page {targetPage ?? 'en cours'} en cours
+              ← Retour à Mon Hifz — Page {mushafPage} en cours
             </button>
             {quickPages.length > 1 && (
               <div className="hidden sm:flex items-center gap-1 text-xs">
@@ -184,9 +289,9 @@ export default function LirePage() {
                   <button
                     key={p}
                     type="button"
-                    onClick={() => navigate(`/lire?page=${p}&from=hifz`)}
+                    onClick={() => setMushafPage(p)}
                     className={`px-2 py-0.5 rounded-full ${
-                      p === targetPage ? 'bg-white text-primary-600' : 'bg-white/20 text-white'
+                      p === mushafPage ? 'bg-white text-primary-600' : 'bg-white/20 text-white'
                     }`}
                   >
                     Page {p}
@@ -239,22 +344,21 @@ export default function LirePage() {
         )}
 
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          {loading || error ? (
+          {readMode === 'lecture' ? (
             <VerseDisplay
               surahNumber={selectedSurah}
-              verses={[]}
-              loading={loading}
-              error={error}
+              pages={lecturePages}
+              loading={pageLoading}
+              error={pageError}
               showTranslation={lectureTextMode === 'both'}
+              onLoadNextPage={loadNextLecturePage}
+              canLoadMore={(lecturePages[lecturePages.length - 1]?.pageNumber ?? mushafPage) < 604}
+              loadingMore={loadingMorePages}
             />
-          ) : readMode === 'lecture' ? (
-            <VerseDisplay
-              surahNumber={selectedSurah}
-              verses={verses}
-              loading={false}
-              error={null}
-              showTranslation={lectureTextMode === 'both'}
-            />
+          ) : loading || error ? (
+            <div className="flex-1 flex items-center justify-center text-gray-500 text-sm">
+              {loading ? 'Chargement de la sourate...' : error}
+            </div>
           ) : (
             <AyahByAyahView
               surahNumber={selectedSurah}
@@ -270,8 +374,8 @@ export default function LirePage() {
         {showContent && (
           <AudioPlayer
             surahNumber={selectedSurah}
-            verseCount={currentSurah?.verses ?? 0}
-            verses={verses}
+            verseCount={readMode === 'lecture' ? lecturePages.reduce((acc, p) => acc + p.verses.length, 0) : currentSurah?.verses ?? 0}
+            verses={readMode === 'lecture' ? lecturePages.flatMap((p) => p.verses) : verses}
             reciterId={reciterId}
             onReciterChange={setReciterId}
           />
