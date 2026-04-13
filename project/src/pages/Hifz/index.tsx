@@ -1,4 +1,5 @@
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useNavigate } from 'react-router-dom';
 import {
   addDaysISO,
   getCurrentTargetPage,
@@ -10,7 +11,33 @@ import Dashboard from './Dashboard';
 import ProfilForm from './ProfilForm';
 
 export default function HifzPage() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useLocalStorage<UserProfile | null>('hifz-profile', null);
+  const openReaderFromHifz = (page: number, pages?: number[]) => {
+    const params = new URLSearchParams();
+    params.set('from', 'hifz');
+    params.set('page', String(page));
+    if (pages && pages.length > 0) {
+      params.set('pages', pages.join(','));
+    }
+    navigate(`/lire?${params.toString()}`);
+  };
+
+  const handleResumeReader = () => {
+    const saved = localStorage.getItem('lire-last-position');
+    if (!saved) {
+      const fallbackPage = profile ? getCurrentTargetPage(profile, progress) : 1;
+      openReaderFromHifz(fallbackPage);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(saved) as { page?: number };
+      openReaderFromHifz(parsed.page ?? 1);
+    } catch {
+      openReaderFromHifz(1);
+    }
+  };
+
   const [progress, setProgress] = useLocalStorage<DailyProgress[]>('hifz-progress', []);
   const [kahfReadDates, setKahfReadDates] = useLocalStorage<string[]>('hifz-kahf-read-dates', []);
 
@@ -202,6 +229,9 @@ export default function HifzPage() {
       kahfReadToday={kahfReadDates.includes(getTodayStr())}
       onMarkKahfRead={handleMarkKahfRead}
       onReset={handleReset}
+      onOpenReaderPage={(page) => openReaderFromHifz(page)}
+      onOpenReaderPages={(pages) => openReaderFromHifz(pages[0] ?? 1, pages)}
+      onResumeReader={handleResumeReader}
     />
   );
 }

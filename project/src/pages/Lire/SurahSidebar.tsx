@@ -8,6 +8,7 @@ interface SurahSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   closeOnSelect?: boolean;
+  memorizingSurahNumber?: number | null;
 }
 
 export default function SurahSidebar({
@@ -16,6 +17,7 @@ export default function SurahSidebar({
   isOpen,
   onClose,
   closeOnSelect = true,
+  memorizingSurahNumber = null,
 }: SurahSidebarProps) {
   const [search, setSearch] = useState('');
 
@@ -103,6 +105,11 @@ export default function SurahSidebar({
                     {s.nameArabic}
                   </p>
                 </div>
+              {memorizingSurahNumber === s.number && (
+                <span className="inline-flex mt-1 text-[10px] px-2 py-0.5 rounded-full bg-primary-500 text-white font-medium">
+                  En cours
+                </span>
+              )}
                 <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
                   {s.nameFrench} · {s.verses}v
                 </p>

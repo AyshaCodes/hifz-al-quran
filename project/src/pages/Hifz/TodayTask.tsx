@@ -16,6 +16,7 @@ interface TodayTaskProps {
   onMarkDoneWithQuality: (quality: PageQuality) => void;
   onSessionSeconds: (seconds: number) => void;
   onMarkReviewed: () => void;
+  onOpenInReader: (page: number) => void;
 }
 
 function formatMmSs(totalSec: number) {
@@ -36,6 +37,7 @@ export default function TodayTask({
   onMarkDoneWithQuality,
   onSessionSeconds,
   onMarkReviewed,
+  onOpenInReader,
 }: TodayTaskProps) {
   const [evalOpen, setEvalOpen] = useState(false);
   const [chronoRunning, setChronoRunning] = useState(false);
@@ -172,6 +174,16 @@ export default function TodayTask({
                   : `Objectif du jour : ${formatPagesFr(dailyMemoGoal)} à mémoriser (et réviser le reste du temps).`}
               </p>
             </>
+          )}
+
+          {!revisionOnly && (
+            <button
+              type="button"
+              onClick={() => onOpenInReader(targetPage)}
+              className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors"
+            >
+              📖 Ouvrir la page {targetPage} dans le lecteur
+            </button>
           )}
 
           {pagesGoal > 0 && (

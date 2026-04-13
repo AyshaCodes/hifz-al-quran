@@ -1,26 +1,26 @@
 import { Moon, Sun, Menu, X, BookOpen } from 'lucide-react';
 import { useState } from 'react';
-import { Page } from '../types';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
-  currentPage: Page;
-  onNavigate: (page: Page) => void;
   isDark: boolean;
   onToggleDark: () => void;
 }
 
-const navItems: { label: string; page: Page }[] = [
-  { label: 'Accueil', page: 'home' },
-  { label: 'Lire', page: 'lire' },
-  { label: 'Mon Hifz', page: 'hifz' },
-  { label: 'Signets', page: 'signets' },
+const navItems = [
+  { label: 'Accueil', path: '/' },
+  { label: 'Lire', path: '/lire' },
+  { label: 'Mon Hifz', path: '/hifz' },
+  { label: 'Signets', path: '/signets' },
 ];
 
-export default function Header({ currentPage, onNavigate, isDark, onToggleDark }: HeaderProps) {
+export default function Header({ isDark, onToggleDark }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleNav = (page: Page) => {
-    onNavigate(page);
+  const handleNav = (path: string) => {
+    navigate(path);
     setMobileOpen(false);
   };
 
@@ -29,7 +29,7 @@ export default function Header({ currentPage, onNavigate, isDark, onToggleDark }
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <button
-            onClick={() => handleNav('home')}
+            onClick={() => handleNav('/')}
             className="flex items-center gap-2.5 group"
           >
             <div className="w-9 h-9 rounded-full green-gradient flex items-center justify-center shadow-sm">
@@ -46,12 +46,12 @@ export default function Header({ currentPage, onNavigate, isDark, onToggleDark }
           </button>
 
           <nav className="hidden md:flex items-center gap-1">
-            {navItems.map(({ label, page }) => (
+            {navItems.map(({ label, path }) => (
               <button
-                key={page}
-                onClick={() => handleNav(page)}
+                key={path}
+                onClick={() => handleNav(path)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  currentPage === page
+                  location.pathname === path
                     ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-beige-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
                 }`}
@@ -83,12 +83,12 @@ export default function Header({ currentPage, onNavigate, isDark, onToggleDark }
       {mobileOpen && (
         <div className="md:hidden border-t border-beige-200 dark:border-gray-800 bg-white dark:bg-gray-950 animate-fade-in">
           <div className="px-4 py-3 space-y-1">
-            {navItems.map(({ label, page }) => (
+            {navItems.map(({ label, path }) => (
               <button
-                key={page}
-                onClick={() => handleNav(page)}
+                key={path}
+                onClick={() => handleNav(path)}
                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  currentPage === page
+                  location.pathname === path
                     ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-beige-100 dark:hover:bg-gray-800'
                 }`}

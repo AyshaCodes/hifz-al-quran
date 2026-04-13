@@ -1,9 +1,10 @@
 import { Menu } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SURAHS } from '../../data/surahs';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { fetchSurahWithTranslation } from '../../lib/quranApi';
-import { Bookmark } from '../../types';
+import { fetchSurahForMushafPage, fetchSurahWithTranslation } from '../../lib/quranApi';
+import { Bookmark, UserProfile } from '../../types';
 import AudioPlayer from './AudioPlayer';
 import AyahByAyahView from './AyahByAyahView';
 import ReadModeToggle, { ReadMode } from './ReadModeToggle';
@@ -18,6 +19,8 @@ interface Verse {
 }
 
 export default function LirePage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedSurah, setSelectedSurah] = useState(1);
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +32,15 @@ export default function LirePage() {
   const [reciterId, setReciterId] = useState('ar.alafasy');
   const [readMode, setReadMode] = useState<ReadMode>('lecture');
   const [bookmarks, setBookmarks] = useLocalStorage<Bookmark[]>('hifz-bookmarks', []);
+  const [memorizingSurahNumber, setMemorizingSurahNumber] = useState<number | null>(null);
+
+  const fromHifz = searchParams.get('from') === 'hifz';
+  const targetPageParam = Number(searchParams.get('page') ?? '0');
+  const targetPage = Number.isFinite(targetPageParam) && targetPageParam > 0 ? targetPageParam : null;
+  const quickPages = (searchParams.get('pages') ?? '')
+    .split(',')
+    .map((p) => Number(p))
+    .filter((p) => Number.isFinite(p) && p > 0);
 
   const loadSurah = useCallback(async (num: number) => {
     setLoading(true);
@@ -46,6 +58,41 @@ export default function LirePage() {
   useEffect(() => {
     loadSurah(selectedSurah);
   }, [selectedSurah, loadSurah]);
+
+  useEffect(() => {
+    if (!targetPage) return;
+    let cancelled = false;
+    fetchSurahForMushafPage(targetPage)
+      .then((surahNum) => {
+        if (!cancelled) {
+          setSelectedSurah(surahNum);
+          setReadMode('lecture');
+        }
+      })
+      .catch(() => {
+        // Keep current surah if page mapping fails.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [targetPage]);
+
+  useEffect(() => {
+    const rawProfile = localStorage.getItem('hifz-profile');
+    if (!rawProfile) {
+      setMemorizingSurahNumber(null);
+      return;
+    }
+    try {
+      const profile = JSON.parse(rawProfile) as UserProfile;
+      const page = (profile.juzActuel - 1) * 20 + 1;
+      fetchSurahForMushafPage(page)
+        .then((surahNum) => setMemorizingSurahNumber(surahNum))
+        .catch(() => setMemorizingSurahNumber(null));
+    } catch {
+      setMemorizingSurahNumber(null);
+    }
+  }, []);
 
   useEffect(() => {
     const syncViewport = () => {
@@ -99,6 +146,17 @@ export default function LirePage() {
     }
   };
 
+  useEffect(() => {
+    if (!selectedSurah) return;
+    const payload = {
+      surahNumber: selectedSurah,
+      page: targetPage ?? null,
+      readMode,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('lire-last-position', JSON.stringify(payload));
+  }, [selectedSurah, targetPage, readMode]);
+
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-beige-100 dark:bg-gray-950">
       <SurahSidebar
@@ -107,9 +165,38 @@ export default function LirePage() {
         isOpen={sidebarOpen}
         onClose={() => (isMobile ? setMobileSidebarOpen(false) : setDesktopSidebarVisible(false))}
         closeOnSelect={isMobile}
+        memorizingSurahNumber={memorizingSurahNumber}
       />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {fromHifz && (
+          <div className="shrink-0 px-4 py-2 bg-primary-500 text-white text-sm flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/hifz')}
+              className="font-medium hover:underline"
+            >
+              ← Retour à Mon Hifz — Page {targetPage ?? 'en cours'} en cours
+            </button>
+            {quickPages.length > 1 && (
+              <div className="hidden sm:flex items-center gap-1 text-xs">
+                {quickPages.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => navigate(`/lire?page=${p}&from=hifz`)}
+                    className={`px-2 py-0.5 rounded-full ${
+                      p === targetPage ? 'bg-white text-primary-600' : 'bg-white/20 text-white'
+                    }`}
+                  >
+                    Page {p}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-beige-200 dark:border-gray-800 shrink-0">
           <button
             type="button"

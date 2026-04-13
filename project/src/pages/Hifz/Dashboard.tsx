@@ -33,6 +33,9 @@ interface DashboardProps {
   kahfReadToday: boolean;
   onMarkKahfRead: () => void;
   onReset: () => void;
+  onOpenReaderPage: (page: number) => void;
+  onOpenReaderPages: (pages: number[]) => void;
+  onResumeReader: () => void;
 }
 
 function isFridayToday() {
@@ -119,6 +122,9 @@ export default function Dashboard({
   kahfReadToday,
   onMarkKahfRead,
   onReset,
+  onOpenReaderPage,
+  onOpenReaderPages,
+  onResumeReader,
 }: DashboardProps) {
   const today = getTodayStr();
   const todayProgress = progress.find((p) => p.date === today) ?? null;
@@ -156,6 +162,17 @@ export default function Dashboard({
 
   const targetPage = getCurrentTargetPage(profile, progress);
   const targetSurah = getSurahNameForPage(targetPage);
+  const completedPages = useMemo(() => {
+    const startPage = (profile.juzActuel - 1) * 20 + 1;
+    return progress
+      .filter((p) => p.completed)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map((entry, index) => ({
+        page: startPage + index,
+        date: entry.date,
+      }));
+  }, [profile.juzActuel, progress]);
+  const lastThreePages = completedPages.slice(-3).map((p) => p.page).reverse();
   const unrevisedPages = getUnrevisedPages(progress, profile.juzActuel, profile);
   const reviewedToday = todayProgress?.lastReviewedAt === today;
 
@@ -299,7 +316,36 @@ export default function Dashboard({
         onMarkDoneWithQuality={onMarkDoneWithQuality}
         onSessionSeconds={onSessionSeconds}
         onMarkReviewed={onMarkTodayReviewed}
+        onOpenInReader={onOpenReaderPage}
       />
+
+      <div className="card p-5">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-3">Accès rapide</h3>
+        <div className="grid sm:grid-cols-3 gap-2.5">
+          <button
+            type="button"
+            onClick={() => onOpenReaderPage(targetPage)}
+            className="px-3 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-medium hover:bg-primary-600 transition-colors"
+          >
+            📖 Ma page du jour
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenReaderPages(lastThreePages)}
+            disabled={lastThreePages.length === 0}
+            className="px-3 py-2.5 rounded-xl bg-beige-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm font-medium disabled:opacity-40"
+          >
+            🔄 Réviser mes dernières pages
+          </button>
+          <button
+            type="button"
+            onClick={onResumeReader}
+            className="px-3 py-2.5 rounded-xl bg-beige-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm font-medium"
+          >
+            📚 Reprendre ma dernière lecture
+          </button>
+        </div>
+      </div>
 
       <WeeklyCalendar progress={progress} />
 

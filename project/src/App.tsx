@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import { useDarkMode } from './hooks/useDarkMode';
@@ -6,41 +6,27 @@ import Home from './pages/Home';
 import HifzPage from './pages/Hifz/index';
 import LirePage from './pages/Lire/index';
 import Signets from './pages/Signets';
-import { Page } from './types';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
   const { isDark, toggle } = useDarkMode();
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <Home onNavigate={setCurrentPage} />;
-      case 'lire':
-        return <LirePage />;
-      case 'hifz':
-        return <HifzPage />;
-      case 'signets':
-        return <Signets onNavigate={setCurrentPage} />;
-      default:
-        return <Home onNavigate={setCurrentPage} />;
-    }
-  };
+  const location = useLocation();
+  const isLire = location.pathname === '/lire';
 
   return (
     <div className="min-h-screen flex flex-col bg-beige-100 dark:bg-gray-950">
-      <Header
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-        isDark={isDark}
-        onToggleDark={toggle}
-      />
-      <main className={`flex-1 ${currentPage === 'lire' ? '' : ''}`}>
-        <div key={currentPage} className="page-transition">
-          {renderPage()}
+      <Header isDark={isDark} onToggleDark={toggle} />
+      <main className="flex-1">
+        <div key={location.pathname + location.search} className="page-transition">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/lire" element={<LirePage />} />
+            <Route path="/hifz" element={<HifzPage />} />
+            <Route path="/signets" element={<Signets />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </div>
       </main>
-      {currentPage !== 'lire' && <Footer />}
+      {!isLire && <Footer />}
     </div>
   );
 }

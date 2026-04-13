@@ -83,6 +83,16 @@ export async function fetchPageWithTranslation(pageNumber: number) {
   };
 }
 
+export async function fetchSurahForMushafPage(pageNumber: number): Promise<number> {
+  const res = await fetch(`${BASE_URL}/page/${pageNumber}/ar.uthmani`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch page surah');
+  }
+  const data = await res.json();
+  const firstAyah = data?.data?.ayahs?.[0];
+  return firstAyah?.surah?.number ?? 1;
+}
+
 /**
  * URL audio par verset : le CDN islamic.network utilise le numéro global d’ayah (alquran.cloud),
  * pas surah×1000 + verset dans la sourate.

@@ -1,30 +1,26 @@
 import { BookOpen, Star, Calendar, ChevronRight, Moon, UserRound, TrendingUp, BellRing, ArrowRight } from 'lucide-react';
-import { Page } from '../types';
-
-interface HomeProps {
-  onNavigate: (page: Page) => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 const features = [
   {
     icon: BookOpen,
     title: 'Lire le Coran',
     desc: 'Lisez les 114 sourates avec traduction française et audio.',
-    page: 'lire' as Page,
+    path: '/lire',
     color: 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400',
   },
   {
     icon: Star,
     title: 'Mon Hifz',
     desc: 'Suivez votre progression de mémorisation jour par jour.',
-    page: 'hifz' as Page,
+    path: '/hifz',
     color: 'bg-gold-50 dark:bg-gold-900/20 text-gold-600 dark:text-gold-400',
   },
   {
     icon: Calendar,
     title: 'Programme Personnalisé',
     desc: 'Un programme adapté à votre rythme et vos objectifs.',
-    page: 'hifz' as Page,
+    path: '/hifz',
     color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
   },
 ];
@@ -60,7 +56,8 @@ const howItWorksSteps = [
   },
 ];
 
-export default function Home({ onNavigate }: HomeProps) {
+export default function Home() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen">
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 dark:from-gray-900 dark:via-primary-950 dark:to-gray-900">
@@ -89,14 +86,14 @@ export default function Home({ onNavigate }: HomeProps) {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => onNavigate('hifz')}
+                onClick={() => navigate('/hifz')}
                 className="btn-primary bg-gold-400 hover:bg-gold-300 text-gray-900 flex items-center justify-center gap-2 text-base shadow-lg"
               >
                 Commencer mon Hifz
                 <ChevronRight className="w-4 h-4" />
               </button>
               <button
-                onClick={() => onNavigate('lire')}
+                onClick={() => navigate('/lire')}
                 className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 text-base"
               >
                 <BookOpen className="w-4 h-4" />
@@ -123,7 +120,7 @@ export default function Home({ onNavigate }: HomeProps) {
             return (
               <button
                 key={f.title}
-                onClick={() => onNavigate(f.page)}
+                onClick={() => navigate(f.path)}
                 className="card p-6 text-left hover:shadow-md hover:-translate-y-1 transition-all duration-200 group"
               >
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${f.color}`}>
@@ -216,7 +213,7 @@ export default function Home({ onNavigate }: HomeProps) {
             <span className="block text-gold-300 mt-1 not-italic">— Al-Hijr 15:9</span>
           </p>
           <button
-            onClick={() => onNavigate('hifz')}
+            onClick={() => navigate('/hifz')}
             className="bg-gold-400 hover:bg-gold-300 text-gray-900 font-semibold py-3 px-8 rounded-xl transition-all duration-200 inline-flex items-center gap-2"
           >
             Créer mon programme

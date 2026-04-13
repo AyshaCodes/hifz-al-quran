@@ -1,12 +1,10 @@
 import { Bookmark, BookmarkCheck, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { Bookmark as BookmarkType, Page } from '../types';
+import { Bookmark as BookmarkType } from '../types';
 
-interface SignetsProps {
-  onNavigate: (page: Page) => void;
-}
-
-export default function Signets({ onNavigate }: SignetsProps) {
+export default function Signets() {
+  const navigate = useNavigate();
   const [bookmarks, setBookmarks] = useLocalStorage<BookmarkType[]>('hifz-bookmarks', []);
 
   const removeBookmark = (surahNumber: number, verseNumber: number) => {
@@ -37,7 +35,7 @@ export default function Signets({ onNavigate }: SignetsProps) {
             Ajoutez des versets en signet pendant votre lecture pour les retrouver ici.
           </p>
           <button
-            onClick={() => onNavigate('lire')}
+            onClick={() => navigate('/lire')}
             className="btn-primary text-sm"
           >
             Commencer à lire
