@@ -22,7 +22,10 @@ export default function LirePage() {
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarVisible, setDesktopSidebarVisible] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [lectureTextMode, setLectureTextMode] = useState<'arabic' | 'both'>('arabic');
   const [reciterId, setReciterId] = useState('ar.alafasy');
   const [readMode, setReadMode] = useState<ReadMode>('lecture');
   const [bookmarks, setBookmarks] = useLocalStorage<Bookmark[]>('hifz-bookmarks', []);
@@ -31,18 +34,31 @@ export default function LirePage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchSurahWithTranslation(num, reciterId);
+      const data = await fetchSurahWithTranslation(num);
       setVerses(data);
     } catch {
       setError('Impossible de charger la sourate. Vérifiez votre connexion.');
     } finally {
       setLoading(false);
     }
-  }, [reciterId]);
+  }, []);
 
   useEffect(() => {
     loadSurah(selectedSurah);
   }, [selectedSurah, loadSurah]);
+
+  useEffect(() => {
+    const syncViewport = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setMobileSidebarOpen(false);
+      }
+    };
+    syncViewport();
+    window.addEventListener('resize', syncViewport);
+    return () => window.removeEventListener('resize', syncViewport);
+  }, []);
 
   const handleToggleBookmark = (verse: Verse) => {
     const surah = SURAHS.find((s) => s.number === selectedSurah);
@@ -73,7 +89,15 @@ export default function LirePage() {
 
   const currentSurah = SURAHS.find((s) => s.number === selectedSurah);
 
-  const showContent = !loading && !error;
+  const showContent = !loading && !error && verses.length > 0;
+  const sidebarOpen = isMobile ? mobileSidebarOpen : desktopSidebarVisible;
+  const toggleSidebar = () => {
+    if (isMobile) {
+      setMobileSidebarOpen((prev) => !prev);
+    } else {
+      setDesktopSidebarVisible((prev) => !prev);
+    }
+  };
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-beige-100 dark:bg-gray-950">
@@ -81,15 +105,17 @@ export default function LirePage() {
         selectedSurah={selectedSurah}
         onSelectSurah={setSelectedSurah}
         isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        onClose={() => (isMobile ? setMobileSidebarOpen(false) : setDesktopSidebarVisible(false))}
+        closeOnSelect={isMobile}
       />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-beige-200 dark:border-gray-800 shrink-0">
           <button
             type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 rounded-lg hover:bg-beige-100 dark:hover:bg-gray-800 text-gray-500"
+            onClick={toggleSidebar}
+            className="p-2 rounded-lg hover:bg-beige-100 dark:hover:bg-gray-800 text-gray-500"
+            title={sidebarOpen ? 'Cacher la sidebar' : 'Afficher la sidebar'}
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -106,6 +132,24 @@ export default function LirePage() {
         </div>
 
         <ReadModeToggle mode={readMode} onModeChange={setReadMode} />
+        {readMode === 'lecture' && (
+          <div className="flex justify-center gap-2 px-4 py-3 bg-white/90 dark:bg-gray-900/90 border-b border-beige-200 dark:border-gray-800 shrink-0">
+            <button
+              type="button"
+              onClick={() => setLectureTextMode('arabic')}
+              className={`px-4 py-1.5 rounded-full text-sm ${lectureTextMode === 'arabic' ? 'bg-primary-500 text-white' : 'bg-beige-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
+            >
+              Arabe
+            </button>
+            <button
+              type="button"
+              onClick={() => setLectureTextMode('both')}
+              className={`px-4 py-1.5 rounded-full text-sm ${lectureTextMode === 'both' ? 'bg-primary-500 text-white' : 'bg-beige-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
+            >
+              Arabe + Traduction
+            </button>
+          </div>
+        )}
 
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {loading || error ? (
@@ -114,8 +158,7 @@ export default function LirePage() {
               verses={[]}
               loading={loading}
               error={error}
-              bookmarks={bookmarks}
-              onToggleBookmark={handleToggleBookmark}
+              showTranslation={lectureTextMode === 'both'}
             />
           ) : readMode === 'lecture' ? (
             <VerseDisplay
@@ -123,8 +166,7 @@ export default function LirePage() {
               verses={verses}
               loading={false}
               error={null}
-              bookmarks={bookmarks}
-              onToggleBookmark={handleToggleBookmark}
+              showTranslation={lectureTextMode === 'both'}
             />
           ) : (
             <AyahByAyahView
@@ -138,7 +180,7 @@ export default function LirePage() {
           )}
         </div>
 
-        {readMode === 'lecture' && showContent && (
+        {showContent && (
           <AudioPlayer
             surahNumber={selectedSurah}
             verseCount={currentSurah?.verses ?? 0}

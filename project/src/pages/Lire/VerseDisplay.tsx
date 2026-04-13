@@ -1,24 +1,18 @@
-import { Bookmark, BookmarkCheck, Loader2 } from 'lucide-react';
-import { Bookmark as BookmarkType } from '../../types';
-import {
-  stripPrependedBismillahFromVerseOne,
-} from '../../lib/bismillah';
+import { Loader2 } from 'lucide-react';
+import { stripPrependedBismillahFromVerseOne } from '../../lib/bismillah';
 import SurahIntro from './SurahIntro';
-
-interface Verse {
-  number: number;
-  numberInSurah: number;
-  text: string;
-  translation: string;
-}
 
 interface VerseDisplayProps {
   surahNumber: number;
-  verses: Verse[];
+  verses: {
+    number: number;
+    numberInSurah: number;
+    text: string;
+    translation: string;
+  }[];
   loading: boolean;
   error: string | null;
-  bookmarks: BookmarkType[];
-  onToggleBookmark: (verse: Verse) => void;
+  showTranslation: boolean;
 }
 
 export default function VerseDisplay({
@@ -26,11 +20,16 @@ export default function VerseDisplay({
   verses,
   loading,
   error,
-  bookmarks,
-  onToggleBookmark,
+  showTranslation,
 }: VerseDisplayProps) {
-  const isBookmarked = (verseNum: number) =>
-    bookmarks.some((b) => b.surahNumber === surahNumber && b.verseNumber === verseNum);
+  const toArabicIndicDigits = (value: number) =>
+    value
+      .toString()
+      .split('')
+      .map((digit) => '٠١٢٣٤٥٦٧٨٩'[Number(digit)] ?? digit)
+      .join('');
+
+  const formatAyahMarker = (ayahNumber: number) => `﴿${toArabicIndicDigits(ayahNumber)}﴾`;
 
   if (loading) {
     return (
@@ -57,56 +56,50 @@ export default function VerseDisplay({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto min-h-0">
+    <div className="flex-1 overflow-y-auto min-h-0 bg-[#faf8f1] dark:bg-gray-950">
       <SurahIntro surahNumber={surahNumber} />
 
-      <div className="divide-y divide-beige-100 dark:divide-gray-800">
-        {verses.map((verse) => {
-          const displayArabic = stripPrependedBismillahFromVerseOne(
-            surahNumber,
-            verse.numberInSurah,
-            verse.text
-          );
-          return (
-            <div
-              key={verse.number}
-              className="p-5 hover:bg-beige-50 dark:hover:bg-gray-900/30 transition-colors group animate-fade-in"
-            >
-              <div className="flex items-start justify-between gap-3 mb-4">
-                <span className="text-[11px] sm:text-xs font-mono text-gray-500 dark:text-gray-400 tabular-nums pt-0.5">
-                  {surahNumber}:{verse.numberInSurah}
+      <div className="max-w-[700px] mx-auto px-4 py-8 sm:py-10 bg-white/80 dark:bg-gray-900/70">
+        {!showTranslation ? (
+          <p
+            className="text-[2rem] leading-[2.5] text-gray-900 dark:text-gray-100"
+            style={{ direction: 'rtl', textAlign: 'justify', fontFamily: "'Scheherazade New', serif" }}
+          >
+            {verses.map((verse) => {
+              const cleanText = stripPrependedBismillahFromVerseOne(
+                surahNumber,
+                verse.numberInSurah,
+                verse.text
+              );
+              return (
+                <span key={verse.number}>
+                  {cleanText} <span className="text-gold-600">{formatAyahMarker(verse.numberInSurah)}</span>{' '}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => onToggleBookmark({ ...verse, text: displayArabic })}
-                  className={`p-1.5 rounded-lg transition-colors ${
-                    isBookmarked(verse.numberInSurah)
-                      ? 'text-gold-500'
-                      : 'text-gray-400 dark:text-gray-500 hover:text-gold-400'
-                  }`}
-                  title={isBookmarked(verse.numberInSurah) ? 'Retirer le signet' : 'Ajouter un signet'}
-                >
-                  {isBookmarked(verse.numberInSurah) ? (
-                    <BookmarkCheck className="w-5 h-5" />
-                  ) : (
-                    <Bookmark className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-
-              <p
-                className="font-arabic text-2xl text-right text-gray-800 dark:text-gray-100 leading-loose mb-4"
-                style={{ direction: 'rtl' }}
-              >
-                {displayArabic}
-              </p>
-
-              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-l-2 border-gold-300 pl-3 italic">
-                {verse.translation}
-              </p>
-            </div>
-          );
-        })}
+              );
+            })}
+          </p>
+        ) : (
+          <div>
+            {verses.map((verse) => {
+              const cleanText = stripPrependedBismillahFromVerseOne(
+                surahNumber,
+                verse.numberInSurah,
+                verse.text
+              );
+              return (
+                <div key={verse.number} className="mb-5">
+                  <p
+                    className="text-[2rem] leading-[2.5] text-gray-900 dark:text-gray-100"
+                    style={{ direction: 'rtl', textAlign: 'justify', fontFamily: "'Scheherazade New', serif" }}
+                  >
+                    {cleanText} <span className="text-gold-600">{formatAyahMarker(verse.numberInSurah)}</span>
+                  </p>
+                  <p className="text-[0.9rem] italic text-gray-500 dark:text-gray-400">{verse.translation}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

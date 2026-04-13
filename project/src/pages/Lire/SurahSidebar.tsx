@@ -7,9 +7,16 @@ interface SurahSidebarProps {
   onSelectSurah: (num: number) => void;
   isOpen: boolean;
   onClose: () => void;
+  closeOnSelect?: boolean;
 }
 
-export default function SurahSidebar({ selectedSurah, onSelectSurah, isOpen, onClose }: SurahSidebarProps) {
+export default function SurahSidebar({
+  selectedSurah,
+  onSelectSurah,
+  isOpen,
+  onClose,
+  closeOnSelect = true,
+}: SurahSidebarProps) {
   const [search, setSearch] = useState('');
 
   const filtered = SURAHS.filter(
@@ -30,13 +37,15 @@ export default function SurahSidebar({ selectedSurah, onSelectSurah, isOpen, onC
 
       <aside
         className={`
-          fixed md:static inset-y-0 left-0 z-40 md:z-auto
-          w-72 md:w-64 lg:w-72
+          fixed md:relative inset-y-0 left-0 z-40 md:z-10
+          w-72
           bg-white dark:bg-gray-900
           border-r border-beige-200 dark:border-gray-800
           flex flex-col
-          transition-transform duration-300
-          ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+          transition-all duration-300 ease-in-out
+          ${isOpen
+            ? 'translate-x-0 md:w-64 lg:w-72 opacity-100'
+            : '-translate-x-full md:translate-x-0 md:w-0 opacity-100 md:opacity-0 md:border-r-0'}
         `}
       >
         <div className="p-4 border-b border-beige-200 dark:border-gray-800">
@@ -65,7 +74,10 @@ export default function SurahSidebar({ selectedSurah, onSelectSurah, isOpen, onC
           {filtered.map((s) => (
             <button
               key={s.number}
-              onClick={() => { onSelectSurah(s.number); onClose(); }}
+              onClick={() => {
+                onSelectSurah(s.number);
+                if (closeOnSelect) onClose();
+              }}
               className={`
                 w-full flex items-center gap-3 px-4 py-3 text-left
                 hover:bg-beige-50 dark:hover:bg-gray-800 transition-colors

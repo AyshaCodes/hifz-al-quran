@@ -7,6 +7,13 @@ export interface ApiVerse {
   audio?: string;
 }
 
+export interface ApiPageVerse extends ApiVerse {
+  surahNumber: number;
+  translation: string;
+  juz: number;
+  hizbQuarter: number;
+}
+
 export interface ApiSurah {
   number: number;
   name: string;
@@ -41,6 +48,39 @@ export async function fetchSurahWithTranslation(surahNumber: number, reciterId =
     translation: frenchAyahs[i]?.text ?? '',
     audio: audioAyahs[i]?.audio ?? undefined,
   }));
+}
+
+export async function fetchPageWithTranslation(pageNumber: number) {
+  const [arabicRes, frenchRes] = await Promise.all([
+    fetch(`${BASE_URL}/page/${pageNumber}/ar.uthmani`),
+    fetch(`${BASE_URL}/page/${pageNumber}/fr.hamidullah`),
+  ]);
+
+  if (!arabicRes.ok || !frenchRes.ok) {
+    throw new Error('Failed to fetch mushaf page');
+  }
+
+  const arabicData = await arabicRes.json();
+  const frenchData = await frenchRes.json();
+
+  const arabicAyahs: any[] = arabicData.data.ayahs ?? [];
+  const frenchAyahs: any[] = frenchData.data.ayahs ?? [];
+
+  const ayahs: ApiPageVerse[] = arabicAyahs.map((ayah, i) => ({
+    number: ayah.number,
+    numberInSurah: ayah.numberInSurah,
+    surahNumber: ayah.surah?.number ?? 0,
+    text: ayah.text,
+    translation: frenchAyahs[i]?.text ?? '',
+    juz: ayah.juz ?? 0,
+    hizbQuarter: ayah.hizbQuarter ?? 0,
+  }));
+
+  return {
+    ayahs,
+    juz: ayahs[0]?.juz ?? 0,
+    hizbQuarter: ayahs[0]?.hizbQuarter ?? 0,
+  };
 }
 
 /**

@@ -9,27 +9,37 @@ export default function SurahIntro({ surahNumber }: { surahNumber: number }) {
   if (!surah) return null;
 
   return (
-    <>
-      <div className="green-gradient text-white text-center py-8 px-4 mb-2">
-        <p className="font-arabic text-4xl mb-2">{surah.nameArabic}</p>
-        <p className="font-amiri text-xl text-gold-300 mb-1">{surah.nameTranslit}</p>
-        <p className="text-primary-200 text-sm">{surah.nameFrench}</p>
-        <div className="flex justify-center gap-4 mt-3">
-          <span className="text-xs bg-white/10 px-3 py-1 rounded-full">
+    <div className="bg-white/90 dark:bg-gray-900/90 border-b border-beige-200 dark:border-gray-800">
+      <div className="max-w-5xl mx-auto text-center py-9 px-4">
+        <p className="font-arabic text-5xl sm:text-6xl text-primary-700 dark:text-primary-300 mb-2">
+          {surah.nameArabic}
+        </p>
+        <p className="text-base sm:text-lg text-gray-700 dark:text-gray-200">{surah.nameFrench}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{surah.nameTranslit}</p>
+
+        <div className="flex justify-center gap-2 sm:gap-3 mt-4 flex-wrap">
+          <span className="text-xs bg-beige-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full">
             {surah.verses} versets
           </span>
-          <span className="text-xs bg-white/10 px-3 py-1 rounded-full capitalize">
+          <span className="text-xs bg-beige-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full capitalize">
             {surah.revelationType}
           </span>
-          <span className="text-xs bg-white/10 px-3 py-1 rounded-full">Juz {surah.juz}</span>
+          <span className="text-xs bg-beige-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full">
+            Juz {surah.juz}
+          </span>
         </div>
       </div>
 
       {shouldShowStandaloneBismillah(surahNumber) && (
-        <div className="text-center pt-10 pb-12 px-6 mb-2 font-arabic text-3xl sm:text-4xl text-gray-700 dark:text-gray-200 leading-[2] tracking-wide bg-beige-50/80 dark:bg-gray-900/40">
-          {BISMILLAH_STANDALONE_ARABIC}
+        <div className="text-center py-7 px-6 bg-beige-50/80 dark:bg-gray-900/40 border-t border-beige-200/70 dark:border-gray-800">
+          <p className="font-arabic text-3xl sm:text-4xl text-gray-700 dark:text-gray-200 leading-[2] tracking-wide">
+            {BISMILLAH_STANDALONE_ARABIC}
+          </p>
+          <p className="mt-2 text-sm italic text-gray-500 dark:text-gray-400">
+            Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux.
+          </p>
         </div>
       )}
-    </>
+    </div>
   );
 }
