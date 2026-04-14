@@ -11,6 +11,7 @@ const navItems = [
   { label: 'Accueil', path: '/' },
   { label: 'Lire', path: '/lire' },
   { label: 'Mon Hifz', path: '/hifz' },
+  { label: 'Ressources', path: '/ressources' },
   { label: 'Signets', path: '/signets' },
 ];
 

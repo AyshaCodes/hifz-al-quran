@@ -55,3 +55,76 @@ export function reviewThresholdDays(quality?: MemorizationQuality): number {
   if (q === 'partial') return 1;
   return 3;
 }
+
+export interface PlannedDay {
+  date: string;
+  dayLabel: string;
+  mode: 'memorization' | 'revision' | 'kahf';
+  targetPages: number;
+  fromPage: number;
+  toPage: number;
+}
+
+function toISODate(d: Date): string {
+  return d.toISOString().split('T')[0];
+}
+
+function addDays(base: Date, days: number): Date {
+  const next = new Date(base);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+export function getWeeklyPlan(profile: UserProfile, progress: DailyProgress[]): PlannedDay[] {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = addDays(today, mondayOffset);
+
+  const startPage = getCurrentTargetPage(profile, progress);
+  let cursor = startPage;
+
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = addDays(monday, i);
+    const dateStr = toISODate(date);
+    const dayLabel = date.toLocaleDateString('fr-FR', { weekday: 'short' });
+    const isFriday = date.getDay() === 5;
+    const revisionOnly = isRevisionOnlyPeriod(profile, dateStr);
+    const goal = getDailyMemoGoal(profile, dateStr);
+
+    if (isFriday) {
+      return {
+        date: dateStr,
+        dayLabel,
+        mode: 'kahf',
+        targetPages: 0,
+        fromPage: cursor,
+        toPage: cursor,
+      };
+    }
+
+    if (revisionOnly || goal <= 0) {
+      return {
+        date: dateStr,
+        dayLabel,
+        mode: 'revision',
+        targetPages: 0,
+        fromPage: cursor,
+        toPage: cursor,
+      };
+    }
+
+    const fromPage = cursor;
+    const toPage = Math.max(fromPage, fromPage + Math.ceil(goal) - 1);
+    cursor = toPage + 1;
+
+    return {
+      date: dateStr,
+      dayLabel,
+      mode: 'memorization',
+      targetPages: goal,
+      fromPage,
+      toPage,
+    };
+  });
+}

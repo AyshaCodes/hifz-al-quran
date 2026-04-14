@@ -83,8 +83,8 @@ export default function AyahByAyahView({
             const isCurrent = currentPlayingVerse === verse.numberInSurah;
 
             return (
-              <article key={verse.number} className="py-10 sm:py-12 border-b border-beige-200/80 dark:border-gray-800/80 last:border-b-0">
-                <div className="flex items-center justify-between gap-4 mb-5">
+              <article key={verse.number} className="py-6 sm:py-8 border-b border-beige-200/80 dark:border-gray-800/80 last:border-b-0">
+                <div className="flex items-center justify-between gap-4 mb-3">
                   <span className="text-xs font-mono text-gray-400 dark:text-gray-500 tabular-nums">
                     {verseRef}
                   </span>
@@ -123,7 +123,7 @@ export default function AyahByAyahView({
                 </div>
 
                 <p
-                  className="font-arabic text-3xl sm:text-[2.2rem] text-center text-gray-900 dark:text-gray-50 leading-[2.1] mb-4"
+                  className="font-arabic text-2xl sm:text-[1.8rem] text-center text-gray-900 dark:text-gray-50 leading-[1.7] mb-3"
                   style={{ direction: 'rtl' }}
                 >
                   {displayArabic}

@@ -43,6 +43,7 @@ export default function LirePage() {
   const [pageLoading, setPageLoading] = useState(false);
   const [loadingMorePages, setLoadingMorePages] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
+  const [reachedSurahEnd, setReachedSurahEnd] = useState(false);
   const [desktopSidebarVisible, setDesktopSidebarVisible] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -102,20 +103,19 @@ export default function LirePage() {
     const loadPage = async () => {
       setPageLoading(true);
       setPageError(null);
+      setReachedSurahEnd(false);
       try {
         const pageData = await fetchPageWithTranslation(mushafPage);
+        const filteredAyahs = pageData.ayahs.filter((ayah) => ayah.surahNumber === selectedSurah);
         if (cancelled) return;
         setLecturePages([
           {
             pageNumber: mushafPage,
-            verses: pageData.ayahs,
+            verses: filteredAyahs,
             juz: pageData.juz,
             hizbQuarter: pageData.hizbQuarter,
           },
         ]);
-        if (pageData.ayahs[0]?.surahNumber) {
-          setSelectedSurah(pageData.ayahs[0].surahNumber);
-        }
       } catch {
         if (!cancelled) {
           setPageError('Impossible de charger la page du Mushaf.');
@@ -130,23 +130,29 @@ export default function LirePage() {
     return () => {
       cancelled = true;
     };
-  }, [mushafPage, readMode]);
+  }, [mushafPage, readMode, selectedSurah]);
 
   const loadNextLecturePage = async () => {
-    if (readMode !== 'lecture' || loadingMorePages || pageLoading) return;
+    if (readMode !== 'lecture' || loadingMorePages || pageLoading || reachedSurahEnd) return;
     const lastPage = lecturePages[lecturePages.length - 1]?.pageNumber ?? mushafPage;
     if (lastPage >= 604) return;
     setLoadingMorePages(true);
     try {
       const nextPageNumber = lastPage + 1;
       const pageData = await fetchPageWithTranslation(nextPageNumber);
+      const containsSelectedSurah = pageData.ayahs.some((ayah) => ayah.surahNumber === selectedSurah);
+      if (!containsSelectedSurah) {
+        setReachedSurahEnd(true);
+        return;
+      }
+      const filteredAyahs = pageData.ayahs.filter((ayah) => ayah.surahNumber === selectedSurah);
       setLecturePages((prev) => {
         if (prev.some((p) => p.pageNumber === nextPageNumber)) return prev;
         return [
           ...prev,
           {
             pageNumber: nextPageNumber,
-            verses: pageData.ayahs,
+            verses: filteredAyahs,
             juz: pageData.juz,
             hizbQuarter: pageData.hizbQuarter,
           },
@@ -352,7 +358,10 @@ export default function LirePage() {
               error={pageError}
               showTranslation={lectureTextMode === 'both'}
               onLoadNextPage={loadNextLecturePage}
-              canLoadMore={(lecturePages[lecturePages.length - 1]?.pageNumber ?? mushafPage) < 604}
+              canLoadMore={
+                !reachedSurahEnd &&
+                (lecturePages[lecturePages.length - 1]?.pageNumber ?? mushafPage) < 604
+              }
               loadingMore={loadingMorePages}
             />
           ) : loading || error ? (

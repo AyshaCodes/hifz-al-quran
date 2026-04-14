@@ -12,6 +12,7 @@ import {
   getDailyMemoGoal,
   getTodayStr,
   isRevisionOnlyPeriod,
+  getWeeklyPlan,
   memorizationQualityOrDefault,
   reviewThresholdDays,
 } from '../../lib/hifzSchedule';
@@ -20,6 +21,7 @@ import ProgressChart from './ProgressChart';
 import StatCards from './StatCards';
 import TodayTask from './TodayTask';
 import WeeklyCalendar from './WeeklyCalendar';
+import WeeklyPlan from './WeeklyPlan';
 
 interface DashboardProps {
   profile: UserProfile;
@@ -161,6 +163,7 @@ export default function Dashboard({
   }, [progress, profile, todayProgress]);
 
   const targetPage = getCurrentTargetPage(profile, progress);
+  const weeklyPlan = getWeeklyPlan(profile, progress);
   const targetSurah = getSurahNameForPage(targetPage);
   const completedPages = useMemo(() => {
     const startPage = (profile.juzActuel - 1) * 20 + 1;
@@ -348,6 +351,7 @@ export default function Dashboard({
       </div>
 
       <WeeklyCalendar progress={progress} />
+      <WeeklyPlan plan={weeklyPlan} />
 
       {unrevisedPages.length > 0 && (
         <div className="card p-5 border-l-4 border-l-amber-400 bg-amber-50 dark:bg-amber-900/10">

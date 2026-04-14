@@ -1,5 +1,8 @@
-import { BookOpen, Star, Calendar, ChevronRight, Moon, UserRound, TrendingUp, BellRing, ArrowRight } from 'lucide-react';
+import { BookOpen, Star, Calendar, ChevronRight, Moon, UserRound, TrendingUp, BellRing, ArrowRight, BarChart3, Target, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { UserProfile, DailyProgress } from '../types';
+import { getCurrentTargetPage, getTodayStr, getDailyMemoGoal } from '../lib/hifzSchedule';
 
 const features = [
   {
@@ -38,6 +41,20 @@ const verses = [
   },
 ];
 
+const hifzMotivation = [
+  {
+    arabic: 'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ',
+    french: "Le meilleur d'entre vous est celui qui apprend le Coran et l'enseigne.",
+    ref: 'Hadith — Al-Bukhari',
+  },
+  {
+    arabic: 'يُقَالُ لِصَاحِبِ الْقُرْآنِ: اقْرَأْ وَارْتَقِ',
+    french:
+      'Il sera dit au compagnon du Coran : Récite et élève-toi en degrés.',
+    ref: 'Hadith — At-Tirmidhi',
+  },
+];
+
 const howItWorksSteps = [
   {
     icon: UserRound,
@@ -58,6 +75,54 @@ const howItWorksSteps = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const [profile] = useLocalStorage<UserProfile | null>('hifz-profile', null);
+  const [progress] = useLocalStorage<DailyProgress[]>('hifz-progress', []);
+
+  // Calculer les statistiques si un profil existe
+  const userStats = profile ? {
+    currentPage: getCurrentTargetPage(profile, progress),
+    todayGoal: getDailyMemoGoal(profile, getTodayStr()),
+    completedDays: progress.filter(p => p.completed).length,
+    totalDays: progress.length,
+    streak: calculateStreak(progress),
+    progressPercentage: calculateProgressPercentage(profile, progress)
+  } : null;
+
+  function calculateStreak(progressData: DailyProgress[]): number {
+    if (progressData.length === 0) return 0;
+    
+    const sorted = [...progressData]
+      .filter(p => p.completed || p.lastReviewedAt === p.date)
+      .sort((a, b) => b.date.localeCompare(a.date));
+    
+    if (sorted.length === 0) return 0;
+    
+    let streak = 0;
+    let currentDate = new Date();
+    
+    for (const entry of sorted) {
+      const entryDate = new Date(entry.date);
+      const diffDays = Math.floor((currentDate.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === streak) {
+        streak++;
+        currentDate = entryDate;
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  }
+
+  function calculateProgressPercentage(profile: UserProfile, progressData: DailyProgress[]): number {
+    const startPage = ((profile.juzActuel || 1) - 1) * 20 + 1;
+    const completedPages = progressData.filter(p => p.completed).length;
+    const totalPages = 604 - startPage + 1; // Total pages dans le Coran
+    
+    return Math.min(Math.round((completedPages / totalPages) * 100), 100);
+  }
+
   return (
     <div className="min-h-screen">
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 dark:from-gray-900 dark:via-primary-950 dark:to-gray-900">
@@ -67,39 +132,114 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-              <Moon className="w-4 h-4 text-gold-300" />
-              <span>Votre compagnon de mémorisation</span>
-            </div>
+          <div className="text-center max-w-4xl mx-auto">
+            {userStats ? (
+              // Vue pour utilisateur avec profil existant
+              <>
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+                  <Moon className="w-4 h-4 text-gold-300" />
+                  <span>Bienvenue {profile?.prenom} !</span>
+                </div>
 
-            <h1 className="font-arabic text-5xl md:text-6xl text-white mb-4 leading-tight" style={{ direction: 'rtl' }}>
-              حِفْظُ الْقُرْآن
-            </h1>
-            <h2 className="font-amiri text-3xl md:text-4xl text-gold-300 mb-6">
-              Hifz Al-Quran
-            </h2>
-            <p className="text-primary-100 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
-              Mémorisez le Livre d'Allah à votre rythme avec un programme personnalisé,
-              un suivi quotidien et des rappels de révision.
-            </p>
+                <h1 className="font-arabic text-4xl md:text-5xl text-white mb-4 leading-tight" style={{ direction: 'rtl' }}>
+                  {'{'}hifz-al-quran{'}'}
+                </h1>
+                <h2 className="font-amiri text-2xl md:text-3xl text-gold-300 mb-6">
+                  Continuez votre Hifz
+                </h2>
+                
+                {/* Cartes de statistiques */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div className="flex items-center justify-center gap-2 text-gold-300 mb-1">
+                      <Target className="w-4 h-4" />
+                      <span className="text-xs">Page actuelle</span>
+                    </div>
+                    <p className="text-white text-xl font-bold">{userStats.currentPage}</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div className="flex items-center justify-center gap-2 text-gold-300 mb-1">
+                      <BarChart3 className="w-4 h-4" />
+                      <span className="text-xs">Progression</span>
+                    </div>
+                    <p className="text-white text-xl font-bold">{userStats.progressPercentage}%</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div className="flex items-center justify-center gap-2 text-gold-300 mb-1">
+                      <Clock className="w-4 h-4" />
+                      <span className="text-xs">Série</span>
+                    </div>
+                    <p className="text-white text-xl font-bold">{userStats.streak} jours</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <div className="flex items-center justify-center gap-2 text-gold-300 mb-1">
+                      <Star className="w-4 h-4" />
+                      <span className="text-xs">Objectif du jour</span>
+                    </div>
+                    <p className="text-white text-xl font-bold">{userStats.todayGoal} pages</p>
+                  </div>
+                </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => navigate('/hifz')}
-                className="btn-primary bg-gold-400 hover:bg-gold-300 text-gray-900 flex items-center justify-center gap-2 text-base shadow-lg"
-              >
-                Commencer mon Hifz
-                <ChevronRight className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => navigate('/lire')}
-                className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 text-base"
-              >
-                <BookOpen className="w-4 h-4" />
-                Lire le Coran
-              </button>
-            </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    onClick={() => navigate('/hifz')}
+                    className="bg-white/10 hover:bg-white/15 border border-white/25 rounded-2xl px-5 py-4 text-left text-white shadow-lg backdrop-blur-sm max-w-md w-full sm:w-auto"
+                  >
+                    <p className="text-sm text-primary-100">Bienvenue {profile?.prenom}</p>
+                    <p className="font-semibold text-lg mt-0.5">
+                      Page {userStats.currentPage} / 604
+                    </p>
+                    <p className="inline-flex items-center gap-1.5 text-gold-300 text-sm mt-2">
+                      Continuez votre Hifz
+                      <ChevronRight className="w-4 h-4" />
+                    </p>
+                  </button>
+                  <button
+                    onClick={() => navigate('/lire')}
+                    className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 text-base"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Lire le Coran
+                  </button>
+                </div>
+              </>
+            ) : (
+              // Vue pour nouvel utilisateur
+              <>
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+                  <Moon className="w-4 h-4 text-gold-300" />
+                  <span>Votre compagnon de mémorisation</span>
+                </div>
+
+                <h1 className="font-arabic text-5xl md:text-6xl text-white mb-4 leading-tight" style={{ direction: 'rtl' }}>
+                  {'{'}hifz-al-quran{'}'}
+                </h1>
+                <h2 className="font-amiri text-3xl md:text-4xl text-gold-300 mb-6">
+                  Hifz Al-Quran
+                </h2>
+                <p className="text-primary-100 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
+                  Mémorisez le Livre d'Allah à votre rythme avec un programme personnalisé,
+                  un suivi quotidien et des rappels de révision.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    onClick={() => navigate('/hifz')}
+                    className="btn-primary bg-gold-400 hover:bg-gold-300 text-gray-900 flex items-center justify-center gap-2 text-base shadow-lg"
+                  >
+                    Commencer mon Hifz
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => navigate('/lire')}
+                    className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 text-base"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Lire le Coran
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -178,11 +318,44 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="py-14 bg-white/70 dark:bg-gray-900/30">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="font-amiri text-3xl text-primary-700 dark:text-primary-400 mb-2">
+              Motivation pour le Hifz
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Rappels prophétiques pour avancer avec sincérité et constance
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            {hifzMotivation.map((item) => (
+              <div
+                key={item.ref}
+                className="rounded-2xl border border-beige-200 dark:border-gray-800 bg-beige-50/70 dark:bg-gray-900/60 p-6"
+              >
+                <p
+                  className="font-arabic text-3xl text-gray-800 dark:text-gray-100 text-right leading-loose"
+                  style={{ direction: 'rtl' }}
+                >
+                  {item.arabic}
+                </p>
+                <p className="mt-3 text-sm italic text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {item.french}
+                </p>
+                <p className="mt-2 text-xs font-medium text-gold-600 dark:text-gold-400">{item.ref}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="bg-beige-100 dark:bg-gray-900/50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="font-amiri text-3xl text-primary-700 dark:text-primary-400 mb-2">
-              Inspiration du Coran
+              {/* Inspiration du Coran */}
             </h2>
           </div>
 

@@ -6,6 +6,8 @@ import Home from './pages/Home';
 import HifzPage from './pages/Hifz/index';
 import LirePage from './pages/Lire/index';
 import Signets from './pages/Signets';
+import Ressources from './pages/Ressources';
+import Contact from './pages/Contact';
 
 export default function App() {
   const { isDark, toggle } = useDarkMode();
@@ -22,6 +24,8 @@ export default function App() {
             <Route path="/lire" element={<LirePage />} />
             <Route path="/hifz" element={<HifzPage />} />
             <Route path="/signets" element={<Signets />} />
+            <Route path="/ressources" element={<Ressources />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

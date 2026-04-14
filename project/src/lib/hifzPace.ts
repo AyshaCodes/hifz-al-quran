@@ -28,7 +28,7 @@ export function getPagesPerDayFromMinutes(minutes: number): number {
 
 export function snapTempsToStep(minutes: number): TempsJourMin {
   const allowed = TEMPS_JOUR_STEPS as readonly number[];
-  let best = allowed[0];
+  let best: TempsJourMin = TEMPS_JOUR_STEPS[0];
   let bestDiff = Math.abs(minutes - best);
   for (const v of allowed) {
     const d = Math.abs(minutes - v);

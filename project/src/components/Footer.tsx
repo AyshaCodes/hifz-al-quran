@@ -1,4 +1,4 @@
-import { BookOpen, Heart } from 'lucide-react';
+import { BookOpen, Heart, Instagram } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -23,6 +23,13 @@ export default function Footer() {
           </div>
 
           <div className="text-right">
+            <a
+              href="#"
+              className="inline-flex items-center gap-1.5 text-primary-100 hover:text-gold-300 text-xs mb-1 transition-colors"
+            >
+              <Instagram className="w-3.5 h-3.5" />
+              Une question ? Contactez-nous
+            </a>
             <p className="text-primary-300 dark:text-gray-500 text-xs">
               © {new Date().getFullYear()} Hifz Al-Quran
             </p>
