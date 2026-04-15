@@ -135,8 +135,9 @@ export default function TodayTask({
 
   return (
     <div
-      className={`card p-5 border-l-4 ${memoDoneToday ? 'border-l-primary-500' : 'border-l-gold-400'}`}
+      className={`card p-5 border-l-4 relative overflow-hidden ${memoDoneToday ? 'border-l-primary-500' : 'border-l-gold-400'}`}
     >
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-500 via-gold-400 to-primary-500 opacity-70" />
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -180,7 +181,7 @@ export default function TodayTask({
             <button
               type="button"
               onClick={() => onOpenInReader(targetPage)}
-              className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors"
+              className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium transition-colors shadow-sm"
             >
               📖 Ouvrir la page {targetPage} dans le lecteur
             </button>
@@ -230,7 +231,7 @@ export default function TodayTask({
             <button
               type="button"
               onClick={startChrono}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-semibold hover:bg-primary-600"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-semibold hover:bg-primary-600 shadow-sm"
             >
               <Play className="w-4 h-4" />
               Démarrer la session
@@ -271,7 +272,7 @@ export default function TodayTask({
           <button
             type="button"
             onClick={handleOpenEval}
-            className="btn-primary flex items-center justify-center gap-2 text-sm py-2.5"
+            className="btn-primary flex items-center justify-center gap-2 text-sm py-2.5 shadow-sm"
           >
             <CheckCircle className="w-4 h-4" />
             Marquer comme fait

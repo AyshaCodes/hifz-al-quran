@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bookmark as BookmarkType } from '../../types';
 import { buildVerseAudioUrl } from '../../lib/quranApi';
 import { stripPrependedBismillahFromVerseOne } from '../../lib/bismillah';
+import CompactSurahAudio, { CompactSurahAudioHandle } from './CompactSurahAudio';
 import SurahIntro from './SurahIntro';
 
 interface Verse {
@@ -26,12 +27,13 @@ export default function AyahByAyahView({
   verses,
   bookmarks,
   reciterId,
-  onReciterChange: _onReciterChange,
+  onReciterChange,
   onToggleBookmark,
 }: AyahByAyahViewProps) {
   const [currentPlayingVerse, setCurrentPlayingVerse] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const compactSurahAudioRef = useRef<CompactSurahAudioHandle>(null);
 
   useEffect(() => {
     setCurrentPlayingVerse(null);
@@ -46,6 +48,8 @@ export default function AyahByAyahView({
   const handlePlayVerse = (verse: Verse) => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    compactSurahAudioRef.current?.pause();
 
     if (currentPlayingVerse === verse.numberInSurah && isPlaying) {
       audio.pause();
@@ -70,6 +74,15 @@ export default function AyahByAyahView({
       />
 
       <div className="flex-1 overflow-y-auto min-h-0">
+        <CompactSurahAudio
+          ref={compactSurahAudioRef}
+          surahNumber={surahNumber}
+          verses={verses}
+          reciterId={reciterId}
+          onReciterChange={onReciterChange}
+          otherAudioRef={audioRef}
+          toolbarClassName="bg-[#faf8f1]/92 dark:bg-gray-950/92"
+        />
         <SurahIntro surahNumber={surahNumber} />
 
         <div className="max-w-5xl mx-auto px-4 py-6 bg-white/80 dark:bg-gray-900/80">

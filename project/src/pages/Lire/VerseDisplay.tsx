@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react';
-import { stripPrependedBismillahFromVerseOne, shouldShowStandaloneBismillah, BISMILLAH_STANDALONE_ARABIC } from '../../lib/bismillah';
+import { stripPrependedBismillahFromVerseOne } from '../../lib/bismillah';
 import { ApiPageVerse } from '../../lib/quranApi';
+import CompactSurahAudio, { CompactSurahAudioVerse } from './CompactSurahAudio';
 import SurahIntro from './SurahIntro';
 
 interface MushafPageData {
@@ -15,7 +16,11 @@ interface VerseDisplayProps {
   pages: MushafPageData[];
   loading: boolean;
   error: string | null;
-  showTranslation: boolean;
+  textMode: 'arabic' | 'both';
+  onTextModeChange: (mode: 'arabic' | 'both') => void;
+  audioVerses: CompactSurahAudioVerse[];
+  reciterId: string;
+  onReciterChange: (id: string) => void;
   onLoadNextPage: () => void;
   canLoadMore: boolean;
   loadingMore: boolean;
@@ -26,11 +31,16 @@ export default function VerseDisplay({
   pages,
   loading,
   error,
-  showTranslation,
+  textMode,
+  onTextModeChange,
+  audioVerses,
+  reciterId,
+  onReciterChange,
   onLoadNextPage,
   canLoadMore,
   loadingMore,
 }: VerseDisplayProps) {
+  const showTranslation = textMode === 'both';
   const toArabicIndicDigits = (value: number) =>
     value
       .toString()
@@ -86,8 +96,50 @@ export default function VerseDisplay({
     return groups;
   };
 
+  const textModeToggle = (
+    <div
+      className="inline-flex items-center gap-1.5 text-[10px] tabular-nums tracking-wide text-gray-500 dark:text-gray-400"
+      role="group"
+      aria-label="Affichage du texte"
+    >
+      <button
+        type="button"
+        onClick={() => onTextModeChange('arabic')}
+        className={`px-1 py-0.5 rounded-sm transition-colors ${
+          textMode === 'arabic'
+            ? 'text-gray-900 dark:text-gray-100 font-semibold'
+            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+        }`}
+      >
+        AR
+      </button>
+      <span className="text-gray-300 dark:text-gray-600 select-none" aria-hidden>
+        |
+      </span>
+      <button
+        type="button"
+        onClick={() => onTextModeChange('both')}
+        className={`px-1 py-0.5 rounded-sm transition-colors ${
+          textMode === 'both'
+            ? 'text-gray-900 dark:text-gray-100 font-semibold'
+            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+        }`}
+      >
+        AR + FR
+      </button>
+    </div>
+  );
+
   return (
     <div className="flex-1 overflow-y-auto min-h-0 bg-[#f8f6e9] dark:bg-gray-950" onScroll={handleScroll}>
+      <CompactSurahAudio
+        surahNumber={surahNumber ?? 0}
+        verses={audioVerses}
+        reciterId={reciterId}
+        onReciterChange={onReciterChange}
+        leadingControls={textModeToggle}
+      />
+
       {surahNumber && <SurahIntro surahNumber={surahNumber} />}
 
       <div className="max-w-[650px] mx-auto px-3 py-4 sm:py-5">
@@ -103,24 +155,11 @@ export default function VerseDisplay({
                 </div>
                 <div className="space-y-4">
                   {pageSurahGroups.map((group) => {
-                    const showBismillah =
-                      shouldShowStandaloneBismillah(group.surahNumber) &&
-                      group.verses.some((v) => v.numberInSurah === 1);
                     return (
                       <div key={`${page.pageNumber}-${group.surahNumber}-${group.verses[0]?.number ?? 0}`}>
                         <p className="text-[10px] text-gray-500/85 dark:text-gray-400 mb-1.5">
                           Sourate {group.surahNumber}
                         </p>
-                        {showBismillah && (
-                          <div className="text-center mb-4 pt-1">
-                            <p
-                              className="font-arabic text-[1.9rem] text-gray-700 dark:text-gray-200 leading-[2.1]"
-                              style={{ direction: 'rtl', fontFamily: "'Scheherazade New', 'Amiri', serif" }}
-                            >
-                              {BISMILLAH_STANDALONE_ARABIC}
-                            </p>
-                          </div>
-                        )}
 
                         {!showTranslation ? (
                           <p

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SURAHS } from '../../data/surahs';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { getCurrentTargetPage } from '../../lib/hifzSchedule';
 import {
   ApiPageVerse,
   fetchFirstPageForSurah,
@@ -10,8 +11,7 @@ import {
   fetchSurahForMushafPage,
   fetchSurahWithTranslation,
 } from '../../lib/quranApi';
-import { Bookmark, UserProfile } from '../../types';
-import AudioPlayer from './AudioPlayer';
+import { Bookmark, DailyProgress, UserProfile } from '../../types';
 import AyahByAyahView from './AyahByAyahView';
 import ReadModeToggle, { ReadMode } from './ReadModeToggle';
 import SurahSidebar from './SurahSidebar';
@@ -173,7 +173,9 @@ export default function LirePage() {
     }
     try {
       const profile = JSON.parse(rawProfile) as UserProfile;
-      const page = (profile.juzActuel - 1) * 20 + 1;
+      const rawProgress = localStorage.getItem('hifz-progress');
+      const progress: DailyProgress[] = rawProgress ? JSON.parse(rawProgress) : [];
+      const page = getCurrentTargetPage(profile, progress);
       fetchSurahForMushafPage(page)
         .then((surahNum) => setMemorizingSurahNumber(surahNum))
         .catch(() => setMemorizingSurahNumber(null));
@@ -223,11 +225,6 @@ export default function LirePage() {
   };
 
   const currentSurah = SURAHS.find((s) => s.number === selectedSurah);
-
-  const showContent =
-    readMode === 'lecture'
-      ? !pageLoading && !pageError && lecturePages.length > 0
-      : !loading && !error && verses.length > 0;
   const sidebarOpen = isMobile ? mobileSidebarOpen : desktopSidebarVisible;
   const toggleSidebar = () => {
     if (isMobile) {
@@ -330,24 +327,6 @@ export default function LirePage() {
         </div>
 
         <ReadModeToggle mode={readMode} onModeChange={setReadMode} />
-        {readMode === 'lecture' && (
-          <div className="flex justify-center gap-2 px-4 py-3 bg-white/90 dark:bg-gray-900/90 border-b border-beige-200 dark:border-gray-800 shrink-0">
-            <button
-              type="button"
-              onClick={() => setLectureTextMode('arabic')}
-              className={`px-4 py-1.5 rounded-full text-sm ${lectureTextMode === 'arabic' ? 'bg-primary-500 text-white' : 'bg-beige-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
-            >
-              Arabe
-            </button>
-            <button
-              type="button"
-              onClick={() => setLectureTextMode('both')}
-              className={`px-4 py-1.5 rounded-full text-sm ${lectureTextMode === 'both' ? 'bg-primary-500 text-white' : 'bg-beige-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
-            >
-              Arabe + Traduction
-            </button>
-          </div>
-        )}
 
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {readMode === 'lecture' ? (
@@ -356,7 +335,11 @@ export default function LirePage() {
               pages={lecturePages}
               loading={pageLoading}
               error={pageError}
-              showTranslation={lectureTextMode === 'both'}
+              textMode={lectureTextMode}
+              onTextModeChange={setLectureTextMode}
+              audioVerses={verses}
+              reciterId={reciterId}
+              onReciterChange={setReciterId}
               onLoadNextPage={loadNextLecturePage}
               canLoadMore={
                 !reachedSurahEnd &&
@@ -379,16 +362,6 @@ export default function LirePage() {
             />
           )}
         </div>
-
-        {showContent && (
-          <AudioPlayer
-            surahNumber={selectedSurah}
-            verseCount={readMode === 'lecture' ? lecturePages.reduce((acc, p) => acc + p.verses.length, 0) : currentSurah?.verses ?? 0}
-            verses={readMode === 'lecture' ? lecturePages.flatMap((p) => p.verses) : verses}
-            reciterId={reciterId}
-            onReciterChange={setReciterId}
-          />
-        )}
       </div>
     </div>
   );
