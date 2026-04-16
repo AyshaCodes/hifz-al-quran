@@ -3,7 +3,6 @@ import Footer from './components/Footer';
 import Header from './components/Header';
 import { useDarkMode } from './hooks/useDarkMode';
 import Home from './pages/Home';
-import HifzPage from './pages/Hifz/index';
 import HifzApp from './components/hifz/HifzApp';
 import LirePage from './pages/Lire/index';
 import Signets from './pages/Signets';
@@ -23,8 +22,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/lire" element={<LirePage />} />
-            <Route path="/hifz" element={<HifzPage />} />
-            <Route path="/hifz-new" element={<HifzApp />} />
+            <Route path="/hifz" element={<HifzApp />} />
             <Route path="/signets" element={<Signets />} />
             <Route path="/ressources" element={<Ressources />} />
             <Route path="/contact" element={<Contact />} />
