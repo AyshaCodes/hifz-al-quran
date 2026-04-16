@@ -112,45 +112,45 @@ export default function Dashboard({ profile, progress, onProgressChange, onReset
 
   return (
     <div className="min-h-screen bg-[#f8f6e9] flex flex-col">
-      <div className="flex-1 px-4 py-8">
+      <div className="flex-1 px-3 sm:px-4 py-6 sm:py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 sm:mb-8">
             <div
-              className="text-3xl font-bold text-[#2c6e3c] mb-2"
+              className="text-2xl sm:text-3xl font-bold text-[#2c6e3c] mb-2"
               style={{ fontFamily: "'Amiri', serif" }}
             >
               هِفْظ
             </div>
-            <h1 className="text-xl font-semibold text-[#4a6b4b]">
+            <h1 className="text-lg sm:text-xl font-semibold text-[#4a6b4b]">
               Tableau de bord - {profile.questionnaire.prenom}
             </h1>
-            <p className="text-[#7a8c7b] mt-1">
+            <p className="text-sm sm:text-base text-[#7a8c7b] mt-1">
               Phase : {getPhaseLabel()} | {profile.programme.pagesParJour} pages/jour
             </p>
           </div>
 
           {/* Stats principales */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-[#e8e4d4] p-6 text-center">
-              <div className="text-3xl font-bold text-[#2c6e3c]">{progress.pagesCompletees}</div>
-              <div className="text-sm text-[#7a8c7b] mt-1">Pages complétées</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-[#e8e4d4] p-4 sm:p-6 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-[#2c6e3c]">{progress.pagesCompletees}</div>
+              <div className="text-xs sm:text-sm text-[#7a8c7b] mt-1">Pages complétées</div>
               <div className="text-xs text-[#7a8c7b] mt-2">
                 {getPagesThisMonth(progress.jours)} ce mois
               </div>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-sm border border-[#e8e4d4] p-6 text-center">
-              <div className="text-3xl font-bold text-[#2c6e3c]">{progress.joursConsecutifs}</div>
-              <div className="text-sm text-[#7a8c7b] mt-1">Jours consécutifs</div>
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-[#e8e4d4] p-4 sm:p-6 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-[#2c6e3c]">{progress.joursConsecutifs}</div>
+              <div className="text-xs sm:text-sm text-[#7a8c7b] mt-1">Jours consécutifs</div>
               <div className="text-xs text-[#7a8c7b] mt-2">
                 🎯 Objectif quotidien
               </div>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-sm border border-[#e8e4d4] p-6 text-center">
-              <div className="text-3xl font-bold text-[#2c6e3c]">{getCompletionPercentage()}%</div>
-              <div className="text-sm text-[#7a8c7b] mt-1">Progression totale</div>
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-[#e8e4d4] p-4 sm:p-6 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-[#2c6e3c]">{getCompletionPercentage()}%</div>
+              <div className="text-xs sm:text-sm text-[#7a8c7b] mt-1">Progression totale</div>
               <div className="text-xs text-[#7a8c7b] mt-2">
                 {profile.programme.pagesRestantes} pages restantes
               </div>
@@ -158,30 +158,30 @@ export default function Dashboard({ profile, progress, onProgressChange, onReset
           </div>
 
           {/* Session du jour */}
-          <div className="bg-white rounded-2xl shadow-sm border border-[#e8e4d4] p-6 mb-8">
-            <h2 className="text-lg font-semibold text-[#2c3e2d] mb-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-[#e8e4d4] p-4 sm:p-6 mb-6 sm:mb-8">
+            <h2 className="text-base sm:text-lg font-semibold text-[#2c3e2d] mb-3 sm:mb-4">
               📖 Session du jour
             </h2>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <div className="text-sm text-[#7a8c7b] mb-2">Chronomètre</div>
-                <div className="text-2xl font-mono font-bold text-[#2c6e3c]">
+                <div className="text-xs sm:text-sm text-[#7a8c7b] mb-2">Chronomètre</div>
+                <div className="text-xl sm:text-2xl font-mono font-bold text-[#2c6e3c]">
                   {formatDuration(sessionSeconds)}
                 </div>
                 
-                <div className="flex gap-2 mt-4">
+                <div className="flex gap-2 mt-3 sm:mt-4">
                   {!sessionStartTime ? (
                     <button
                       onClick={handleStartSession}
-                      className="px-4 py-2 bg-[#2c6e3c] text-white rounded-lg hover:bg-[#235630] transition-colors"
+                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-[#2c6e3c] text-white rounded-lg hover:bg-[#235630] transition-colors text-sm sm:text-base"
                     >
                       ▶️ Démarrer
                     </button>
                   ) : (
                     <button
                       onClick={handleStopSession}
-                      className="px-4 py-2 bg-[#e74c3c] text-white rounded-lg hover:bg-[#c0392b] transition-colors"
+                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-[#e74c3c] text-white rounded-lg hover:bg-[#c0392b] transition-colors text-sm sm:text-base"
                     >
                       ⏸️ Arrêter
                     </button>
@@ -190,13 +190,13 @@ export default function Dashboard({ profile, progress, onProgressChange, onReset
               </div>
               
               <div>
-                <div className="text-sm text-[#7a8c7b] mb-2">Tâches du jour</div>
+                <div className="text-xs sm:text-sm text-[#7a8c7b] mb-2">Tâches du jour</div>
                 <div className="space-y-2">
                   <button
                     onClick={handleMarkPageDone}
                     disabled={todayProgress?.pageFaite}
                     className={`
-                      w-full px-4 py-2 rounded-lg text-left transition-colors
+                      w-full px-3 sm:px-4 py-2 sm:py-2 rounded-lg text-left transition-colors text-sm sm:text-base
                       ${todayProgress?.pageFaite
                         ? 'bg-[#d4edda] text-[#155724] cursor-not-allowed'
                         : 'bg-[#f8f6e9] hover:bg-[#e8e4d4] text-[#2c3e2d]'
@@ -210,7 +210,7 @@ export default function Dashboard({ profile, progress, onProgressChange, onReset
                     onClick={handleMarkRevisionDone}
                     disabled={todayProgress?.pageRevisee}
                     className={`
-                      w-full px-4 py-2 rounded-lg text-left transition-colors
+                      w-full px-3 sm:px-4 py-2 sm:py-2 rounded-lg text-left transition-colors text-sm sm:text-base
                       ${todayProgress?.pageRevisee
                         ? 'bg-[#d4edda] text-[#155724] cursor-not-allowed'
                         : 'bg-[#f8f6e9] hover:bg-[#e8e4d4] text-[#2c3e2d]'
@@ -228,7 +228,7 @@ export default function Dashboard({ profile, progress, onProgressChange, onReset
           <div className="flex justify-center">
             <button
               onClick={onReset}
-              className="px-6 py-3 border-2 border-[#e74c3c] text-[#e74c3c] rounded-lg hover:bg-[#e74c3c] hover:text-white transition-colors"
+              className="px-4 sm:px-6 py-2 sm:py-3 border-2 border-[#e74c3c] text-[#e74c3c] rounded-lg hover:bg-[#e74c3c] hover:text-white transition-colors text-sm sm:text-base"
             >
               🔄 Réinitialiser mon programme
             </button>

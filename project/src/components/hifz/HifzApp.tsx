@@ -61,15 +61,15 @@ export default function HifzApp() {
 
   if (appState === 'loading') {
     return (
-      <div className="min-h-screen bg-[#f8f6e9] flex items-center justify-center">
+      <div className="min-h-screen bg-beige-100 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
           <div
-            className="text-3xl font-bold text-[#2c6e3c] mb-3"
+            className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-3"
             style={{ fontFamily: "'Amiri', serif" }}
           >
             هِفْظ
           </div>
-          <div className="w-6 h-6 border-2 border-[#2c6e3c]/30 border-t-[#2c6e3c] rounded-full animate-spin mx-auto" />
+          <div className="w-6 h-6 border-2 border-primary-300 dark:border-primary-600 border-t-primary-500 rounded-full animate-spin mx-auto" />
         </div>
       </div>
     );
