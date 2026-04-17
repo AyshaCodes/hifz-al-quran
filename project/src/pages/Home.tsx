@@ -134,7 +134,7 @@ export default function Home() {
               <StatsCard label="Objectif du jour" value={`${userStats.todayGoal} page${userStats.todayGoal > 1 ? 's' : ''}`} icon={Star} />
             </motion.div>
           ) : (
-            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex gap-4 justify-center">
+            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button onClick={() => navigate('/hifz')} className="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all flex items-center gap-2 text-lg">
                 Commencer mon Hifz <ChevronRight className="w-5 h-5" />
               </button>
