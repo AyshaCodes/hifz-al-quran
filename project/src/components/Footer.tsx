@@ -1,6 +1,8 @@
 import { BookOpen, Heart, Instagram } from 'lucide-react';
 
 export default function Footer() {
+  const INSTAGRAM_LINK = "https://www.instagram.com/somme_de_jours/";
+
   return (
     <footer className="bg-primary-700 dark:bg-gray-950 border-t border-primary-800 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -23,13 +25,15 @@ export default function Footer() {
           </div>
 
           <div className="text-right">
-            <a
-              href="#"
-              className="inline-flex items-center gap-1.5 text-primary-100 hover:text-gold-300 text-xs mb-1 transition-colors"
-            >
-              <Instagram className="w-3.5 h-3.5" />
-              Une question ? Contactez-nous
-            </a>
+         <a
+  href={INSTAGRAM_LINK}   // ← au lieu de "#"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-1.5 text-primary-100 hover:text-gold-300 text-xs mb-1 transition-colors"
+>
+  <Instagram className="w-3.5 h-3.5" />
+  Une question ? Contactez-nous
+</a>
             <p className="text-primary-300 dark:text-gray-500 text-xs">
               © {new Date().getFullYear()} Hifz Al-Quran
             </p>
