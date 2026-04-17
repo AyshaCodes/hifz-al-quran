@@ -127,14 +127,23 @@ export default function Home() {
           </motion.p>
 
           {profile && userStats ? (
-  <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-  <button onClick={() => navigate('/hifz')} className="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all flex items-center gap-2 text-lg">
-    Commencer mon Hifz <ChevronRight className="w-5 h-5" />
-  </button>
-  <button onClick={() => navigate('/lire')} className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold py-3 px-8 rounded-full transition-all flex items-center gap-2">
-    <BookOpen className="w-5 h-5" /> Lire le Coran
-  </button>
-</motion.div>
+            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button onClick={() => navigate('/hifz')} className="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all flex items-center gap-2 text-lg">
+                Commencer mon Hifz <ChevronRight className="w-5 h-5" />
+              </button>
+              <button onClick={() => navigate('/lire')} className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold py-3 px-8 rounded-full transition-all flex items-center gap-2">
+                <BookOpen className="w-5 h-5" /> Lire le Coran
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button onClick={() => navigate('/hifz')} className="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all flex items-center gap-2 text-lg">
+                Commencer mon Hifz <ChevronRight className="w-5 h-5" />
+              </button>
+              <button onClick={() => navigate('/lire')} className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-semibold py-3 px-8 rounded-full transition-all flex items-center gap-2">
+                <BookOpen className="w-5 h-5" /> Lire le Coran
+              </button>
+            </motion.div>
           )}
         </div>
       </motion.section>
@@ -270,19 +279,6 @@ export default function Home() {
           </button>
         </motion.div>
       </section>
-    </div>
-  );
-}
-
-// Composant carte statistique
-function StatsCard({ label, value, icon: Icon }: { label: string; value: string | number; icon: any }) {
-  return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 hover:scale-105 transition">
-      <div className="flex items-center justify-center gap-2 text-stone-300 mb-1">
-        <Icon className="w-4 h-4" />
-        <span className="text-xs uppercase tracking-wide">{label}</span>
-      </div>
-      <p className="text-white text-2xl font-bold">{value}</p>
     </div>
   );
 }
