@@ -1,14 +1,36 @@
 // Utilisation de l'API directe par défaut pour éviter les problèmes de proxy
 const DIRECT_API = 'https://api.alquran.cloud/v1';
 
+// Cache simple en mémoire pour éviter les requêtes répétées
+const cache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
+
+function getCacheKey(endpoint: string, params?: string): string {
+  return `${endpoint}${params ? `_${params}` : ''}`;
+}
+
+function getFromCache(key: string): any | null {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+  cache.delete(key);
+  return null;
+}
+
+function setCache(key: string, data: any): void {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
 // Retry optimisé pour gérer les erreurs 429 et CORS
 async function fetchWithRetry(path: string, maxRetries = 3): Promise<Response> {
-  // On essaie d'abord l'API directe car elle est plus fiable que le proxy local
   const url = `${DIRECT_API}${path}`;
   
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const response = await fetch(url);
+      // Ajout d'un paramètre timestamp pour éviter le cache navigateur agressif
+      const finalUrl = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      const response = await fetch(finalUrl);
       
       if (response.status === 429) {
         const waitTime = Math.pow(2, attempt) * 1000;
@@ -18,7 +40,7 @@ async function fetchWithRetry(path: string, maxRetries = 3): Promise<Response> {
       
       if (response.ok) return response;
       
-      // Fallback vers le proxy /api/quran si on est sur Vercel et que le direct échoue
+      // Fallback vers le proxy si on est sur Vercel
       if (attempt === maxRetries && typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
         const proxyRes = await fetch(`/api/quran${path}`);
         if (proxyRes.ok) return proxyRes;

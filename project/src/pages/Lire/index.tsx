@@ -170,8 +170,14 @@ export default function LirePage() {
       setPageError(null);
       setReachedSurahEnd(false);
       try {
+        console.log('Loading page:', mushafPage);
         const pageData = await fetchPageWithTranslation(mushafPage);
         if (cancelled) return;
+        
+        if (!pageData || !pageData.ayahs || pageData.ayahs.length === 0) {
+          throw new Error('Page vide ou invalide');
+        }
+
         setLecturePages([
           {
             pageNumber: mushafPage,
@@ -184,10 +190,10 @@ export default function LirePage() {
         if (!cancelled) {
           console.error('Error loading page:', err);
           const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-          if (errorMessage.includes('429') || errorMessage.includes('CORS')) {
-            setPageError('Service temporairement indisponible. Veuillez réessayer dans quelques minutes.');
+          if (errorMessage.includes('429')) {
+            setPageError('Trop de requêtes. Veuillez patienter quelques secondes...');
           } else {
-            setPageError('Impossible de charger la page du Mushaf.');
+            setPageError(`Erreur : ${errorMessage}. Vérifiez votre connexion.`);
           }
         }
       } finally {
