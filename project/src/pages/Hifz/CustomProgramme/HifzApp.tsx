@@ -10,7 +10,6 @@ import { DailyProgress, PageQuality, UserProfile } from '../../../types';
 import { QuestionnaireData } from '../../../types/hifz';
 import Dashboard from './Dashboard';
 import QuestionnaireContainer from './QuestionnaireContainer';
-
 export default function HifzPage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useLocalStorage<UserProfile | null>('hifz-profile', null);

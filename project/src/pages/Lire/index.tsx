@@ -173,11 +173,10 @@ export default function LirePage() {
       try {
         const pageData = await fetchPageWithTranslation(mushafPage);
         if (cancelled) return;
-        const filteredAyahs = pageData.ayahs.filter((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
         setLecturePages([
           {
             pageNumber: mushafPage,
-            verses: filteredAyahs,
+            verses: pageData.ayahs,
             juz: pageData.juz,
             hizbQuarter: pageData.hizbQuarter,
           },
@@ -210,19 +209,19 @@ export default function LirePage() {
     try {
       const nextPageNumber = lastPage + 1;
       const pageData = await fetchPageWithTranslation(nextPageNumber);
-      const containsSelectedSurah = pageData.ayahs.some((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
-      if (!containsSelectedSurah) {
+      
+      if (!pageData.ayahs || pageData.ayahs.length === 0) {
         setReachedSurahEnd(true);
         return;
       }
-      const filteredAyahs = pageData.ayahs.filter((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
+
       setLecturePages((prev) => {
         if (prev.some((p) => p.pageNumber === nextPageNumber)) return prev;
         return [
           ...prev,
           {
             pageNumber: nextPageNumber,
-            verses: filteredAyahs,
+            verses: pageData.ayahs,
             juz: pageData.juz,
             hizbQuarter: pageData.hizbQuarter,
           },
@@ -293,24 +292,42 @@ export default function LirePage() {
     else setDesktopSidebarVisible((prev) => !prev);
   };
 
-  const handleSelectSurah = (surahNumber: number) => {
+  const handleSelectSurah = async (surahNumber: number) => {
     if (surahNumber === selectedSurah) return;
-    skipAutoPageRef.current = false; // laisser le recalcul auto se faire
-    setSelectedSurah(surahNumber);
+    
     setLecturePages([]);
     setReachedSurahEnd(false);
+    
+    if (readMode === 'lecture') {
+      skipAutoPageRef.current = true;
+      try {
+        const firstPage = await fetchFirstPageForSurah(surahNumber);
+        setSelectedSurah(surahNumber);
+        setMushafPage(firstPage);
+      } catch (err) {
+        console.error('Erreur lors du changement de sourate', err);
+        setSelectedSurah(surahNumber);
+      }
+    } else {
+      setSelectedSurah(surahNumber);
+    }
   };
 
-  const handleSelectPage = (page: number) => {
+  const handleSelectPage = async (page: number) => {
     skipAutoPageRef.current = true;
-    setMushafPage(Math.min(604, Math.max(1, page)));
+    const pageNum = Math.min(604, Math.max(1, page));
     setLecturePages([]);
     setReachedSurahEnd(false);
     setReadMode('lecture');
-    // Mettre à jour selectedSurah avec la sourate de cette page
-    fetchSurahForMushafPage(page)
-      .then((surahNum) => setSelectedSurah(surahNum))
-      .catch(() => {});
+
+    try {
+      const surahNum = await fetchSurahForMushafPage(pageNum);
+      setSelectedSurah(surahNum);
+      setMushafPage(pageNum);
+    } catch (err) {
+      console.error('Erreur lors du changement de page', err);
+      setMushafPage(pageNum);
+    }
   };
 
   useEffect(() => {
@@ -355,7 +372,7 @@ export default function LirePage() {
                     <button
                       key={p}
                       type="button"
-                      onClick={() => setMushafPage(p)}
+                      onClick={() => handleSelectPage(p)}
                       className={`px-2 py-0.5 rounded-full transition ${
                         p === mushafPage ? 'bg-white text-green-800' : 'bg-white/20 text-white hover:bg-white/30'
                       }`}
