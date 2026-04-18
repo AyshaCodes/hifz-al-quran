@@ -1,5 +1,6 @@
 import { Moon, Sun, Menu, X, BookOpen } from 'lucide-react';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from '../hooks/useRouter';
 
 interface HeaderProps {
