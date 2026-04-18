@@ -1,3 +1,4 @@
+// Fix Vercel deployment - updated imports paths
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
