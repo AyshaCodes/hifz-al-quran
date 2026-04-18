@@ -146,15 +146,15 @@ export default function AyahByAyahView({
                   </div>
 
                   <p
-                    className="font-arabic text-lg sm:text-xl text-center text-gray-900 dark:text-gray-50 leading-[3] mb-8 font-normal"
-                    style={{ direction: 'rtl' }}
+                    className="font-arabic text-lg sm:text-xl text-center text-gray-900 dark:text-gray-50 leading-[3.5] mb-10 font-normal"
+                    style={{ direction: 'rtl', wordSpacing: '0.1em' }}
                   >
                     {displayArabic}
                   </p>
 
-                  <div className="w-16 h-px bg-stone-100 dark:bg-gray-800 mx-auto mb-8 rounded-full" />
+                  <div className="w-16 h-px bg-stone-100 dark:bg-gray-800 mx-auto mb-10 rounded-full" />
 
-                  <p className="font-amiri text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed italic text-center max-w-2xl mx-auto">
+                  <p className="font-amiri text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-[2] italic text-center max-w-2xl mx-auto tracking-wide">
                     {verse.translation}
                   </p>
                 </article>

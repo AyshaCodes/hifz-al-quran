@@ -152,9 +152,9 @@ export default function Home() {
       <div className="max-w-4xl mx-auto px-4 -mt-20 relative z-20">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="premium-card p-10 text-center">
           <p className="text-xs uppercase tracking-[0.3em] font-bold text-primary-600 dark:text-primary-400 mb-6">✨ Verset du jour</p>
-          <p className="font-arabic text-xl sm:text-2xl text-gray-800 dark:text-gray-100 leading-relaxed mb-8 font-normal" dir="rtl">{dailyVerse.arabic}</p>
+          <p className="font-arabic text-xl sm:text-2xl text-gray-800 dark:text-gray-100 leading-[3] mb-8 font-normal" dir="rtl">{dailyVerse.arabic}</p>
           <div className="w-24 h-1 bg-gradient-to-r from-transparent via-primary-200 dark:via-primary-800 to-transparent mx-auto mb-8 rounded-full" />
-          <p className="font-amiri text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed italic">« {dailyVerse.french} »</p>
+          <p className="font-amiri text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-[2] italic">« {dailyVerse.french} »</p>
           <p className="text-xs font-medium text-stone-400 dark:text-stone-500 mt-6 tracking-widest">— {dailyVerse.ref}</p>
         </motion.div>
       </div>

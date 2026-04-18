@@ -83,8 +83,8 @@ export default function Signets() {
                     </div>
 
                     <p
-                      className="font-arabic text-lg sm:text-xl text-gray-800 dark:text-gray-100 leading-[2] mb-6 font-normal"
-                      style={{ direction: 'rtl' }}
+                      className="font-arabic text-lg sm:text-xl text-gray-800 dark:text-gray-100 leading-[3] mb-6 font-normal"
+                      style={{ direction: 'rtl', wordSpacing: '0.1em' }}
                     >
                       {bookmark.verseText}
                     </p>
