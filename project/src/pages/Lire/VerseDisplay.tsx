@@ -174,8 +174,8 @@ export default function VerseDisplay({
 
                         {!showTranslation ? (
                           <p
-                            className="text-[1.6rem] leading-[2] text-gray-900 dark:text-gray-100"
-                            style={{ direction: 'rtl', textAlign: 'justify', fontFamily: "'Scheherazade New', 'Amiri', serif" }}
+                            className="text-[1.6rem] leading-[2.2] text-gray-900 dark:text-gray-100 font-arabic"
+                            style={{ direction: 'rtl', textAlign: 'justify' }}
                           >
                             {group.verses.map((verse) => {
                               const cleanText = stripPrependedBismillahFromVerseOne(
@@ -204,8 +204,8 @@ export default function VerseDisplay({
                               return (
                                 <div key={verse.number} className="pb-1.5 last:pb-0">
                                   <p
-                                    className="text-[1.6rem] leading-[2] text-gray-900 dark:text-gray-100"
-                                    style={{ direction: 'rtl', textAlign: 'justify', fontFamily: "'Scheherazade New', 'Amiri', serif" }}
+                                    className="text-[1.6rem] leading-[2.2] text-gray-900 dark:text-gray-100 font-arabic"
+                                    style={{ direction: 'rtl', textAlign: 'justify' }}
                                   >
                                     {cleanText}{' '}
                                     <span className="text-[0.95rem] text-gold-700 dark:text-gold-400 align-middle">

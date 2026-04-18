@@ -52,7 +52,7 @@ export default function Header({ isDark, onToggleDark }: HeaderProps) {
                 onClick={() => handleNav(path)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   currentPath === path
-                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                    ? 'bg-primary-600 text-white shadow-md'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-beige-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
                 }`}
               >
@@ -89,7 +89,7 @@ export default function Header({ isDark, onToggleDark }: HeaderProps) {
                 onClick={() => handleNav(path)}
                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   currentPath === path
-                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                    ? 'bg-primary-600 text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-beige-100 dark:hover:bg-gray-800'
                 }`}
               >
