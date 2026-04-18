@@ -7,6 +7,7 @@ import {
   getTodayStr,
 } from '../../../lib/hifzSchedule';
 import { DailyProgress, PageQuality, UserProfile } from '../../../types';
+import { QuestionnaireData } from '../../../types/hifz';
 import Dashboard from './Dashboard';
 import QuestionnaireContainer from './QuestionnaireContainer';
 
@@ -41,8 +42,37 @@ export default function HifzPage() {
   const [progress, setProgress] = useLocalStorage<DailyProgress[]>('hifz-progress', []);
   const [kahfReadDates, setKahfReadDates] = useLocalStorage<string[]>('hifz-kahf-read-dates', []);
 
-  const handleCreateProfile = (newProfile: UserProfile) => {
-    setProfile(newProfile);
+  const convertQuestionnaireToProfile = (data: QuestionnaireData): UserProfile => {
+    const today = getTodayStr();
+    const revisionOnlyUntil = data.qualiteMemorisation === 'oubliee' 
+      ? addDaysISO(today, 30) 
+      : undefined;
+
+    // Convertir QualiteMemorisation vers MemorizationQuality
+    const memorizationQuality: 'good' | 'partial' | 'forgotten' = 
+      data.qualiteMemorisation === 'solide' ? 'good' :
+      data.qualiteMemorisation === 'partielle' ? 'partial' :
+      'forgotten';
+
+    return {
+      prenom: data.prenom,
+      juzActuel: data.juzArrive,
+      objectif: data.objectif === 'revision' 
+        ? 'Révision et consolidation'
+        : data.aDateObjectif 
+          ? `Mémoriser ${data.nombreJuzObjectif} Juz avant le ${data.dateObjectif}`
+          : `Mémoriser ${data.nombreJuzObjectif} Juz`,
+      tempsParJour: data.minutesParJour,
+      createdAt: new Date().toISOString(),
+      memorizationQuality,
+      revisionOnlyUntil,
+      urgentReviewPages: [],
+    };
+  };
+
+  const handleCreateProfile = (questionnaireData: QuestionnaireData) => {
+    const profile = convertQuestionnaireToProfile(questionnaireData);
+    setProfile(profile);
     setProgress([]);
   };
 

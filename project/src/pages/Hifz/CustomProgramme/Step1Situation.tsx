@@ -1,5 +1,7 @@
+import { Situation } from '../../../types/hifz';
+
 interface Props {
-  value: 'debutant' | 'revision' | null;
+  value: Situation | null;
   onChange: (value: 'debutant' | 'revision') => void;
 }
 
