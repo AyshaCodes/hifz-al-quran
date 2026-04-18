@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from './hooks/useRouter';
-import HifzChoice from './pages/Hifz/index';
-import HifzApp from './pages/Hifz/CustomProgramme/HifzApp';
-import GuidedApp from './pages/Hifz/GuidedProgramme/GuidedApp';
+import HifzChoice from './pages/hifz/index';
+import HifzApp from './pages/hifz/CustomProgramme/HifzApp';
+import GuidedApp from './pages/hifz/GuidedProgramme/GuidedApp';
 
 function App() {
   const { path, navigate } = useRouter();
