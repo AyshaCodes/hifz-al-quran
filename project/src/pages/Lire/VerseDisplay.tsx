@@ -142,7 +142,7 @@ export default function VerseDisplay({
   const formatAyahMarker = (ayahNumber: number) => `﴿${toArabicIndicDigits(ayahNumber)}﴾`;
 
   return (
-    <div className="flex-1 min-h-0 bg-[#f8f6e9] dark:bg-gray-950">
+    <div className="flex-1 min-h-0 bg-beige-100 dark:bg-gray-900">
       <CompactSurahAudio
         surahNumber={surahNumber ?? 0}
         verses={audioVerses}
@@ -158,7 +158,7 @@ export default function VerseDisplay({
           const pageSurahGroups = groupPageVersesBySurah(page.verses);
           return (
             <div key={page.pageNumber} className="mb-6">
-              <div className="rounded-lg border border-beige-200/70 dark:border-gray-800/80 bg-[#f8f6e9] dark:bg-gray-900/70 px-4 sm:px-5 py-4">
+              <div className="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900/70 px-4 sm:px-5 py-4 shadow-sm">
                 <div className="flex items-center justify-end text-[10px] text-gray-500/80 dark:text-gray-400 mb-2.5">
                   <span className="px-2 py-0.5 rounded-full bg-beige-200/60 dark:bg-gray-800/80">
                     Page {page.pageNumber}

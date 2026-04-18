@@ -321,7 +321,7 @@ export default function LirePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-blue-950 dark:via-gray-900 dark:to-blue-950">
-      <div className="relative flex flex-col lg:flex-row">
+      <div className="relative flex flex-col lg:flex-row h-screen overflow-hidden">
         <SurahSidebar
           selectedSurah={selectedSurah}
           onSelectSurah={handleSelectSurah}
@@ -331,7 +331,7 @@ export default function LirePage() {
           memorizingSurahNumber={memorizingSurahNumber}
         />
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col h-screen overflow-y-auto">
           {fromHifz && (
             <div className="px-4 py-2 bg-green-800 text-white text-sm flex flex-wrap items-center justify-between gap-3">
               <button
@@ -360,7 +360,7 @@ export default function LirePage() {
             </div>
           )}
 
-          <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800">
+          <div className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 flex-shrink-0">
             <div className="flex items-center gap-3 px-4 py-3">
               <button
                 type="button"
