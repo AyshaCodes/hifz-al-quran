@@ -62,7 +62,7 @@ export default function AyahByAyahView({
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-[#faf8f1] dark:bg-gray-950/50">
+    <div className="flex-1 flex flex-col min-h-0 bg-stone-50/50 dark:bg-gray-950/50">
       <audio
         ref={audioRef}
         onEnded={() => {
@@ -73,7 +73,7 @@ export default function AyahByAyahView({
         onPause={() => setIsPlaying(false)}
       />
 
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
         <CompactSurahAudio
           ref={compactSurahAudioRef}
           surahNumber={surahNumber}
@@ -81,73 +81,86 @@ export default function AyahByAyahView({
           reciterId={reciterId}
           onReciterChange={onReciterChange}
           otherAudioRef={audioRef}
-          toolbarClassName="bg-[#faf8f1]/92 dark:bg-gray-950/92"
+          toolbarClassName="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-stone-200/50 dark:border-white/5"
         />
         <SurahIntro surahNumber={surahNumber} />
 
-        <div className="max-w-5xl mx-auto px-4 py-6 bg-white/80 dark:bg-gray-900/80">
-          {verses.map((verse) => {
-            const displayArabic = stripPrependedBismillahFromVerseOne(
-              surahNumber,
-              verse.numberInSurah,
-              verse.text
-            );
-            const verseRef = `${surahNumber}:${verse.numberInSurah}`;
-            const isCurrent = currentPlayingVerse === verse.numberInSurah;
+        <div className="max-w-4xl mx-auto px-4 py-12">
+          <div className="space-y-6">
+            {verses.map((verse) => {
+              const displayArabic = stripPrependedBismillahFromVerseOne(
+                surahNumber,
+                verse.numberInSurah,
+                verse.text
+              );
+              const verseRef = `${surahNumber}:${verse.numberInSurah}`;
+              const isCurrent = currentPlayingVerse === verse.numberInSurah;
 
-            return (
-              <article key={verse.number} className="py-6 sm:py-8 border-b border-beige-200/80 dark:border-gray-800/80 last:border-b-0">
-                <div className="flex items-center justify-between gap-4 mb-3">
-                  <span className="text-xs font-mono text-gray-400 dark:text-gray-500 tabular-nums">
-                    {verseRef}
-                  </span>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handlePlayVerse(verse)}
-                      className="p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-beige-100 dark:hover:bg-gray-800 transition-colors"
-                      title="Lire le verset"
-                    >
-                      {isCurrent && isPlaying ? (
-                        <Pause className="w-3.5 h-3.5" />
-                      ) : (
-                        <Play className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => onToggleBookmark({ ...verse, text: displayArabic })}
-                      className={`p-1.5 rounded-md transition-colors ${
-                        isBookmarked(verse.numberInSurah)
-                          ? 'text-gold-500'
-                          : 'text-gray-500 dark:text-gray-400 hover:text-gold-400 hover:bg-beige-100 dark:hover:bg-gray-800'
-                      }`}
-                      title={isBookmarked(verse.numberInSurah) ? 'Retirer le signet' : 'Ajouter un signet'}
-                    >
-                      {isBookmarked(verse.numberInSurah) ? (
-                        <BookmarkCheck className="w-3.5 h-3.5" />
-                      ) : (
-                        <Bookmark className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <p
-                  className="font-arabic text-2xl sm:text-[1.8rem] text-center text-gray-900 dark:text-gray-50 leading-[1.7] mb-3"
-                  style={{ direction: 'rtl' }}
+              return (
+                <article 
+                  key={verse.number} 
+                  className={`premium-card p-8 transition-all duration-500 ${
+                    isCurrent ? 'ring-2 ring-primary-500/50 bg-primary-50/30 dark:bg-primary-900/10 shadow-xl scale-[1.02]' : 'hover:scale-[1.01]'
+                  }`}
                 >
-                  {displayArabic}
-                </p>
+                  <div className="flex items-center justify-between gap-4 mb-8">
+                    <span className="px-3 py-1 rounded-full bg-stone-100 dark:bg-gray-800 text-[10px] font-bold text-stone-500 dark:text-stone-400 tracking-widest uppercase">
+                      Verset {verseRef}
+                    </span>
 
-                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed italic text-center">
-                  {verse.translation}
-                </p>
-              </article>
-            );
-          })}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handlePlayVerse(verse)}
+                        className={`p-2.5 rounded-xl transition-all duration-300 ${
+                          isCurrent && isPlaying 
+                            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20' 
+                            : 'bg-stone-100 dark:bg-gray-800 text-stone-600 dark:text-stone-400 hover:text-primary-600 dark:hover:text-primary-400'
+                        }`}
+                        title="Lire le verset"
+                      >
+                        {isCurrent && isPlaying ? (
+                          <Pause className="w-5 h-5" />
+                        ) : (
+                          <Play className="w-5 h-5" />
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onToggleBookmark({ ...verse, text: displayArabic })}
+                        className={`p-2.5 rounded-xl transition-all duration-300 ${
+                          isBookmarked(verse.numberInSurah)
+                            ? 'bg-gold-100 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400'
+                            : 'bg-stone-100 dark:bg-gray-800 text-stone-600 dark:text-stone-400 hover:text-gold-500'
+                        }`}
+                        title={isBookmarked(verse.numberInSurah) ? 'Retirer le signet' : 'Ajouter un signet'}
+                      >
+                        {isBookmarked(verse.numberInSurah) ? (
+                          <BookmarkCheck className="w-5 h-5" />
+                        ) : (
+                          <Bookmark className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <p
+                    className="font-arabic text-3xl sm:text-4xl text-center text-gray-900 dark:text-gray-50 leading-[2] mb-8"
+                    style={{ direction: 'rtl' }}
+                  >
+                    {displayArabic}
+                  </p>
+
+                  <div className="w-16 h-0.5 bg-stone-100 dark:bg-gray-800 mx-auto mb-8 rounded-full" />
+
+                  <p className="font-amiri text-xl text-gray-600 dark:text-gray-400 leading-relaxed italic text-center max-w-2xl mx-auto">
+                    {verse.translation}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

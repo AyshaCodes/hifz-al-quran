@@ -4,42 +4,55 @@ export default function Footer() {
   const INSTAGRAM_LINK = "https://www.instagram.com/somme_de_jours/";
 
   return (
-    <footer className="bg-primary-700 dark:bg-gray-950 border-t border-primary-800 dark:border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-white" />
+    <footer className="bg-primary-950 dark:bg-gray-950 border-t border-white/5 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary-500/20 to-transparent" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+          
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <div className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl green-gradient flex items-center justify-center shadow-lg shadow-primary-600/20 rotate-3 group-hover:rotate-0 transition-all">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-amiri text-2xl text-white font-bold">Hifz Al-Quran</span>
             </div>
-            <span className="font-amiri text-lg text-white font-bold">Hifz Al-Quran</span>
+            <p className="text-primary-200/60 dark:text-gray-500 text-xs tracking-widest uppercase font-bold text-center md:text-left">
+              Votre compagnon spirituel de mémorisation
+            </p>
           </div>
 
-          <div className="text-center">
-            <p className="font-arabic text-lg text-gold-300 mb-1">
+          <div className="text-center space-y-4">
+            <p className="font-arabic text-3xl text-gold-400 drop-shadow-sm">
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </p>
-            <p className="text-primary-200 dark:text-gray-400 text-sm flex items-center gap-1 justify-center">
-              Qu'Allah facilite votre mémorisation
-              <Heart className="w-3.5 h-3.5 text-gold-400 fill-gold-400" />
-            </p>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-primary-100 dark:text-gray-400 text-sm font-amiri italic">
+                Qu'Allah facilite votre mémorisation
+              </p>
+              <Heart className="w-4 h-4 text-gold-500 fill-gold-500 animate-pulse" />
+            </div>
           </div>
 
-          <div className="text-right">
-         <a
-  href={INSTAGRAM_LINK}   // ← au lieu de "#"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-flex items-center gap-1.5 text-primary-100 hover:text-gold-300 text-xs mb-1 transition-colors"
->
-  <Instagram className="w-3.5 h-3.5" />
-  Une question ? Contactez-nous
-</a>
-            <p className="text-primary-300 dark:text-gray-500 text-xs">
-              © {new Date().getFullYear()} Hifz Al-Quran
-            </p>
-            <p className="text-primary-400 dark:text-gray-600 text-xs mt-0.5">
-              Tous droits réservés
-            </p>
+          <div className="flex flex-col items-center md:items-end gap-6">
+            <a
+              href={INSTAGRAM_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all flex items-center gap-3 group shadow-xl"
+            >
+              <Instagram className="w-5 h-5 text-gold-400 group-hover:scale-110 transition-transform" />
+              <div className="flex flex-col items-start">
+                <span className="text-[10px] uppercase tracking-widest font-bold text-primary-300">Une question ?</span>
+                <span className="text-sm font-semibold">Contactez-nous</span>
+              </div>
+            </a>
+            
+            <div className="text-center md:text-right">
+              <p className="text-primary-400 dark:text-gray-600 text-[10px] font-bold uppercase tracking-[0.2em]">
+                © {new Date().getFullYear()} Hifz Al-Quran • Tous droits réservés
+              </p>
+            </div>
           </div>
         </div>
       </div>

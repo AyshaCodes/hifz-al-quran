@@ -127,20 +127,20 @@ export default function Home() {
           </motion.p>
 
           {profile && userStats ? (
-            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button onClick={() => navigate('/hifz')} className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 px-10 rounded-full shadow-xl transition-all flex items-center gap-2 text-lg active:scale-95">
-                Commencer mon Hifz <ChevronRight className="w-5 h-5" />
+            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <button onClick={() => navigate('/hifz')} className="btn-premium px-10 py-4 text-lg">
+                Continuer mon Hifz <ChevronRight className="w-5 h-5" />
               </button>
-              <button onClick={() => navigate('/lire')} className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3.5 px-10 rounded-full transition-all flex items-center gap-2 border border-white/30 active:scale-95">
+              <button onClick={() => navigate('/lire')} className="btn-secondary px-10 py-4 text-lg">
                 <BookOpen className="w-5 h-5" /> Lire le Coran
               </button>
             </motion.div>
           ) : (
-            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button onClick={() => navigate('/hifz')} className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 px-10 rounded-full shadow-xl transition-all flex items-center gap-2 text-lg active:scale-95">
+            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <button onClick={() => navigate('/hifz')} className="btn-premium px-10 py-4 text-lg">
                 Commencer mon Hifz <ChevronRight className="w-5 h-5" />
               </button>
-              <button onClick={() => navigate('/lire')} className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3.5 px-10 rounded-full transition-all flex items-center gap-2 border border-white/30 active:scale-95">
+              <button onClick={() => navigate('/lire')} className="btn-secondary px-10 py-4 text-lg">
                 <BookOpen className="w-5 h-5" /> Lire le Coran
               </button>
             </motion.div>
@@ -149,50 +149,51 @@ export default function Home() {
       </motion.section>
 
       {/* Verset du jour */}
-      <div className="max-w-3xl mx-auto px-4 -mt-16 relative z-20">
-        <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/50 dark:border-stone-700 text-center">
-          <p className="text-xs uppercase tracking-[0.2em] font-bold text-primary-600 dark:text-primary-400 mb-4">✨ Verset du jour</p>
-          <p className="font-arabic text-3xl md:text-4xl text-gray-800 dark:text-gray-100 leading-relaxed mb-6" dir="rtl">{dailyVerse.arabic}</p>
-          <div className="w-16 h-1 bg-primary-100 dark:bg-primary-900/30 mx-auto mb-6 rounded-full" />
-          <p className="font-amiri text-xl text-gray-700 dark:text-gray-300 leading-relaxed italic">« {dailyVerse.french} »</p>
-          <p className="text-sm font-medium text-stone-400 dark:text-stone-500 mt-4 tracking-wide">— {dailyVerse.ref}</p>
+      <div className="max-w-4xl mx-auto px-4 -mt-20 relative z-20">
+        <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="premium-card p-10 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] font-bold text-primary-600 dark:text-primary-400 mb-6">✨ Verset du jour</p>
+          <p className="font-arabic text-4xl md:text-5xl text-gray-800 dark:text-gray-100 leading-relaxed mb-8" dir="rtl">{dailyVerse.arabic}</p>
+          <div className="w-24 h-1 bg-gradient-to-r from-transparent via-primary-200 dark:via-primary-800 to-transparent mx-auto mb-8 rounded-full" />
+          <p className="font-amiri text-2xl text-gray-700 dark:text-gray-300 leading-relaxed italic">« {dailyVerse.french} »</p>
+          <p className="text-sm font-medium text-stone-400 dark:text-stone-500 mt-6 tracking-widest">— {dailyVerse.ref}</p>
         </motion.div>
       </div>
 
       {/* Section Fonctionnalités */}
-      <section className="py-20 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="font-amiri text-4xl text-primary-800 dark:text-primary-400">Une expérience complète</motion.h2>
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="text-stone-500 dark:text-stone-400">Outils pensés pour faciliter votre mémorisation</motion.p>
+      <section className="section-container">
+        <div className="text-center">
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="section-title">Une expérience complète</motion.h2>
+          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="section-subtitle">Outils pensés pour faciliter votre mémorisation</motion.p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-8">
           {features.map((f, i) => (
-            <motion.button key={f.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} whileHover={{ y: -8 }} onClick={() => navigate(f.path)} className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all text-left border border-stone-100 dark:border-gray-700">
-              <div className={`w-12 h-12 rounded-full ${f.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition`}>
-                <f.icon className={`w-6 h-6 ${f.iconColor}`} />
+            <motion.button key={f.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} whileHover={{ y: -10 }} onClick={() => navigate(f.path)} className="group premium-card p-8 text-left border-none shadow-lg">
+              <div className={`w-14 h-14 rounded-2xl ${f.bgColor} flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                <f.icon className={`w-7 h-7 ${f.iconColor}`} />
               </div>
-              <h3 className="font-bold text-lg text-gray-800 dark:text-white mb-2">{f.title}</h3>
-              <p className="text-stone-500 dark:text-stone-400 text-sm">{f.desc}</p>
+              <h3 className="font-bold text-xl text-gray-800 dark:text-white mb-3">{f.title}</h3>
+              <p className="text-stone-500 dark:text-stone-400 leading-relaxed">{f.desc}</p>
             </motion.button>
           ))}
         </div>
       </section>
 
       {/* Section Comment ça marche */}
-      <section className="py-16 bg-beige-50 dark:bg-gray-900">
+      <section className="py-24 bg-stone-100/50 dark:bg-gray-900/50">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="font-amiri text-3xl text-primary-800 dark:text-primary-400">En trois étapes simples</h2>
+          <div className="text-center mb-16">
+            <h2 className="section-title">En trois étapes simples</h2>
+            <p className="section-subtitle">Commencez votre voyage spirituel aujourd'hui</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-12">
             {steps.map((s, i) => (
-              <motion.div key={s.title} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }} className="relative text-center">
-                <div className="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-4">
-                  <s.icon className="w-8 h-8 text-primary-700 dark:text-primary-400" />
+              <motion.div key={s.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="relative text-center group">
+                <div className="w-24 h-24 rounded-3xl bg-white dark:bg-gray-800 shadow-xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-500 border border-stone-100 dark:border-gray-700">
+                  <s.icon className="w-10 h-10 text-primary-600 dark:text-primary-400" />
                 </div>
-                <h3 className="font-bold text-gray-800 dark:text-white">{s.title}</h3>
-                <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{s.desc}</p>
-                {i < 2 && <ArrowRight className="hidden md:block absolute top-1/3 -right-6 w-5 h-5 text-stone-400" />}
+                <h3 className="font-bold text-xl text-gray-800 dark:text-white mb-4">{s.title}</h3>
+                <p className="text-stone-500 dark:text-stone-400 leading-relaxed">{s.desc}</p>
+                {i < 2 && <ArrowRight className="hidden lg:block absolute top-1/4 -right-6 w-8 h-8 text-stone-300 dark:text-stone-700" />}
               </motion.div>
             ))}
           </div>
@@ -201,43 +202,43 @@ export default function Home() {
 
       {/* Progression visuelle */}
       {profile && progress.length > 0 && (
-        <section className="py-16 max-w-7xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="font-amiri text-3xl text-primary-800 dark:text-primary-400">Votre cheminement</h2>
-            <p className="text-stone-500 dark:text-stone-400">Visualisez vos efforts et votre régularité</p>
+        <section className="section-container">
+          <div className="text-center">
+            <h2 className="section-title">Votre cheminement</h2>
+            <p className="section-subtitle">Visualisez vos efforts et votre régularité</p>
           </div>
           <div className="grid lg:grid-cols-2 gap-8">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-stone-100 dark:border-gray-700">
-              <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-4">Progression quotidienne</h3>
-              <div className="h-64">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} className="premium-card p-8 shadow-lg">
+              <h3 className="font-bold text-xl text-gray-800 dark:text-white mb-6">Progression quotidienne</h3>
+              <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                     <XAxis dataKey="day" stroke="#9ca3af" axisLine={false} tickLine={false} />
                     <YAxis stroke="#9ca3af" axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                    <Line type="monotone" dataKey="pages" stroke="#2d6a4f" strokeWidth={4} dot={{ fill: '#2d6a4f', r: 5, strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8 }} />
+                    <Tooltip contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }} />
+                    <Line type="monotone" dataKey="pages" stroke="#16a34a" strokeWidth={4} dot={{ fill: '#16a34a', r: 5, strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </motion.div>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-4">Taux de complétion</h3>
-              <div className="h-64">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} className="premium-card p-8 shadow-lg">
+              <h3 className="font-bold text-xl text-gray-800 dark:text-white mb-6">Taux de complétion</h3>
+              <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie dataKey="value" data={pieData} cx="50%" cy="50%" outerRadius={80} label>
+                    <Pie dataKey="value" data={pieData} cx="50%" cy="50%" outerRadius={100} innerRadius={60} paddingAngle={5} label>
                       {pieData.map((entry, idx) => <Cell key={idx} fill={entry.color} />)}
                     </Pie>
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex justify-center gap-4 mt-4">
+              <div className="flex justify-center gap-8 mt-6">
                 {pieData.map((entry, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span className="text-sm">{entry.name}</span>
+                  <div key={idx} className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: entry.color }} />
+                    <span className="text-sm font-medium text-stone-600 dark:text-stone-400">{entry.name}</span>
                   </div>
                 ))}
               </div>
@@ -248,20 +249,20 @@ export default function Home() {
 
       {/* Achievements */}
       {profile && (
-        <section className="py-16 bg-stone-50 dark:bg-gray-900/50">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-10">
-              <h2 className="font-amiri text-3xl text-primary-800 dark:text-primary-400">Vos accomplissements</h2>
-              <p className="text-stone-500 dark:text-stone-400">Chaque effort compte</p>
+        <section className="py-24 bg-stone-50 dark:bg-gray-900/30">
+          <div className="section-container">
+            <div className="text-center">
+              <h2 className="section-title">Vos accomplissements</h2>
+              <p className="section-subtitle">Chaque effort compte dans votre parcours</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {achievements.map((ach, idx) => (
-                <motion.div key={ach.id} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.1 }} className={`text-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-sm border ${ach.unlocked ? 'border-primary-100 dark:border-primary-900/30' : 'border-stone-100 dark:border-gray-700 opacity-60'}`}>
-                  <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 ${ach.unlocked ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20' : 'bg-stone-100 dark:bg-gray-700 text-stone-400'}`}>
-                    <ach.icon className="w-8 h-8" />
+                <motion.div key={ach.id} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.1 }} className={`text-center p-8 premium-card ${ach.unlocked ? 'border-primary-100 dark:border-primary-900/30' : 'opacity-60 grayscale'}`}>
+                  <div className={`w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-6 ${ach.unlocked ? 'green-gradient text-white shadow-xl shadow-primary-600/20' : 'bg-stone-100 dark:bg-gray-800 text-stone-400'}`}>
+                    <ach.icon className="w-10 h-10" />
                   </div>
-                  <p className="font-bold text-gray-800 dark:text-gray-100">{ach.title}</p>
-                  <p className="text-[10px] uppercase tracking-wider text-stone-400 mt-1">{ach.description}</p>
+                  <p className="font-bold text-lg text-gray-800 dark:text-gray-100">{ach.title}</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-stone-400 mt-2">{ach.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -270,14 +271,17 @@ export default function Home() {
       )}
 
       {/* CTA finale */}
-      <section className="py-20 max-w-4xl mx-auto px-4 text-center">
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} className="bg-gradient-to-br from-primary-800 to-primary-950 rounded-[2rem] p-12 shadow-2xl text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
-          <Sparkles className="w-12 h-12 mx-auto mb-6 text-gold-400 animate-pulse" />
-          <p className="font-arabic text-3xl mb-4 leading-relaxed">رَبِّ زِدْنِي عِلْمًا</p>
-          <p className="font-amiri text-xl italic mb-8 text-stone-200">"Seigneur, augmente mes connaissances" (20:114)</p>
-          <button onClick={() => navigate('/hifz')} className="bg-gold-500 hover:bg-gold-400 text-primary-950 font-bold py-4 px-10 rounded-full transition-all inline-flex items-center gap-2 shadow-lg hover:shadow-gold-500/20 active:scale-95">
-            Démarrer mon programme <ChevronRight className="w-5 h-5" />
+      <section className="section-container py-32 text-center">
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} className="relative overflow-hidden bg-primary-900 dark:bg-blue-950 rounded-[3rem] p-16 shadow-2xl text-white">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/20 rounded-full -translate-y-48 translate-x-48 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-gold-500/10 rounded-full translate-y-48 -translate-x-48 blur-3xl" />
+          
+          <Sparkles className="w-16 h-16 mx-auto mb-8 text-gold-400 animate-pulse" />
+          <p className="font-arabic text-4xl md:text-5xl mb-6 leading-relaxed text-glow">رَبِّ زِدْنِي عِلْمًا</p>
+          <p className="font-amiri text-2xl italic mb-12 text-stone-200">"Seigneur, augmente mes connaissances" (20:114)</p>
+          <button onClick={() => navigate('/hifz')} className="relative group overflow-hidden bg-gold-500 hover:bg-gold-400 text-primary-950 font-bold py-5 px-12 rounded-full transition-all inline-flex items-center gap-3 shadow-2xl hover:shadow-gold-500/40 active:scale-95">
+            <span className="relative z-10 text-lg">Démarrer mon programme</span>
+            <ChevronRight className="w-6 h-6 relative z-10 group-hover:translate-x-1 transition-transform" />
           </button>
         </motion.div>
       </section>

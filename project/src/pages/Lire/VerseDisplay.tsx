@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { stripPrependedBismillahFromVerseOne } from '../../lib/bismillah';
 import { ApiPageVerse } from '../../lib/quranApi';
@@ -63,12 +63,12 @@ export default function VerseDisplay({
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center py-20 min-h-0">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-full green-gradient flex items-center justify-center animate-spin">
-            <Loader2 className="w-6 h-6 text-white" />
+      <div className="flex-1 flex items-center justify-center py-20 min-h-0 bg-stone-50 dark:bg-gray-950">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl green-gradient flex items-center justify-center animate-spin shadow-lg shadow-primary-600/20">
+            <Loader2 className="w-8 h-8 text-white" />
           </div>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Chargement de la sourate...</p>
+          <p className="text-stone-500 dark:text-stone-400 font-medium animate-pulse">Chargement de la sourate...</p>
         </div>
       </div>
     );
@@ -76,10 +76,13 @@ export default function VerseDisplay({
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center py-20 min-h-0">
-        <div className="card p-8 text-center max-w-sm">
-          <p className="text-red-500 mb-2 font-medium">Erreur de chargement</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">{error}</p>
+      <div className="flex-1 flex items-center justify-center py-20 min-h-0 bg-stone-50 dark:bg-gray-950">
+        <div className="premium-card p-10 text-center max-w-md mx-4">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <X className="w-8 h-8 text-red-600 dark:text-red-400" />
+          </div>
+          <p className="text-xl font-bold text-gray-800 dark:text-white mb-2">Oups ! Une erreur est survenue</p>
+          <p className="text-stone-500 dark:text-stone-400 leading-relaxed">{error}</p>
         </div>
       </div>
     );
@@ -100,31 +103,28 @@ export default function VerseDisplay({
 
   const textModeToggle = (
     <div
-      className="inline-flex items-center gap-1.5 text-[10px] tabular-nums tracking-wide text-gray-500 dark:text-gray-400"
+      className="inline-flex items-center p-1 bg-stone-100 dark:bg-gray-800 rounded-xl"
       role="group"
       aria-label="Affichage du texte"
     >
       <button
         type="button"
         onClick={() => onTextModeChange('arabic')}
-        className={`px-1 py-0.5 rounded-sm transition-colors ${
+        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
           textMode === 'arabic'
-            ? 'text-gray-900 dark:text-gray-100 font-semibold'
-            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+            ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
+            : 'text-stone-500 hover:text-stone-700 dark:hover:text-stone-300'
         }`}
       >
         AR
       </button>
-      <span className="text-gray-300 dark:text-gray-600 select-none" aria-hidden>
-        |
-      </span>
       <button
         type="button"
         onClick={() => onTextModeChange('both')}
-        className={`px-1 py-0.5 rounded-sm transition-colors ${
+        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
           textMode === 'both'
-            ? 'text-gray-900 dark:text-gray-100 font-semibold'
-            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+            ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
+            : 'text-stone-500 hover:text-stone-700 dark:hover:text-stone-300'
         }`}
       >
         AR + FR
@@ -142,39 +142,48 @@ export default function VerseDisplay({
   const formatAyahMarker = (ayahNumber: number) => `﴿${toArabicIndicDigits(ayahNumber)}﴾`;
 
   return (
-    <div className="flex-1 min-h-0 bg-beige-100 dark:bg-gray-900">
+    <div className="flex-1 min-h-0 bg-stone-50 dark:bg-gray-950/50 custom-scrollbar overflow-y-auto">
       <CompactSurahAudio
         surahNumber={surahNumber ?? 0}
         verses={audioVerses}
         reciterId={reciterId}
         onReciterChange={onReciterChange}
         leadingControls={textModeToggle}
+        toolbarClassName="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-stone-200/50 dark:border-white/5"
       />
 
       {surahNumber && <SurahIntro surahNumber={surahNumber} />}
 
-      <div className="max-w-[650px] mx-auto px-3 py-4 sm:py-5">
+      <div className="max-w-3xl mx-auto px-4 py-8">
         {pages.map((page, pageIndex) => {
           const pageSurahGroups = groupPageVersesBySurah(page.verses);
           return (
-            <div key={page.pageNumber} className="mb-6">
-              <div className="rounded-2xl border border-stone-200 dark:border-gray-800 bg-white dark:bg-gray-900/70 px-4 sm:px-5 py-4 shadow-sm">
-                <div className="flex items-center justify-end text-[10px] text-gray-500/80 dark:text-gray-400 mb-2.5">
-                  <span className="px-2 py-0.5 rounded-full bg-beige-200/60 dark:bg-gray-800/80">
+            <div key={page.pageNumber} className="mb-12">
+              <div className="premium-card p-8 sm:p-10 shadow-lg relative overflow-hidden">
+                <div className="flex items-center justify-between mb-8 border-b border-stone-100 dark:border-white/5 pb-4">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">
+                    Juz {page.juz} • Hizb {Math.ceil(page.hizbQuarter / 4)}
+                  </span>
+                  <span className="px-4 py-1 rounded-full bg-primary-50 dark:bg-primary-900/30 text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest">
                     Page {page.pageNumber}
                   </span>
                 </div>
-                <div className="space-y-4">
+                
+                <div className="space-y-10">
                   {pageSurahGroups.map((group) => {
                     return (
                       <div key={`${page.pageNumber}-${group.surahNumber}-${group.verses[0]?.number ?? 0}`}>
-                        <p className="text-[10px] text-gray-500/85 dark:text-gray-400 mb-1.5">
-                          Sourate {group.surahNumber}
-                        </p>
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className="h-px flex-1 bg-stone-100 dark:bg-white/5" />
+                          <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
+                            Sourate {group.surahNumber}
+                          </p>
+                          <div className="h-px flex-1 bg-stone-100 dark:bg-white/5" />
+                        </div>
 
                         {!showTranslation ? (
                           <p
-                            className="text-[1.6rem] leading-[2.2] text-gray-900 dark:text-gray-100 font-arabic"
+                            className="text-3xl sm:text-4xl leading-[2.2] text-gray-900 dark:text-gray-100 font-arabic"
                             style={{ direction: 'rtl', textAlign: 'justify' }}
                           >
                             {group.verses.map((verse) => {
@@ -184,9 +193,9 @@ export default function VerseDisplay({
                                 verse.text
                               );
                               return (
-                                <span key={verse.number}>
+                                <span key={verse.number} className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-default">
                                   {cleanText}{' '}
-                                  <span className="text-[0.95rem] text-gold-700 dark:text-gold-400 align-middle">
+                                  <span className="text-xl text-gold-600 dark:text-gold-400 align-middle mx-1 font-arabic">
                                     {formatAyahMarker(verse.numberInSurah)}
                                   </span>{' '}
                                 </span>
@@ -194,7 +203,7 @@ export default function VerseDisplay({
                             })}
                           </p>
                         ) : (
-                          <div className="space-y-2">
+                          <div className="space-y-8">
                             {group.verses.map((verse) => {
                               const cleanText = stripPrependedBismillahFromVerseOne(
                                 verse.surahNumber,
@@ -202,19 +211,22 @@ export default function VerseDisplay({
                                 verse.text
                               );
                               return (
-                                <div key={verse.number} className="pb-1.5 last:pb-0">
+                                <div key={verse.number} className="group">
                                   <p
-                                    className="text-[1.6rem] leading-[2.2] text-gray-900 dark:text-gray-100 font-arabic"
-                                    style={{ direction: 'rtl', textAlign: 'justify' }}
+                                    className="text-3xl sm:text-4xl leading-[2] text-gray-900 dark:text-gray-50 font-arabic mb-4"
+                                    style={{ direction: 'rtl' }}
                                   >
-                                    {cleanText}{' '}
-                                    <span className="text-[0.95rem] text-gold-700 dark:text-gold-400 align-middle">
+                                    {cleanText}
+                                    <span className="text-xl text-gold-600 dark:text-gold-400 align-middle mx-2 font-arabic">
                                       {formatAyahMarker(verse.numberInSurah)}
                                     </span>
                                   </p>
-                                  <p className="text-[0.86rem] italic text-gray-500 dark:text-gray-400 leading-relaxed mt-0.5">
+                                  <p className="font-amiri text-lg text-stone-500 dark:text-stone-400 italic leading-relaxed">
                                     {verse.translation}
                                   </p>
+                                  {verse !== group.verses[group.verses.length - 1] && (
+                                    <div className="w-12 h-px bg-stone-100 dark:bg-white/5 mt-8 mx-auto" />
+                                  )}
                                 </div>
                               );
                             })}
@@ -225,30 +237,20 @@ export default function VerseDisplay({
                   })}
                 </div>
               </div>
-
-              {pageIndex < pages.length - 1 && (
-                <div className="flex items-center justify-center my-4 gap-2">
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-beige-200/80 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                    {page.pageNumber}
-                  </span>
-                  <div className="h-px bg-gradient-to-r from-transparent via-primary-400 to-transparent w-full max-w-sm" />
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300">
-                    {pages[pageIndex + 1].pageNumber}
-                  </span>
-                </div>
-              )}
             </div>
           );
         })}
 
-        {loadingMore && (
-          <div className="flex justify-center py-6">
-            <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
+        {canLoadMore && (
+          <div ref={sentinelRef} className="py-12 flex justify-center">
+            {loadingMore && (
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+                <p className="text-xs text-stone-400 font-bold uppercase tracking-widest">Chargement de la suite...</p>
+              </div>
+            )}
           </div>
         )}
-
-        {/* Sentinel pour l'IntersectionObserver */}
-        <div ref={sentinelRef} className="h-1" aria-hidden />
       </div>
     </div>
   );

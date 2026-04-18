@@ -1,6 +1,7 @@
-import { Mail, MessageSquare, Send, User, CheckCircle } from 'lucide-react';
+import { Mail, MessageSquare, Send, User, CheckCircle, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from '../hooks/useRouter';
+import { motion } from 'framer-motion';
 
 export default function Contact() {
   const { navigate } = useRouter();
@@ -53,10 +54,7 @@ export default function Contact() {
     setErrors({});
     
     try {
-      // Simuler l'envoi du formulaire
-      // En production, remplacer par un appel API réel
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
       setIsSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
@@ -70,7 +68,6 @@ export default function Contact() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Effacer l'erreur quand l'utilisateur commence à taper
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -78,24 +75,24 @@ export default function Contact() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-beige-50 dark:bg-gray-950 flex items-center justify-center px-4">
+      <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center px-4">
         <div className="max-w-md w-full">
-          <div className="card p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+          <div className="premium-card p-12 text-center">
+            <div className="w-20 h-20 bg-primary-100 dark:bg-primary-900/30 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-primary-600/10">
+              <CheckCircle className="w-10 h-10 text-primary-600 dark:text-primary-400" />
             </div>
-            <h2 className="font-amiri text-2xl text-gray-800 dark:text-gray-100 mb-4">
+            <h2 className="section-title text-3xl mb-4">
               Message envoyé !
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Merci pour votre message. Nous vous répondrons dans les plus brefs délais.
+            <p className="section-subtitle text-base mb-10 leading-relaxed">
+              Merci pour votre message. Nous vous répondrons dans les plus brefs délais, inshallah.
             </p>
             <button
               onClick={() => {
                 setIsSubmitted(false);
                 navigate('/');
               }}
-              className="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+              className="btn-premium w-full justify-center"
             >
               Retour à l'accueil
             </button>
@@ -106,57 +103,51 @@ export default function Contact() {
   }
 
   return (
-    <div className="min-h-screen bg-beige-50 dark:bg-gray-950">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="font-amiri text-4xl md:text-5xl text-primary-700 dark:text-primary-400 mb-4">
-            Contact
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
-            Une question, une suggestion ou besoin d'aide ? Nous sommes là pour vous accompagner.
+    <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <div className="section-container max-w-5xl">
+        <div className="text-center mb-16">
+          <h1 className="section-title">Contact</h1>
+          <p className="section-subtitle max-w-2xl mx-auto">
+            Une question, une suggestion ou besoin d'aide ? Nous sommes là pour vous accompagner dans votre voyage spirituel.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Informations de contact */}
-          <div className="space-y-8">
+        <div className="grid lg:grid-cols-5 gap-12">
+          <div className="lg:col-span-2 space-y-10">
             <div>
-              <h2 className="font-amiri text-2xl text-gray-800 dark:text-gray-100 mb-6">
+              <h2 className="font-amiri text-2xl text-gray-800 dark:text-gray-100 mb-8 border-l-4 border-primary-500 pl-4">
                 Restons en contact
               </h2>
-              
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+              <div className="space-y-8">
+                <div className="flex items-start gap-5">
+                  <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-stone-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-7 h-7 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">
+                    <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">
                       Par email
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Utilisez le formulaire ci-contre pour nous envoyer un message directement.
+                    <p className="text-stone-500 dark:text-stone-400 text-sm leading-relaxed">
+                      Utilisez le formulaire pour nous envoyer un message directement.
                     </p>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <MessageSquare className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                <div className="flex items-start gap-5">
+                  <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-stone-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
+                    <MessageSquare className="w-7 h-7 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">
+                    <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">
                       Sur les réseaux
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
+                    <p className="text-stone-500 dark:text-stone-400 text-sm mb-3 leading-relaxed">
                       Suivez-nous sur Instagram pour des conseils et l'actualité du programme.
                     </p>
                     <a
                       href="https://instagram.com/hifz.al.quran"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary-600 dark:text-primary-400 hover:underline text-sm font-medium"
+                      className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold hover:underline"
                     >
                       @hifz.al.quran
                     </a>
@@ -164,26 +155,24 @@ export default function Contact() {
                 </div>
               </div>
             </div>
-
-            {/* FAQ rapide */}
-            <div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">
+            <div className="pt-6">
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-6">
                 Questions fréquentes
               </h3>
-              <div className="space-y-3">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                  <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-2">
+              <div className="space-y-4">
+                <div className="premium-card p-5 border-none shadow-md">
+                  <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-2 text-sm">
                     Le programme est-il vraiment gratuit ?
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  <p className="text-stone-500 dark:text-stone-400 text-xs leading-relaxed">
                     Oui ! Le PDF et l'application sont entièrement gratuits pour vous accompagner dans votre Hifz.
                   </p>
                 </div>
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                  <h4 className="font-medium text-gray-800 dark:text-gray-100 mb-2">
-                    Puis-je utiliser le programme sans l'application ?
+                <div className="premium-card p-5 border-none shadow-md">
+                  <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-2 text-sm">
+                    Puis-je l'utiliser sans l'application ?
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  <p className="text-stone-500 dark:text-stone-400 text-xs leading-relaxed">
                     Absolument ! Le PDF contient tout ce qu'il vous faut pour commencer immédiatement.
                   </p>
                 </div>
@@ -191,63 +180,58 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Formulaire de contact */}
-          <div>
-            <div className="card p-8">
-              <h2 className="font-amiri text-2xl text-gray-800 dark:text-gray-100 mb-6">
+          <div className="lg:col-span-3">
+            <div className="premium-card p-10 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
+              <h2 className="font-amiri text-2xl text-gray-800 dark:text-gray-100 mb-8 relative z-10">
                 Envoyez-nous un message
               </h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Nom complet *
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${
-                        errors.name ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Votre nom"
-                    />
+              <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-stone-400 px-1">
+                      Nom complet
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className={`w-full pl-11 pr-4 py-4 rounded-2xl bg-stone-50 dark:bg-gray-800 border-2 transition-all focus:outline-none focus:ring-4 focus:ring-primary-500/10 ${
+                          errors.name ? 'border-red-500/50' : 'border-transparent focus:border-primary-500/50'
+                        }`}
+                        placeholder="Votre nom"
+                      />
+                    </div>
+                    {errors.name && <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider px-1">{errors.name}</p>}
                   </div>
-                  {errors.name && (
-                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email *
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${
-                        errors.email ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="votre@email.com"
-                    />
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-stone-400 px-1">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`w-full pl-11 pr-4 py-4 rounded-2xl bg-stone-50 dark:bg-gray-800 border-2 transition-all focus:outline-none focus:ring-4 focus:ring-primary-500/10 ${
+                          errors.email ? 'border-red-500/50' : 'border-transparent focus:border-primary-500/50'
+                        }`}
+                        placeholder="votre@email.com"
+                      />
+                    </div>
+                    {errors.email && <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider px-1">{errors.email}</p>}
                   </div>
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                  )}
                 </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Sujet *
+                <div className="space-y-2">
+                  <label htmlFor="subject" className="text-xs font-bold uppercase tracking-widest text-stone-400 px-1">
+                    Sujet
                   </label>
                   <input
                     type="text"
@@ -255,56 +239,46 @@ export default function Contact() {
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${
-                      errors.subject ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full px-5 py-4 rounded-2xl bg-stone-50 dark:bg-gray-800 border-2 transition-all focus:outline-none focus:ring-4 focus:ring-primary-500/10 ${
+                      errors.subject ? 'border-red-500/50' : 'border-transparent focus:border-primary-500/50'
                     }`}
-                    placeholder="Sujet de votre message"
+                    placeholder="De quoi souhaitez-vous discuter ?"
                   />
-                  {errors.subject && (
-                    <p className="mt-1 text-sm text-red-600">{errors.subject}</p>
-                  )}
+                  {errors.subject && <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider px-1">{errors.subject}</p>}
                 </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Message *
+                <div className="space-y-2">
+                  <label htmlFor="message" className="text-xs font-bold uppercase tracking-widest text-stone-400 px-1">
+                    Message
                   </label>
                   <textarea
                     id="message"
                     name="message"
+                    rows={6}
                     value={formData.message}
                     onChange={handleChange}
-                    rows={5}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 resize-none ${
-                      errors.message ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full px-5 py-4 rounded-2xl bg-stone-50 dark:bg-gray-800 border-2 transition-all focus:outline-none focus:ring-4 focus:ring-primary-500/10 resize-none ${
+                      errors.message ? 'border-red-500/50' : 'border-transparent focus:border-primary-500/50'
                     }`}
-                    placeholder="Votre message..."
+                    placeholder="Votre message ici..."
                   />
-                  {errors.message && (
-                    <p className="mt-1 text-sm text-red-600">{errors.message}</p>
-                  )}
+                  {errors.message && <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider px-1">{errors.message}</p>}
                 </div>
-
                 {errors.submit && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                    <p className="text-red-600 dark:text-red-400 text-sm">{errors.submit}</p>
-                  </div>
+                  <p className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm font-medium">
+                    {errors.submit}
+                  </p>
                 )}
-
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="btn-premium w-full justify-center py-5 text-lg group"
                 >
                   {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Envoi en cours...
-                    </>
+                    <Loader2 className="w-6 h-6 animate-spin" />
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
                       Envoyer le message
+                      <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </>
                   )}
                 </button>

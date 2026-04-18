@@ -1,4 +1,5 @@
 import { Bookmark, BookmarkCheck, Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useRouter } from '../hooks/useRouter';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Bookmark as BookmarkType } from '../types';
@@ -23,20 +24,20 @@ export default function Signets() {
 
   if (bookmarks.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <div className="card p-12 max-w-md mx-auto">
-          <div className="w-16 h-16 rounded-full bg-beige-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
-            <Bookmark className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+      <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
+        <div className="premium-card p-12 max-w-md w-full text-center">
+          <div className="w-20 h-20 rounded-3xl bg-stone-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-6">
+            <Bookmark className="w-10 h-10 text-stone-300 dark:text-stone-600" />
           </div>
-          <h2 className="font-amiri text-2xl text-gray-700 dark:text-gray-300 mb-2">
+          <h2 className="section-title text-2xl mb-3">
             Aucun signet
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 leading-relaxed">
-            Ajoutez des versets en signet pendant votre lecture pour les retrouver ici.
+          <p className="section-subtitle text-sm mb-8 leading-relaxed">
+            Ajoutez des versets en signet pendant votre lecture pour les retrouver facilement ici.
           </p>
           <button
             onClick={() => navigate('/lire')}
-            className="btn-primary text-sm"
+            className="btn-premium w-full justify-center"
           >
             Commencer à lire
           </button>
@@ -46,60 +47,64 @@ export default function Signets() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-amiri text-3xl text-primary-700 dark:text-primary-400">
-            Mes Signets
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-            {bookmarks.length} verset{bookmarks.length > 1 ? 's' : ''} sauvegardé{bookmarks.length > 1 ? 's' : ''}
-          </p>
+    <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <div className="section-container max-w-4xl">
+        <div className="flex items-end justify-between mb-12 border-b border-stone-200 dark:border-white/5 pb-8">
+          <div>
+            <h1 className="section-title">Mes Signets</h1>
+            <p className="section-subtitle mb-0">
+              {bookmarks.length} verset{bookmarks.length > 1 ? 's' : ''} précieux sauvegardé{bookmarks.length > 1 ? 's' : ''}
+            </p>
+          </div>
+          <div className="w-16 h-16 rounded-2xl gold-gradient flex items-center justify-center shadow-lg shadow-gold-500/20 rotate-3">
+            <BookmarkCheck className="w-8 h-8 text-white" />
+          </div>
         </div>
-        <BookmarkCheck className="w-8 h-8 text-gold-400" />
-      </div>
 
-      <div className="space-y-4 animate-fade-in">
-        {bookmarks
-          .sort((a, b) => b.savedAt.localeCompare(a.savedAt))
-          .map((bookmark) => (
-            <div
-              key={`${bookmark.surahNumber}-${bookmark.verseNumber}`}
-              className="card p-5 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-semibold px-2.5 py-1 rounded-full">
-                      {bookmark.surahNameArabic}
-                    </span>
-                    <span className="text-gray-400 dark:text-gray-500 text-xs font-mono tabular-nums">
-                      {bookmark.surahNumber}:{bookmark.verseNumber} · {bookmark.surahName}
-                    </span>
+        <div className="grid gap-6">
+          {bookmarks
+            .sort((a, b) => b.savedAt.localeCompare(a.savedAt))
+            .map((bookmark) => (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                key={`${bookmark.surahNumber}-${bookmark.verseNumber}`}
+                className="premium-card p-8 group relative"
+              >
+                <div className="flex items-start justify-between gap-6">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center flex-wrap gap-3 mb-6">
+                      <span className="bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                        {bookmark.surahNameArabic}
+                      </span>
+                      <span className="text-stone-400 dark:text-stone-500 text-[10px] font-bold uppercase tracking-widest">
+                        {bookmark.surahNumber}:{bookmark.verseNumber} · {bookmark.surahName}
+                      </span>
+                    </div>
+
+                    <p
+                      className="font-arabic text-3xl text-gray-800 dark:text-gray-100 leading-[1.8] mb-6"
+                      style={{ direction: 'rtl' }}
+                    >
+                      {bookmark.verseText}
+                    </p>
+
+                    <p className="text-stone-400 dark:text-stone-500 text-[10px] font-bold uppercase tracking-widest">
+                      Ajouté le {formatDate(bookmark.savedAt)}
+                    </p>
                   </div>
 
-                  <p
-                    className="font-arabic text-xl text-gray-800 dark:text-gray-100 leading-loose mb-3"
-                    style={{ direction: 'rtl' }}
+                  <button
+                    onClick={() => removeBookmark(bookmark.surahNumber, bookmark.verseNumber)}
+                    className="p-3 rounded-xl bg-stone-50 dark:bg-gray-800 text-stone-300 dark:text-stone-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex-shrink-0"
+                    title="Supprimer ce signet"
                   >
-                    {bookmark.verseText}
-                  </p>
-
-                  <p className="text-gray-400 dark:text-gray-500 text-xs">
-                    Sauvegardé le {formatDate(bookmark.savedAt)}
-                  </p>
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                 </div>
-
-                <button
-                  onClick={() => removeBookmark(bookmark.surahNumber, bookmark.verseNumber)}
-                  className="p-2 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex-shrink-0"
-                  title="Supprimer ce signet"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+              </motion.div>
+            ))}
+        </div>
       </div>
     </div>
   );

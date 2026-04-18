@@ -4,25 +4,50 @@
 
 @layer components {
   .green-gradient {
-    @apply bg-gradient-to-br from-primary-600 to-primary-800;
+    @apply bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800;
   }
 
-  .card {
-    @apply bg-white dark:bg-gray-900 border border-stone-100 dark:border-gray-800 rounded-2xl shadow-sm;
+  .premium-card {
+    @apply bg-white dark:bg-gray-900/50 backdrop-blur-md border border-stone-200/60 dark:border-white/10 rounded-[2rem] shadow-premium hover:shadow-premium-hover transition-all duration-500;
   }
 
-  .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors shadow-sm active:scale-95;
+  .btn-premium {
+    @apply relative overflow-hidden bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 shadow-lg active:scale-95 flex items-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 border border-white/30 active:scale-95 flex items-center gap-2;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+
+  .section-container {
+    @apply py-20 px-4 max-w-7xl mx-auto;
+  }
+
+  .section-title {
+    @apply font-amiri text-4xl text-primary-900 dark:text-primary-50 mb-2;
+  }
+
+  .section-subtitle {
+    @apply text-stone-500 dark:text-stone-400 text-lg mb-12;
+  }
+
+  .gold-gradient {
+    @apply bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600;
   }
 }
 
 :root {
   --font-amiri: 'Amiri', serif;
   --font-arabic: 'Noto Sans Arabic', sans-serif;
+  --primary-glow: rgba(22, 163, 74, 0.2);
 }
 
 body {
-  @apply bg-stone-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300;
+  @apply bg-[#FDFBF7] text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-500;
   font-family: 'Inter', sans-serif;
 }
 
@@ -32,4 +57,22 @@ body {
 
 .font-arabic {
   font-family: var(--font-arabic);
+}
+
+/* Custom Scrollbar Premium */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-stone-100 dark:bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-stone-300 dark:bg-gray-700 rounded-full hover:bg-primary-500 transition-colors;
+}
+
+/* Glassmorphism utility */
+.glass {
+  @apply bg-white/70 dark:bg-gray-950/70 backdrop-blur-lg border border-white/20 dark:border-white/10;
 }
