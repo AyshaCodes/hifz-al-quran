@@ -1,6 +1,28 @@
 // Utilisation de l'API directe par défaut pour éviter les problèmes de proxy
 const DIRECT_API = 'https://api.alquran.cloud/v1';
 
+export interface ApiVerse {
+  number: number;
+  numberInSurah: number;
+  text: string;
+  translation: string;
+  surahNumber?: number;
+  juz: number;
+  hizbQuarter: number;
+  page?: number;
+  audio?: string;
+}
+
+export interface ApiPageVerse {
+  number: number;
+  numberInSurah: number;
+  surahNumber: number;
+  text: string;
+  translation: string;
+  juz: number;
+  hizbQuarter: number;
+}
+
 // Cache simple en mémoire pour éviter les requêtes répétées
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
