@@ -1,47 +1,70 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Quote } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
 const quotes = [
-  { type: 'hadith', text: 'Le meilleur d’entre vous est celui qui apprend le Coran et l’enseigne.', ref: 'Rapporté par Al-Bukhari' },
-  { type: 'verse', arabic: 'وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا', french: 'Récite le Coran lentement et clairement.', ref: 'Sourate Al-Muzzammil 73:4' },
-  { type: 'dua', text: 'اللهم اجعل القرآن العظيم ربيع قلبي', translation: 'Ô Allah, fais du Coran le printemps de mon cœur', ref: 'Dua du Prophète ﷺ' },
-  { type: 'hadith', text: 'Le Coran est un intercesseur dont l’intercession est acceptée.', ref: 'Rapporté par Muslim' },
-  { type: 'verse', arabic: 'إِنَّ هَـٰذَا ٱلْقُرْءَانَ يَهْدِى لِلَّتِى هِىَ أَقْوَمُ', french: 'Ce Coran guide vers ce qu’il y a de plus droit.', ref: 'Al-Isra 17:9' },
+  {
+    text: 'Le meilleur d\'entre vous est celui qui apprend le Coran et l\'enseigne.',
+    source: 'Prophète Muhammad ﷺ (Bukhari)',
+  },
+  {
+    text: 'Récitez le Coran car il intercédera en faveur de ses compagnons au Jour du Jugement.',
+    source: 'Prophète Muhammad ﷺ (Muslim)',
+  },
+  {
+    text: 'Celui dont le cœur est vide du Coran est comme une maison en ruine.',
+    source: 'Prophète Muhammad ﷺ (Tirmidhi)',
+  },
+  {
+    text: 'En vérité, Nous avons fait descendre le Coran et Nous en sommes le gardien.',
+    source: 'Sourate Al-Hijr (15:9)',
+  },
+  {
+    text: 'Le porteur du Coran ne doit pas s\'agiter avec ceux qui s\'agitent ni se montrer ignorant avec ceux qui montrent l\'ignorance.',
+    source: 'Hasan al-Basri',
+  },
+  {
+    text: 'Le Coran est un remède pour ce que renferment les poitrines.',
+    source: 'Sourate Yunus (10:57)',
+  },
+  {
+    text: 'Illuminez vos maisons par la récitation du Coran.',
+    source: 'Prophète Muhammad ﷺ (Ibn Majah)',
+  },
+  {
+    text: 'Quiconque récite une lettre du Coran aura une bonne action, et cette bonne action sera multipliée par dix.',
+    source: 'Prophète Muhammad ﷺ (Tirmidhi)',
+  },
 ];
 
-export default function MotivationalQuote() {
+interface Props {
+  variant?: 'green' | 'blue';
+}
+
+export default function MotivationalQuote({ variant = 'green' }: Props) {
   const [quote, setQuote] = useState(quotes[0]);
 
   useEffect(() => {
-    // Change de citation toutes les heures (ou à chaque montage)
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    setQuote(quotes[randomIndex]);
+    const idx = Math.floor(Math.random() * quotes.length);
+    setQuote(quotes[idx]);
   }, []);
+
+  const borderColor = variant === 'green' ? 'border-green-700' : 'border-blue-700';
+  const iconColor = variant === 'green' ? 'text-green-700' : 'text-blue-700';
+  const textColor = variant === 'green' ? 'text-green-800' : 'text-blue-800';
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-r from-amber-50 to-stone-50 dark:from-amber-900/20 dark:to-stone-800/30 rounded-2xl p-5 border border-amber-200 dark:border-amber-800/30 max-w-2xl mx-auto text-center"
+      transition={{ duration: 0.5 }}
+      className={`bg-white/80 border-l-4 ${borderColor} rounded-xl px-5 py-4 shadow-md flex gap-3 items-start`}
     >
-      <Quote className="w-6 h-6 mx-auto text-amber-500 mb-2" />
-      {quote.type === 'verse' && (
-        <>
-          <p className="font-arabic text-2xl text-gray-800 dark:text-gray-100 leading-loose" dir="rtl">{quote.arabic}</p>
-          <p className="italic text-stone-600 dark:text-stone-300 text-sm mt-2">{quote.french}</p>
-        </>
-      )}
-      {quote.type === 'hadith' && (
-        <p className="text-stone-700 dark:text-stone-200 text-sm md:text-base">« {quote.text} »</p>
-      )}
-      {quote.type === 'dua' && (
-        <>
-          <p className="font-arabic text-xl text-gray-800 dark:text-gray-100">{quote.text}</p>
-          <p className="text-stone-600 dark:text-stone-300 text-sm mt-1">{quote.translation}</p>
-        </>
-      )}
-      <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">— {quote.ref}</p>
+      <BookOpen className={`${iconColor} mt-1 shrink-0`} size={20} />
+      <div>
+        <p className={`font-semibold text-sm italic ${textColor}`}>« {quote.text} »</p>
+        <p className="text-xs text-stone-500 mt-1">{quote.source}</p>
+      </div>
     </motion.div>
   );
 }

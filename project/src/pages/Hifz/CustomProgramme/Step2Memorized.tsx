@@ -1,101 +1,96 @@
+import { motion } from 'framer-motion';
+import { QuestionnaireData } from '../../../types/hifz';
+
 interface Props {
-  data: {
-    departMemorisation: string;
-    juzArrive: number;
-    qualiteMemorisation: 'good' | 'partial' | 'forgotten' | null;
-  };
-  onChange: (field: string, value: any) => void;
+  data: QuestionnaireData;
+  onChange: (updates: Partial<QuestionnaireData>) => void;
 }
+
+const DEPART_OPTIONS = [
+  { value: 'debut', label: 'Depuis le début (Juz 1)', sub: 'J\'ai commencé par Al-Fatiha.' },
+  { value: 'milieu', label: 'Depuis le milieu', sub: 'J\'ai commencé par les dernières sourates.' },
+  { value: 'juzPrecis', label: 'Juz précis', sub: 'Indiquez le juz où vous en êtes.' },
+] as const;
+
+const QUALITE_OPTIONS = [
+  { value: 'solide', label: 'Solide', sub: 'Je récite avec fluidité et confiance.' },
+  { value: 'partielle', label: 'Partielle', sub: 'Quelques hésitations, besoin de renforcer.' },
+  { value: 'oubliee', label: 'Oubliée en partie', sub: 'J\'ai besoin de révisions intensives.' },
+] as const;
 
 export default function Step2Memorized({ data, onChange }: Props) {
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, x: 30 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -30 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
       <div>
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          Ta mémorisation actuelle
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Dis-nous où tu en es et comment tu évalues ta mémorisation.
-        </p>
+        <h2 className="text-xl font-bold text-stone-800">Ce que vous avez déjà mémorisé</h2>
+        <p className="text-sm text-stone-500 mt-1">Partagez votre progression actuelle.</p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Point de départ de ta mémorisation
-        </label>
-        <select
-          value={data.departMemorisation}
-          onChange={(e) => onChange('departMemorisation', e.target.value)}
-          className="w-full px-4 py-3 bg-stone-50 dark:bg-gray-900 border border-stone-200 dark:border-stone-700 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-700"
-        >
-          <option value="debut">Depuis le début (Al-Fatiha)</option>
-          <option value="milieu">Au milieu du Coran</option>
-          <option value="fin">Vers la fin du Coran</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Juz actuel (là où tu en es)
-        </label>
-        <select
-          value={data.juzArrive}
-          onChange={(e) => onChange('juzArrive', Number(e.target.value))}
-          className="w-full px-4 py-3 bg-stone-50 dark:bg-gray-900 border border-stone-200 dark:border-stone-700 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-700"
-        >
-          {Array.from({ length: 30 }, (_, i) => i + 1).map((j) => (
-            <option key={j} value={j}>
-              Juz {j} {j === 30 ? '(Al-Amma)' : j === 1 ? '(Al-Fatiha)' : ''}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          Comment évalues-tu ta mémorisation des Juz déjà acquis ?
-        </label>
+        <p className="text-sm font-semibold text-stone-700 mb-2">Par où avez-vous commencé ?</p>
         <div className="space-y-2">
-          {[
-            {
-              value: 'good' as const,
-              emoji: '',
-              title: 'Je me souviens bien',
-              desc: 'Révision légère : viser environ 1 Juz tous les 3 jours dans ton planning.',
-            },
-            {
-              value: 'partial' as const,
-              emoji: '',
-              title: 'Je me souviens partiellement',
-              desc: 'Révision intensive : 1 Juz par jour en cible, la moitié du temps quotidien réservée à la révision.',
-            },
-            {
-              value: 'forgotten' as const,
-              emoji: '',
-              title: "J'ai beaucoup oublié",
-              desc: 'Phase de consolidation : 1 mois de révision uniquement, sans nouvelle mémorisation.',
-            },
-          ].map((opt) => (
-            <button
+          {DEPART_OPTIONS.map((opt) => (
+            <motion.button
               key={opt.value}
-              type="button"
-              onClick={() => onChange('qualiteMemorisation', opt.value)}
-              className={`w-full text-left rounded-xl border-2 p-3 transition-all ${
-                data.qualiteMemorisation === opt.value
-                  ? 'border-green-500 bg-green-50 dark:bg-green-900/25 ring-2 ring-green-200 dark:ring-green-800'
-                  : 'border-stone-200 dark:border-stone-700 bg-stone-50/80 dark:bg-gray-800/80 hover:border-stone-300 dark:hover:border-stone-600'
-              }`}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onChange({ departMemorisation: opt.value })}
+              className={`w-full text-left p-3.5 rounded-xl border-2 transition-all
+                ${data.departMemorisation === opt.value
+                  ? 'border-green-700 bg-green-50'
+                  : 'border-stone-200 bg-white hover:border-stone-300'
+                }`}
             >
-              <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                {opt.emoji} {opt.title}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                {opt.desc}
-              </p>
-            </button>
+              <p className="font-semibold text-stone-800 text-sm">{opt.label}</p>
+              <p className="text-xs text-stone-500 mt-0.5">{opt.sub}</p>
+            </motion.button>
           ))}
         </div>
       </div>
-    </div>
+
+      {data.departMemorisation === 'juzPrecis' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <label className="text-sm font-semibold text-stone-700 block mb-2">
+            Juz actuel (1–30)
+          </label>
+          <input
+            type="number"
+            min={1}
+            max={30}
+            value={data.juzArrive}
+            onChange={(e) => onChange({ juzArrive: parseInt(e.target.value) || 1 })}
+            className="w-full border-2 border-stone-200 rounded-xl px-4 py-3 text-stone-800 focus:outline-none focus:border-green-700 text-sm"
+          />
+        </motion.div>
+      )}
+
+      <div>
+        <p className="text-sm font-semibold text-stone-700 mb-2">Qualité de mémorisation</p>
+        <div className="space-y-2">
+          {QUALITE_OPTIONS.map((opt) => (
+            <motion.button
+              key={opt.value}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onChange({ qualiteMemorisation: opt.value })}
+              className={`w-full text-left p-3.5 rounded-xl border-2 transition-all
+                ${data.qualiteMemorisation === opt.value
+                  ? 'border-green-700 bg-green-50'
+                  : 'border-stone-200 bg-white hover:border-stone-300'
+                }`}
+            >
+              <p className="font-semibold text-stone-800 text-sm">{opt.label}</p>
+              <p className="text-xs text-stone-500 mt-0.5">{opt.sub}</p>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    </motion.div>
   );
 }

@@ -1,68 +1,53 @@
-import { CalendarDays, MoonStar, Repeat } from 'lucide-react';
-import { PlannedDay } from '../../../lib/hifzSchedule';
+import { motion } from 'framer-motion';
 
-interface WeeklyPlanProps {
-  plan: PlannedDay[];
+interface DayPlan {
+  label: string;
+  pages: number;
+  isActive: boolean;
 }
 
-function isToday(dateStr: string) {
-  return new Date().toISOString().split('T')[0] === dateStr;
+interface Props {
+  daysPerWeek: number;
+  pagesPerDay: number;
+  variant?: 'green' | 'blue';
 }
 
-export default function WeeklyPlan({ plan }: WeeklyPlanProps) {
+const ALL_DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+export default function WeeklyPlan({ daysPerWeek, pagesPerDay, variant = 'green' }: Props) {
+  const days: DayPlan[] = ALL_DAYS.map((label, i) => ({
+    label,
+    pages: pagesPerDay,
+    isActive: i < daysPerWeek,
+  }));
+
+  const activeClass = variant === 'green' ? 'bg-green-700 text-white' : 'bg-blue-700 text-white';
+  const inactiveClass = 'bg-stone-100 text-stone-400';
+
   return (
-    <div className="card p-5">
-      <div className="flex items-center gap-2 mb-4">
-        <CalendarDays className="w-4 h-4 text-primary-500" />
-        <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-sm">
-          Planning automatique (semaine)
-        </h3>
-      </div>
-
-      <div className="space-y-2">
-        {plan.map((day) => {
-          const today = isToday(day.date);
-          return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className="bg-white/90 rounded-2xl shadow-xl border border-stone-200 p-5"
+    >
+      <h3 className="text-base font-bold text-stone-800 mb-4">Plan hebdomadaire</h3>
+      <div className="flex items-end gap-2 justify-between">
+        {days.map((day) => (
+          <div key={day.label} className="flex flex-col items-center gap-1.5 flex-1">
+            <span className="text-xs font-semibold text-stone-400">{day.label}</span>
             <div
-              key={day.date}
-              className={`rounded-xl border px-3 py-2.5 flex items-center justify-between ${
-                today
-                  ? 'border-primary-300 bg-primary-50 dark:bg-primary-900/20'
-                  : 'border-beige-200 dark:border-gray-700'
-              }`}
+              className={`w-full rounded-xl py-2 text-center text-xs font-bold ${day.isActive ? activeClass : inactiveClass}`}
             >
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {day.dayLabel} · {new Date(day.date + 'T12:00:00').toLocaleDateString('fr-FR')}
-                </p>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {day.mode === 'kahf'
-                    ? 'Lecture de sourate Al-Kahf'
-                    : day.mode === 'revision'
-                      ? 'Jour de révision'
-                      : `Pages ${day.fromPage} -> ${day.toPage}`}
-                </p>
-              </div>
-
-              {day.mode === 'kahf' ? (
-                <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gold-100 dark:bg-gold-900/30 text-gold-700 dark:text-gold-400">
-                  <MoonStar className="w-3 h-3" />
-                  Vendredi
-                </span>
-              ) : day.mode === 'revision' ? (
-                <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-beige-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                  <Repeat className="w-3 h-3" />
-                  Révision
-                </span>
-              ) : (
-                <span className="text-xs px-2 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
-                  {day.targetPages} page{day.targetPages > 1 ? 's' : ''}
-                </span>
-              )}
+              {day.isActive ? `${day.pages}p` : '—'}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
-    </div>
+      <p className="text-xs text-stone-500 mt-3 text-center">
+        {daysPerWeek} jour(s)/semaine · {pagesPerDay} page(s)/jour
+      </p>
+    </motion.div>
   );
 }

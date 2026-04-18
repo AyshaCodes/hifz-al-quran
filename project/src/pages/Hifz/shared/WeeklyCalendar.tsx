@@ -1,102 +1,71 @@
-import { DailyProgress } from '../../../types';
-import { Check, Dot, MoonStar } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { DailyProgress } from '../../../types/hifz';
 
-interface WeeklyCalendarProps {
+interface Props {
   progress: DailyProgress[];
+  variant?: 'green' | 'blue';
 }
 
-const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const DAYS_FR = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
-function getWeekDates() {
+function getWeekDays(): string[] {
+  const days: string[] = [];
   const today = new Date();
   const dayOfWeek = today.getDay();
   const monday = new Date(today);
-  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  monday.setDate(today.getDate() + diff);
-
-  return Array.from({ length: 7 }, (_, i) => {
+  monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+  for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    return d;
-  });
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
 }
 
-function formatDate(d: Date) {
-  return d.toISOString().split('T')[0];
-}
+export default function WeeklyCalendar({ progress, variant = 'green' }: Props) {
+  const weekDays = getWeekDays();
+  const progressMap = new Map(progress.map((p) => [p.date, p]));
+  const today = new Date().toISOString().split('T')[0];
 
-function isFriday(d: Date) {
-  return d.getDay() === 5;
-}
-
-function isToday(d: Date) {
-  return formatDate(d) === formatDate(new Date());
-}
-
-export default function WeeklyCalendar({ progress }: WeeklyCalendarProps) {
-  const weekDates = getWeekDates();
-  const today = new Date();
+  const activeClass = variant === 'green' ? 'bg-green-700' : 'bg-blue-700';
 
   return (
-    <div className="card p-5">
-      <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">Cette semaine</h3>
-      <div className="grid grid-cols-7 gap-2">
-        {weekDates.map((date, i) => {
-          const dateStr = formatDate(date);
-          const dayProgress = progress.find((p) => p.date === dateStr);
-          const done = dayProgress?.completed ?? false;
-          const isFri = isFriday(date);
-          const todayDay = isToday(date);
-          const isPast = date < today && !todayDay;
-          const isFuture = date > today && !todayDay;
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className="bg-white/90 rounded-2xl shadow-xl border border-stone-200 p-5"
+    >
+      <h3 className="text-base font-bold text-stone-800 mb-4">Planning de la semaine</h3>
+      <div className="grid grid-cols-7 gap-1.5">
+        {weekDays.map((date, i) => {
+          const entry = progressMap.get(date);
+          const isToday = date === today;
+          const isDone = entry?.completed;
+          const isFuture = date > today;
 
           return (
-            <div key={i} className="flex flex-col items-center gap-1.5">
-              <p className={`text-xs font-medium ${todayDay ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 dark:text-gray-500'}`}>
-                {DAYS[i]}
-              </p>
-              <p className={`text-sm font-semibold ${todayDay ? 'text-primary-700 dark:text-primary-300' : 'text-gray-600 dark:text-gray-400'}`}>
-                {date.getDate()}
-              </p>
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all
-                  ${todayDay ? 'ring-2 ring-primary-400 ring-offset-2 dark:ring-offset-gray-900' : ''}
-                  ${done && isFri ? 'bg-gold-400 text-white' :
-                    done ? 'bg-primary-500 text-white' :
-                    isFri && !isFuture ? 'bg-gold-100 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400 border-2 border-gold-300' :
-                    isPast ? 'bg-red-100 dark:bg-red-900/20 text-red-400' :
-                    isFuture ? 'bg-beige-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600' :
-                    'bg-beige-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                  }
+            <div key={date} className="flex flex-col items-center gap-1.5">
+              <span className="text-xs font-medium text-stone-500">{DAYS_FR[i]}</span>
+              <motion.div
+                whileHover={!isFuture ? { scale: 1.1 } : {}}
+                className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all
+                  ${isToday ? `ring-2 ring-offset-1 ${variant === 'green' ? 'ring-green-700' : 'ring-blue-700'}` : ''}
+                  ${isDone ? `${activeClass} text-white` : isFuture ? 'bg-stone-100 text-stone-300' : 'bg-stone-200 text-stone-500'}
                 `}
               >
-                {isFri ? (
-                  <MoonStar className="w-3.5 h-3.5" />
-                ) : done ? (
-                  <Check className="w-3.5 h-3.5" />
-                ) : isPast ? (
-                  <Dot className="w-4 h-4" />
-                ) : null}
-              </div>
+                {new Date(date).getDate()}
+              </motion.div>
+              {entry?.pagesDone ? (
+                <span className="text-xs text-stone-400">{entry.pagesDone}p</span>
+              ) : (
+                <span className="text-xs text-stone-300">—</span>
+              )}
             </div>
           );
         })}
       </div>
-
-      <div className="flex gap-4 mt-4 pt-3 border-t border-beige-100 dark:border-gray-800">
-        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-          <div className="w-3 h-3 rounded-full bg-primary-500" />
-          <span>Fait</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-          <div className="w-3 h-3 rounded-full bg-red-200" />
-          <span>Manqué</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-          <div className="w-3 h-3 rounded-full bg-gold-400" />
-          <span>Vendredi</span>
-        </div>
-      </div>
-    </div>
+    </motion.div>
   );
 }

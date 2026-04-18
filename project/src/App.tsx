@@ -1,43 +1,42 @@
-// App.tsx
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import Footer from './components/Footer';
-import Header from './components/Header';
-import { useDarkMode } from './hooks/useDarkMode';
-import Home from './pages/Home';
-import HifzChoice from './pages/Hifz/index';  // index.tsx à la racine de hifz
-import HifzApp from './pages/Hifz/CustomProgramme/HifzApp';  // programme personnalisé
-import GuidedSetup from './pages/Hifz/GuidedProgramme/GuidedSetup';
-import GuidedDashboard from './pages/Hifz/GuidedProgramme/GuidedDashboard';
-import LirePage from './pages/Lire/index';
-import Signets from './pages/Signets';
-import Ressources from './pages/Ressources';
-import Contact from './pages/Contact';
+import { useEffect, useState } from 'react';
+import { useRouter } from './hooks/useRouter';
+import HifzChoice from './pages/hifz/index';
+import HifzApp from './pages/hifz/CustomProgramme/HifzApp';
+import GuidedApp from './pages/hifz/GuidedProgramme/GuidedApp';
 
-export default function App() {
-  const { isDark, toggle } = useDarkMode();
-  const location = useLocation();
-  const isLire = location.pathname === '/lire';
+function App() {
+  const { path, navigate } = useRouter();
+
+  const [hasCustomProfile, setHasCustomProfile] = useState(false);
+  const [hasGuidedProfile, setHasGuidedProfile] = useState(false);
+
+  useEffect(() => {
+    setHasCustomProfile(!!localStorage.getItem('hifz-profile'));
+    setHasGuidedProfile(!!localStorage.getItem('hifz-guided-profile'));
+  }, [path]);
+
+  useEffect(() => {
+    if (!path || path === '/' || path === '') {
+      navigate('/hifz');
+    }
+  }, [path, navigate]);
+
+  if (path === '/hifz/custom') {
+    return <HifzApp onBack={() => navigate('/hifz')} />;
+  }
+
+  if (path === '/hifz/guided') {
+    return <GuidedApp onBack={() => navigate('/hifz')} />;
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-beige-100 dark:bg-gray-950">
-      <Header isDark={isDark} onToggleDark={toggle} />
-      <main className="flex-1">
-        <div key={location.pathname + location.search} className="page-transition">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/lire" element={<LirePage />} />
-            <Route path="/hifz" element={<HifzChoice />} />
-            <Route path="/hifz/custom" element={<HifzApp />} />
-            <Route path="/hifz/guided" element={<GuidedSetup />} />
-            <Route path="/hifz/guided/dashboard" element={<GuidedDashboard />} />
-            <Route path="/signets" element={<Signets />} />
-            <Route path="/ressources" element={<Ressources />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </main>
-      {!isLire && <Footer />}
-    </div>
+    <HifzChoice
+      onSelectCustom={() => navigate('/hifz/custom')}
+      onSelectGuided={() => navigate('/hifz/guided')}
+      hasCustomProfile={hasCustomProfile}
+      hasGuidedProfile={hasGuidedProfile}
+    />
   );
 }
+
+export default App;

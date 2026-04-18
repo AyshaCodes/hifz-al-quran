@@ -1,141 +1,115 @@
+import { motion } from 'framer-motion';
+import { QuestionnaireData } from '../../../types/hifz';
+
 interface Props {
-  data: {
-    heuresDisponibles: string[];
-    minutesParJour: number;
-    joursParSemaine: string[];
-  };
-  onChange: (field: string, value: any) => void;
+  data: QuestionnaireData;
+  onChange: (updates: Partial<QuestionnaireData>) => void;
 }
 
+const HEURES = [
+  { value: 'fajr', label: 'Fajr (avant l\'aube)' },
+  { value: 'matin', label: 'Matin' },
+  { value: 'midi', label: 'Midi' },
+  { value: 'aprem', label: 'Après-midi' },
+  { value: 'asr', label: 'Asr' },
+  { value: 'soir', label: 'Soir / Isha' },
+  { value: 'nuit', label: 'Nuit (Tahajjud)' },
+];
+
+const JOURS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const JOURS_VALS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+const MINUTES = [15, 20, 30, 45, 60, 90, 120];
+
 export default function Step4Availability({ data, onChange }: Props) {
-  const HEURES_OPTIONS = [
-    { value: 'fajr', label: 'Fajr (avant lever du soleil)', icon: '' },
-    { value: 'dhuhr', label: 'Dhuhr (midi)', icon: '' },
-    { value: 'asr', label: 'Asr (après-midi)', icon: '' },
-    { value: 'maghrib', label: 'Maghrib (coucher du soleil)', icon: '' },
-    { value: 'isha', label: 'Isha (soir)', icon: '' },
-    { value: 'night', label: 'Nuit tardive', icon: '' },
-  ];
-
-  const JOURS_OPTIONS = [
-    { value: 'L', label: 'Lundi' },
-    { value: 'M', label: 'Mardi' },
-    { value: 'Me', label: 'Mercredi' },
-    { value: 'J', label: 'Jeudi' },
-    { value: 'V', label: 'Vendredi' },
-    { value: 'S', label: 'Samedi' },
-    { value: 'D', label: 'Dimanche' },
-  ];
-
-  const TEMPS_OPTIONS = [15, 30, 45, 60, 90, 120];
-
-  const handleHeureToggle = (heure: string) => {
-    const updated = data.heuresDisponibles.includes(heure)
-      ? data.heuresDisponibles.filter(h => h !== heure)
-      : [...data.heuresDisponibles, heure];
-    onChange('heuresDisponibles', updated);
+  const toggleHeure = (h: string) => {
+    const list = data.heuresDisponibles.includes(h)
+      ? data.heuresDisponibles.filter((x) => x !== h)
+      : [...data.heuresDisponibles, h];
+    onChange({ heuresDisponibles: list });
   };
 
-  const handleJourToggle = (jour: string) => {
-    const updated = data.joursParSemaine.includes(jour)
-      ? data.joursParSemaine.filter(j => j !== jour)
-      : [...data.joursParSemaine, jour];
-    onChange('joursParSemaine', updated);
-  };
-
-  const formatTemps = (minutes: number) => {
-    if (minutes < 60) return `${minutes} min`;
-    if (minutes === 60) return '1h';
-    if (minutes === 90) return '1h30';
-    return `${minutes / 60}h`;
+  const toggleJour = (j: string) => {
+    const list = data.joursParSemaine.includes(j)
+      ? data.joursParSemaine.filter((x) => x !== j)
+      : [...data.joursParSemaine, j];
+    onChange({ joursParSemaine: list });
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, x: 30 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -30 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
       <div>
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          Ta disponibilité
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Quand peux-tu étudier et combien de temps par jour ?
-        </p>
+        <h2 className="text-xl font-bold text-stone-800">Votre disponibilité</h2>
+        <p className="text-sm text-stone-500 mt-1">Configurez votre emploi du temps pour le Hifz.</p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          Quelles heures te conviennent ?
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {HEURES_OPTIONS.map((heure) => (
-            <button
-              key={heure.value}
-              type="button"
-              onClick={() => handleHeureToggle(heure.value)}
-              className={`p-3 rounded-xl border-2 text-xs font-medium transition-all ${
-                data.heuresDisponibles.includes(heure.value)
-                  ? 'border-green-500 bg-green-50 dark:bg-green-900/25 text-green-800 dark:text-green-200'
-                  : 'border-stone-200 dark:border-stone-700 bg-stone-50/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:border-stone-300 dark:hover:border-stone-600'
-              }`}
+        <p className="text-sm font-semibold text-stone-700 mb-2">Moments disponibles</p>
+        <div className="flex flex-wrap gap-2">
+          {HEURES.map((h) => (
+            <motion.button
+              key={h.value}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => toggleHeure(h.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all
+                ${data.heuresDisponibles.includes(h.value)
+                  ? 'bg-green-700 text-white border-green-700'
+                  : 'bg-white text-stone-600 border-stone-200 hover:border-stone-300'
+                }`}
             >
-              {heure.label}
-            </button>
+              {h.label}
+            </motion.button>
           ))}
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          Quels jours de la semaine ?
-        </label>
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-          {JOURS_OPTIONS.map((jour) => (
-            <button
-              key={jour.value}
-              type="button"
-              onClick={() => handleJourToggle(jour.value)}
-              className={`p-3 rounded-xl border-2 text-xs font-medium transition-all ${
-                data.joursParSemaine.includes(jour.value)
-                  ? 'border-green-500 bg-green-50 dark:bg-green-900/25 text-green-800 dark:text-green-200'
-                  : 'border-stone-200 dark:border-stone-700 bg-stone-50/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:border-stone-300 dark:hover:border-stone-600'
-              }`}
+        <p className="text-sm font-semibold text-stone-700 mb-2">Jours par semaine</p>
+        <div className="flex gap-2">
+          {JOURS.map((j, i) => (
+            <motion.button
+              key={j}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => toggleJour(JOURS_VALS[i])}
+              className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all
+                ${data.joursParSemaine.includes(JOURS_VALS[i])
+                  ? 'bg-green-700 text-white border-green-700'
+                  : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
+                }`}
             >
-              {jour.label}
-            </button>
+              {j}
+            </motion.button>
           ))}
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          Temps par jour : <span className="text-green-700 dark:text-green-400 font-semibold">{formatTemps(data.minutesParJour)}</span>
-        </label>
-        <input
-          type="range"
-          min={TEMPS_OPTIONS[0]}
-          max={TEMPS_OPTIONS[TEMPS_OPTIONS.length - 1]}
-          step={15}
-          value={data.minutesParJour}
-          onChange={(e) => onChange('minutesParJour', Number(e.target.value))}
-          className="w-full accent-green-500"
-        />
-        <div className="flex justify-between text-xs text-gray-400 mt-1">
-          {TEMPS_OPTIONS.map((m) => (
-            <span key={m} className={m === data.minutesParJour ? 'text-green-600 font-semibold' : ''}>
-              {formatTemps(m)}
-            </span>
+        <p className="text-sm font-semibold text-stone-700 mb-2">
+          Temps par jour : <span className="text-green-700">{data.minutesParJour} min</span>
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {MINUTES.map((m) => (
+            <motion.button
+              key={m}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onChange({ minutesParJour: m })}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all
+                ${data.minutesParJour === m
+                  ? 'bg-green-700 text-white border-green-700'
+                  : 'bg-white text-stone-600 border-stone-200 hover:border-stone-300'
+                }`}
+            >
+              {m} min
+            </motion.button>
           ))}
         </div>
       </div>
-
-      <div className="bg-beige-50 dark:bg-gray-800 rounded-xl p-4 border border-beige-200 dark:border-gray-700">
-        <p className="text-xs text-gray-600 dark:text-gray-400 text-center leading-relaxed">
-          Avec <strong className="text-green-700 dark:text-green-400">{formatTemps(data.minutesParJour)}</strong> par jour,{' '}
-          {data.joursParSemaine.length} jour{data.joursParSemaine.length > 1 ? 's' : ''} par semaine
-          {' '}soit environ <strong className="text-green-700 dark:text-green-400">
-            {Math.round((data.minutesParJour * data.joursParSemaine.length) / 60)}h
-          </strong> par semaine.
-        </p>
-      </div>
-    </div>
+    </motion.div>
   );
 }

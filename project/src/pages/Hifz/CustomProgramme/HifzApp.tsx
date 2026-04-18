@@ -1,266 +1,116 @@
-import { useLocalStorage } from '../../../hooks/useLocalStorage';
-import { useNavigate } from 'react-router-dom';
-import {
-  addDaysISO,
-  getCurrentTargetPage,
-  getDailyMemoGoal,
-  getTodayStr,
-} from '../../../lib/hifzSchedule';
-import { DailyProgress, PageQuality, UserProfile } from '../../../types';
-import { QuestionnaireData } from '../../../types/hifz';
-import Dashboard from './Dashboard';
+import { useState, useEffect } from 'react';
+import { QuestionnaireData, UserProfile, DailyProgress } from '../../../types/hifz';
+import { getTodayString } from '../../../lib/revisionHelper';
 import QuestionnaireContainer from './QuestionnaireContainer';
-export default function HifzPage() {
-  const navigate = useNavigate();
-  const [profile, setProfile] = useLocalStorage<UserProfile | null>('hifz-profile', null);
-  const openReaderFromHifz = (page: number, pages?: number[]) => {
-    const params = new URLSearchParams();
-    params.set('from', 'hifz');
-    params.set('page', String(page));
-    if (pages && pages.length > 0) {
-      params.set('pages', pages.join(','));
-    }
-    navigate(`/lire?${params.toString()}`);
-  };
+import Dashboard from './Dashboard';
 
-  const handleResumeReader = () => {
-    const saved = localStorage.getItem('lire-last-position');
-    if (!saved) {
-      const fallbackPage = profile ? getCurrentTargetPage(profile, progress) : 1;
-      openReaderFromHifz(fallbackPage);
-      return;
-    }
+interface Props {
+  onBack: () => void;
+}
+
+const PROFILE_KEY = 'hifz-profile';
+const PROGRESS_KEY = 'hifz-progress';
+
+function buildProfile(data: QuestionnaireData): UserProfile {
+  const juzActuel =
+    data.situation === 'debutant'
+      ? 1
+      : data.departMemorisation === 'juzPrecis'
+      ? data.juzArrive
+      : data.departMemorisation === 'milieu'
+      ? 15
+      : 1;
+
+  const quality =
+    data.qualiteMemorisation === 'solide'
+      ? 'good'
+      : data.qualiteMemorisation === 'partielle'
+      ? 'partial'
+      : 'forgotten';
+
+  let objectifLabel = 'Mémoriser le Coran';
+  if (data.objectif === 'nombreJuz') objectifLabel = `${data.nombreJuzObjectif} juz`;
+  else if (data.objectif === 'dateButoir') objectifLabel = `Avant le ${data.dateObjectif}`;
+  else if (data.objectif === 'revision') objectifLabel = 'Révision complète';
+
+  return {
+    prenom: data.prenom || 'Frère/Sœur',
+    juzActuel,
+    objectif: objectifLabel,
+    tempsParJour: data.minutesParJour,
+    createdAt: new Date().toISOString(),
+    memorizationQuality: quality,
+    urgentReviewPages: [],
+  };
+}
+
+export default function HifzApp({ onBack }: Props) {
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
     try {
-      const parsed = JSON.parse(saved) as { page?: number };
-      openReaderFromHifz(parsed.page ?? 1);
+      const raw = localStorage.getItem(PROFILE_KEY);
+      return raw ? JSON.parse(raw) : null;
     } catch {
-      openReaderFromHifz(1);
+      return null;
     }
+  });
+
+  const [progress, setProgress] = useState<DailyProgress[]>(() => {
+    try {
+      const raw = localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    if (profile) localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  }, [profile]);
+
+  useEffect(() => {
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+  }, [progress]);
+
+  const handleSubmit = (data: QuestionnaireData) => {
+    const newProfile = buildProfile(data);
+    setProfile(newProfile);
   };
 
-  const [progress, setProgress] = useLocalStorage<DailyProgress[]>('hifz-progress', []);
-  const [kahfReadDates, setKahfReadDates] = useLocalStorage<string[]>('hifz-kahf-read-dates', []);
-
-  const convertQuestionnaireToProfile = (data: QuestionnaireData): UserProfile => {
-    const today = getTodayStr();
-    const revisionOnlyUntil = data.qualiteMemorisation === 'oubliee' 
-      ? addDaysISO(today, 30) 
-      : undefined;
-
-    // Convertir QualiteMemorisation vers MemorizationQuality
-    const memorizationQuality: 'good' | 'partial' | 'forgotten' = 
-      data.qualiteMemorisation === 'solide' ? 'good' :
-      data.qualiteMemorisation === 'partielle' ? 'partial' :
-      'forgotten';
-
-    return {
-      prenom: data.prenom,
-      juzActuel: data.juzArrive,
-      objectif: data.objectif === 'revision' 
-        ? 'Révision et consolidation'
-        : data.aDateObjectif 
-          ? `Mémoriser ${data.nombreJuzObjectif} Juz avant le ${data.dateObjectif}`
-          : `Mémoriser ${data.nombreJuzObjectif} Juz`,
-      tempsParJour: data.minutesParJour,
-      createdAt: new Date().toISOString(),
-      memorizationQuality,
-      revisionOnlyUntil,
-      urgentReviewPages: [],
-    };
-  };
-
-  const handleCreateProfile = (questionnaireData: QuestionnaireData) => {
-    const profile = convertQuestionnaireToProfile(questionnaireData);
-    setProfile(profile);
-    setProgress([]);
-  };
-
-  const handleMarkDoneWithQuality = (quality: PageQuality) => {
-    if (!profile) return;
-    const today = getTodayStr();
-    const goal = getDailyMemoGoal(profile, today);
-    if (goal <= 0) return;
-
-    const targetPage = getCurrentTargetPage(profile, progress);
-
-    if (quality === 'hard') {
-      setProgress((prev) => {
-        const existing = prev.find((p) => p.date === today);
-        const rest = prev.filter((p) => p.date !== today);
-        return [
-          ...rest,
-          {
-            date: today,
-            completed: false,
-            pagesDone: existing?.pagesDone ?? 0,
-            pageQuality: 'hard',
-            lastReviewedAt: today,
-            sessionSeconds: existing?.sessionSeconds ?? 0,
-          },
-        ];
-      });
-      return;
-    }
-
-    let urgent = [...(profile.urgentReviewPages ?? [])];
-    if (quality === 'hesitant' && !urgent.includes(targetPage)) {
-      urgent.push(targetPage);
-    }
-    if (quality === 'fluent') {
-      urgent = urgent.filter((p) => p !== targetPage);
-    }
-
-    setProfile((prev) =>
-      prev ? { ...prev, urgentReviewPages: urgent } : null
-    );
-
+  const handleMarkDone = (pages: number, quality: 'fluent' | 'hesitant' | 'hard') => {
+    const today = getTodayString();
     setProgress((prev) => {
-      const existing = prev.find((p) => p.date === today);
-      const sessionKeep = existing?.sessionSeconds ?? 0;
-      const newEntry: DailyProgress = {
-        date: today,
-        pagesDone: goal,
-        completed: true,
-        lastReviewedAt: today,
-        pageQuality: quality,
-        sessionSeconds: sessionKeep,
-      };
-      if (existing) {
-        return prev.map((p) => (p.date === today ? { ...newEntry, sessionSeconds: Math.max(sessionKeep, p.sessionSeconds ?? 0) } : p));
-      }
-      return [...prev, newEntry];
-    });
-  };
-
-  const handleSessionSeconds = (seconds: number) => {
-    const today = getTodayStr();
-    setProgress((prev) => {
-      const existing = prev.find((p) => p.date === today);
-      if (existing) {
-        return prev.map((p) =>
-          p.date === today ? { ...p, sessionSeconds: Math.max(p.sessionSeconds ?? 0, seconds) } : p
-        );
-      }
+      const filtered = prev.filter((p) => p.date !== today);
       return [
-        ...prev,
+        ...filtered,
         {
           date: today,
-          pagesDone: 0,
-          completed: false,
-          sessionSeconds: seconds,
+          pagesDone: pages,
+          completed: true,
+          pageQuality: quality,
+          sessionSeconds: 0,
+          pageNumber: (profile?.juzActuel ?? 1) * 20 + filtered.length,
         },
       ];
     });
   };
 
-  const handleMarkTodayReviewed = () => {
-    const today = getTodayStr();
-    setProgress((prev) => {
-      const existing = prev.find((p) => p.date === today);
-      if (!existing) {
-        return [
-          ...prev,
-          {
-            date: today,
-            pagesDone: 0,
-            completed: false,
-            lastReviewedAt: today,
-          },
-        ];
-      }
-      return prev.map((entry) =>
-        entry.date === today ? { ...entry, lastReviewedAt: today } : entry
-      );
-    });
-  };
-
-  const handleMarkPriorityReviewed = (pages: number[]) => {
-    if (!profile || pages.length === 0) return;
-
-    const startPage = ((profile.juzActuel ?? 1) - 1) * 20 + 1;
-    const completedSorted = [...progress]
-      .filter((p) => p.completed)
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    const pageMap = new Map<number, DailyProgress>();
-    completedSorted.forEach((entry, index) => {
-      pageMap.set(startPage + index, entry);
-    });
-
-    const today = getTodayStr();
-    setProgress((prev) =>
-      prev.map((entry) => {
-        const hit = pages.some((page) => pageMap.get(page)?.date === entry.date);
-        if (!hit) return entry;
-        return { ...entry, lastReviewedAt: today };
-      })
-    );
-
-    setProfile((prev) =>
-      prev
-        ? {
-            ...prev,
-            urgentReviewPages: (prev.urgentReviewPages ?? []).filter((p) => !pages.includes(p)),
-          }
-        : null
-    );
-  };
-
-  const handleActivateTenJuzConsolidation = () => {
-    const today = getTodayStr();
-    setProfile((prev) =>
-      prev
-        ? {
-            ...prev,
-            revisionOnlyUntil: addDaysISO(today, 30),
-            tenJuzDismissed: true,
-          }
-        : null
-    );
-  };
-
-  const handleDismissTenJuzHint = () => {
-    setProfile((prev) => (prev ? { ...prev, tenJuzDismissed: true } : null));
-  };
-
   const handleReset = () => {
-    if (
-      window.confirm(
-        'Êtes-vous sûr de vouloir réinitialiser votre programme ? Toutes vos données seront supprimées.'
-      )
-    ) {
-      setProfile(null);
-      setProgress([]);
-      setKahfReadDates([]);
-    }
-  };
-
-  const handleMarkKahfRead = () => {
-    const today = getTodayStr();
-    if (kahfReadDates.includes(today)) return;
-    setKahfReadDates([...kahfReadDates, today]);
+    localStorage.removeItem(PROFILE_KEY);
+    localStorage.removeItem(PROGRESS_KEY);
+    setProfile(null);
+    setProgress([]);
   };
 
   if (!profile) {
-    return <QuestionnaireContainer onSubmit={handleCreateProfile} />;
+    return <QuestionnaireContainer onSubmit={handleSubmit} onBack={onBack} />;
   }
 
   return (
     <Dashboard
       profile={profile}
       progress={progress}
-      onMarkDoneWithQuality={handleMarkDoneWithQuality}
-      onSessionSeconds={handleSessionSeconds}
-      onMarkTodayReviewed={handleMarkTodayReviewed}
-      onMarkPriorityReviewed={handleMarkPriorityReviewed}
-      onActivateTenJuzConsolidation={handleActivateTenJuzConsolidation}
-      onDismissTenJuzHint={handleDismissTenJuzHint}
-      kahfReadToday={kahfReadDates.includes(getTodayStr())}
-      onMarkKahfRead={handleMarkKahfRead}
+      onMarkDone={handleMarkDone}
       onReset={handleReset}
-      onOpenReaderPage={(page) => openReaderFromHifz(page)}
-      onOpenReaderPages={(pages) => openReaderFromHifz(pages[0] ?? 1, pages)}
-      onResumeReader={handleResumeReader}
     />
   );
 }
