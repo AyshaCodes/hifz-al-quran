@@ -155,7 +155,7 @@ export default function VerseDisplay({
       {surahNumber && <SurahIntro surahNumber={surahNumber} />}
 
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {pages.map((page, pageIndex) => {
+        {pages.map((page) => {
           const pageSurahGroups = groupPageVersesBySurah(page.verses);
           return (
             <div key={page.pageNumber} className="mb-12">

@@ -24,19 +24,15 @@ export const calculateProgramme = (data: QuestionnaireData): ProgrammeHifz => {
   let pagesDejaMemori = 0;
 
   if (data.situation !== 'debutant' && data.situation !== null) {
-    if (data.departMemorisation === 'fin') {
-      juzDepart = 30 - (data.juzArrive - 1);
-      pagesDejaMemori = (30 - data.juzArrive + 1) * PAGES_PAR_JUZ;
-    } else {
-      juzDepart = data.juzArrive;
-      pagesDejaMemori = (data.juzArrive - 1) * PAGES_PAR_JUZ;
-    }
+    // Note: departMemorisation type is 'debut' | 'milieu' | 'juzPrecis' | null
+    juzDepart = data.juzArrive;
+    pagesDejaMemori = (data.juzArrive - 1) * PAGES_PAR_JUZ;
   }
 
   let pagesRestantes = TOTAL_PAGES - pagesDejaMemori;
   let pagesTotal = TOTAL_PAGES;
 
-  if (data.objectif === 'quelques_juz') {
+  if (data.objectif === 'nombreJuz') {
     pagesTotal = data.nombreJuzObjectif * PAGES_PAR_JUZ;
     pagesRestantes = Math.max(0, pagesTotal - pagesDejaMemori);
   } else if (data.objectif === 'revision') {

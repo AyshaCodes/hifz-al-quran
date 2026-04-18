@@ -1,4 +1,4 @@
-import { Mail, MessageSquare, ExternalLink, ArrowRight } from 'lucide-react';
+import { Mail, MessageSquare, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Contact() {

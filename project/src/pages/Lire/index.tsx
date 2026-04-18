@@ -77,7 +77,7 @@ export default function LirePage() {
         // Nettoyer l'URL pour éviter les boucles
         const params = new URLSearchParams(searchParams);
         params.delete('surah');
-        navigate(`/lire?${params.toString()}`, { replace: true });
+        navigate(`/lire?${params.toString()}`);
       }
     }
   }, [searchParams, selectedSurah, navigate]);

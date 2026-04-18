@@ -24,6 +24,8 @@ export interface UserProfile {
   urgentReviewPages: number[];
 }
 
+export type HifzProfile = UserProfile;
+
 export interface DailyProgress {
   date: string;
   pagesDone: number;
@@ -32,6 +34,23 @@ export interface DailyProgress {
   pageQuality?: 'fluent' | 'hesitant' | 'hard';
   sessionSeconds: number;
   pageNumber?: number;
+}
+
+export interface HifzProgress {
+  jours: DailyProgress[];
+  joursConsecutifs: number;
+  pagesCompletees: number;
+  juzCompletes: number;
+  derniereRevision: Record<number, string>;
+}
+
+export interface ProgrammeHifz {
+  pagesParJour: number;
+  joursParSemaine: number;
+  dateFinPrevue: string;
+  phaseActuelle: 'memorisation' | 'revision' | 'intensif';
+  prochaineEtape: string;
+  dureeEstimeeMois: number;
 }
 
 export interface GuidedProfile {

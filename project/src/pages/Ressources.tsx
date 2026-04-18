@@ -98,7 +98,7 @@ export default function Ressources() {
               { title: "Guide Tajweed pour débutants", icon: BookOpen, desc: "Les bases de la récitation" },
               { title: "Les 40 hadiths An-Nawawi", icon: Award, desc: "L'essentiel de la foi" },
               { title: "Calendrier Ramadan 2027", icon: Calendar, desc: "Planifiez votre mois sacré" }
-            ].map((item, idx) => (
+            ].map((item) => (
               <motion.div
                 key={item.title}
                 variants={fadeUp}

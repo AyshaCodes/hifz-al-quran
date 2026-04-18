@@ -149,7 +149,7 @@ export default function SurahSidebar({
                   key={s.number}
                   onClick={() => {
                     onSelectSurah(s.number);
-                    if (closeOnSelect) onClose();
+                    onClose();
                   }}
                   className={`
                     w-full flex items-center gap-3 px-4 py-2.5 text-left
@@ -198,7 +198,7 @@ export default function SurahSidebar({
               );
             })
           ) : (
-            filteredJuz.map(({ juz, firstSurah, surahsInJuz }) => {
+            filteredJuz.map(({ juz, surahsInJuz }) => {
               const isActive = selectedJuz === juz;
               return (
                 <button
