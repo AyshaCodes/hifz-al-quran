@@ -1,12 +1,13 @@
 import { AlertTriangle, BookOpen, RefreshCw } from 'lucide-react';
 import { useMemo } from 'react';
-import { SURAHS } from '../../data/surahs';
+import { SURAHS } from '../../../data/surahs';
+import MotivationalQuote from '../shared/MotivationalQuote';
 import {
   formatPagesFr,
   formatTempsCourt,
   getPagesPerDayFromMinutes,
   snapTempsToStep,
-} from '../../lib/hifzPace';
+} from '../../../lib/hifzPace';
 import {
   getCurrentTargetPage,
   getDailyMemoGoal,
@@ -15,13 +16,13 @@ import {
   getWeeklyPlan,
   memorizationQualityOrDefault,
   reviewThresholdDays,
-} from '../../lib/hifzSchedule';
-import { DailyProgress, PageQuality, UserProfile } from '../../types';
-import ProgressChart from './ProgressChart';
-import StatCards from './StatCards';
-import TodayTask from './TodayTask';
-import WeeklyCalendar from './WeeklyCalendar';
-import WeeklyPlan from './WeeklyPlan';
+} from '../../../lib/hifzSchedule';
+import { DailyProgress, PageQuality, UserProfile } from '../../../types';
+import ProgressChart from '../shared/ProgressChart';
+import StatCards from '../shared/StatCards';
+import TodayTask from '../shared/TodayTask';
+import WeeklyCalendar from '../shared/WeeklyCalendar';
+import WeeklyPlan from '../shared/WeeklyPlan';
 
 interface DashboardProps {
   profile: UserProfile;
@@ -211,6 +212,8 @@ export default function Dashboard({
           </div>
         </div>
       </div>
+
+      <MotivationalQuote />
 
       <StatCards stats={stats} />
 

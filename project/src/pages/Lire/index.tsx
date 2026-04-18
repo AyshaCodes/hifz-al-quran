@@ -1,5 +1,5 @@
 import { Menu } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SURAHS } from '../../data/surahs';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
@@ -62,14 +62,38 @@ export default function LirePage() {
     .map((p) => Number(p))
     .filter((p) => Number.isFinite(p) && p > 0);
 
-  const loadSurah = useCallback(async (num: number) => {
+  // Ref pour annuler les requêtes
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const currentSurahRef = useRef(selectedSurah);
+
+  // Lire le paramètre surah depuis l'URL et initialiser l'état
+  useEffect(() => {
+    const surahParam = searchParams.get('surah');
+    if (surahParam) {
+      const newSurah = parseInt(surahParam, 10);
+      if (!isNaN(newSurah) && newSurah !== selectedSurah) {
+        setSelectedSurah(newSurah);
+        // Réinitialiser les pages et autres états
+        setLecturePages([]);
+        setReachedSurahEnd(false);
+        // Nettoyer l'URL pour éviter les boucles
+        const params = new URLSearchParams(searchParams);
+        params.delete('surah');
+        navigate(`/lire?${params.toString()}`, { replace: true });
+      }
+    }
+  }, [searchParams, selectedSurah, navigate]);
+
+  const loadSurah = useCallback(async (num: number, signal?: AbortSignal) => {
     setLoading(true);
     setError(null);
     try {
       // Utiliser la nouvelle API sans rate limit
       const data = await fetchSurahFromNewAPI(num);
+      if (signal?.aborted) return;
       setVerses(data);
     } catch (err) {
+      if (signal?.aborted) return;
       console.error('Error loading surah:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       if (errorMessage.includes('429') || errorMessage.includes('CORS')) {
@@ -78,21 +102,32 @@ export default function LirePage() {
         setError('Impossible de charger la sourate. Vérifiez votre connexion.');
       }
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   }, []);
 
+  // Charger la sourate quand elle change
   useEffect(() => {
-    loadSurah(selectedSurah);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    currentSurahRef.current = selectedSurah;
+    loadSurah(selectedSurah, controller.signal);
+    return () => {
+      controller.abort();
+    };
   }, [selectedSurah, loadSurah]);
 
+  // Initialisation depuis targetPage (paramètre URL)
   useEffect(() => {
     if (targetPage) {
       setMushafPage(Math.min(604, Math.max(1, targetPage)));
       let cancelled = false;
       fetchSurahForMushafPage(targetPage)
         .then((surahNum) => {
-          if (!cancelled) {
+          if (!cancelled && surahNum !== selectedSurah) {
             setSelectedSurah(surahNum);
             setReadMode('lecture');
           }
@@ -101,18 +136,35 @@ export default function LirePage() {
       return () => {
         cancelled = true;
       };
-    } else {
-      // Initialize with first page of selected surah if no page parameter
-      fetchFirstPageForSurah(selectedSurah)
-        .then((firstPage) => {
-          setMushafPage(Math.min(604, Math.max(1, firstPage)));
-        })
-        .catch(() => {});
     }
-  }, [targetPage, selectedSurah]);
+  }, [targetPage]); // Ne pas inclure selectedSurah ici pour éviter boucle
 
+  // Mise à jour de mushafPage lorsque la sourate change (en mode lecture)
   useEffect(() => {
     if (readMode !== 'lecture') return;
+    let cancelled = false;
+    const updatePage = async () => {
+      try {
+        const firstPage = await fetchFirstPageForSurah(selectedSurah);
+        if (!cancelled) {
+          setMushafPage(Math.min(604, Math.max(1, firstPage)));
+        }
+      } catch (err) {
+        console.error('Erreur lors de la récupération de la première page', err);
+      }
+    };
+    updatePage();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSurah, readMode]); // Déclenché quand la sourate change en mode lecture
+
+  // Chargement de la page du Mushaf
+  useEffect(() => {
+    if (readMode !== 'lecture') return;
+    if (!selectedSurah) return;
+    if (!mushafPage || isNaN(mushafPage)) return;
+
     let cancelled = false;
     const loadPage = async () => {
       setPageLoading(true);
@@ -120,8 +172,8 @@ export default function LirePage() {
       setReachedSurahEnd(false);
       try {
         const pageData = await fetchPageWithTranslation(mushafPage);
-        const filteredAyahs = pageData.ayahs.filter((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
         if (cancelled) return;
+        const filteredAyahs = pageData.ayahs.filter((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
         setLecturePages([
           {
             pageNumber: mushafPage,
@@ -241,16 +293,10 @@ export default function LirePage() {
     else setDesktopSidebarVisible((prev) => !prev);
   };
 
-  const handleSelectSurah = async (surahNumber: number) => {
-    setSelectedSurah(surahNumber);
-    if (readMode === 'lecture') {
-      try {
-        const firstPage = await fetchFirstPageForSurah(surahNumber);
-        setMushafPage(Math.min(604, Math.max(1, firstPage)));
-      } catch {
-        // keep current page
-      }
-    }
+  const handleSelectSurah = (surahNumber: number) => {
+    if (surahNumber === selectedSurah) return;
+    // Rediriger vers la même page avec un paramètre `surah` dans l'URL
+    navigate(`/lire?surah=${surahNumber}&mode=${readMode}`);
   };
 
   useEffect(() => {
@@ -259,7 +305,7 @@ export default function LirePage() {
     params.set('page', String(mushafPage));
     if (!params.get('from')) params.set('from', 'reader');
     navigate(`/lire?${params.toString()}`, { replace: true });
-  }, [mushafPage, readMode]);
+  }, [mushafPage, readMode, selectedSurah, navigate, searchParams]);
 
   useEffect(() => {
     if (!selectedSurah) return;
@@ -274,11 +320,9 @@ export default function LirePage() {
     );
   }, [selectedSurah, mushafPage, readMode]);
 
-  // ========== RENDU AVEC NOUVEAU THÈME ==========
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-blue-950 dark:via-gray-900 dark:to-blue-950">
       <div className="relative flex flex-col lg:flex-row">
-        {/* Sidebar */}
         <SurahSidebar
           selectedSurah={selectedSurah}
           onSelectSurah={handleSelectSurah}
@@ -288,7 +332,6 @@ export default function LirePage() {
           memorizingSurahNumber={memorizingSurahNumber}
         />
 
-        {/* Contenu principal */}
         <div className="flex-1 min-w-0">
           {fromHifz && (
             <div className="px-4 py-2 bg-green-800 text-white text-sm flex flex-wrap items-center justify-between gap-3">
@@ -318,7 +361,6 @@ export default function LirePage() {
             </div>
           )}
 
-          {/* Barre de navigation */}
           <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800">
             <div className="flex items-center gap-3 px-4 py-3">
               <button
@@ -342,10 +384,8 @@ export default function LirePage() {
             </div>
           </div>
 
-          {/* Toggle mode de lecture */}
           <ReadModeToggle mode={readMode} onModeChange={setReadMode} />
 
-          {/* Zone de contenu */}
           <div className="py-6 px-4">
             {readMode === 'lecture' ? (
               <VerseDisplay

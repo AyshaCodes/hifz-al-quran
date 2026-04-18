@@ -1,5 +1,5 @@
 import { CalendarDays, MoonStar, Repeat } from 'lucide-react';
-import { PlannedDay } from '../../lib/hifzSchedule';
+import { PlannedDay } from '../../../lib/hifzSchedule';
 
 interface WeeklyPlanProps {
   plan: PlannedDay[];

@@ -1,4 +1,4 @@
-import { DailyProgress } from '../../types';
+import { DailyProgress } from '../../../types';
 import { Check, Dot, MoonStar } from 'lucide-react';
 
 interface WeeklyCalendarProps {

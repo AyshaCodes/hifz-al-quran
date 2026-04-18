@@ -3,7 +3,10 @@ import Footer from './components/Footer';
 import Header from './components/Header';
 import { useDarkMode } from './hooks/useDarkMode';
 import Home from './pages/Home';
-import HifzApp from './components/hifz/HifzApp';
+import HifzChoice from './pages/hifz';
+import HifzAppCustom from './pages/hifz/CustomProgramme/HifzApp';
+import GuidedSetup from './pages/hifz/GuidedProgramme/GuidedSetup';
+import GuidedDashboard from './pages/hifz/GuidedProgramme/GuidedDashboard';
 import LirePage from './pages/Lire/index';
 import Signets from './pages/Signets';
 import Ressources from './pages/Ressources';
@@ -22,7 +25,11 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/lire" element={<LirePage />} />
-            <Route path="/hifz" element={<HifzApp />} />
+            <Route path="/hifz" element={<HifzChoice />} />
+            <Route path="/hifz/custom" element={<HifzAppCustom />} />   
+            <Route path="/hifz/guided" element={<GuidedSetup />} />
+            <Route path="/hifz/guided/dashboard" element={<GuidedDashboard />} />
+            <Route path="/hifz/dashboard" element={<GuidedDashboard />} />
             <Route path="/signets" element={<Signets />} />
             <Route path="/ressources" element={<Ressources />} />
             <Route path="/contact" element={<Contact />} />

@@ -1,8 +1,8 @@
 import { CheckCircle, Circle, Heart, Pause, Play, RefreshCcw, RotateCcw, Timer } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { formatPagesFr } from '../../lib/hifzPace';
-import { getDailyMotivationalMessage } from '../../lib/hifzMotivation';
-import { DailyProgress, PageQuality, UserProfile } from '../../types';
+import { formatPagesFr } from '../../../lib/hifzPace';
+import { getDailyMotivationalMessage } from '../../../lib/hifzMotivation';
+import { DailyProgress, PageQuality, UserProfile } from '../../../types';
 
 interface TodayTaskProps {
   targetPage: number;

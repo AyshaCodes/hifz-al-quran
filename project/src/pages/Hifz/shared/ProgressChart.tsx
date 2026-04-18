@@ -1,4 +1,4 @@
-import { DailyProgress } from '../../types';
+import { DailyProgress } from '../../../types';
 
 interface ProgressChartProps {
   progress: DailyProgress[];
