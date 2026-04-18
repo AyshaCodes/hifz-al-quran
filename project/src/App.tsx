@@ -1,4 +1,4 @@
-// Fix Vercel deployment - updated imports paths
+// Fix Vercel deployment - updated imports paths - v2
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
@@ -42,3 +42,4 @@ export default function App() {
     </div>
   );
 }
+
