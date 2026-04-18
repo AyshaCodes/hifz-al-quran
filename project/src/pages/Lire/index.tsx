@@ -178,10 +178,17 @@ export default function LirePage() {
           throw new Error('Page vide ou invalide');
         }
 
+        const filteredAyahs = pageData.ayahs.filter((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
+        
+        if (filteredAyahs.length === 0) {
+          setReachedSurahEnd(true);
+          return;
+        }
+
         setLecturePages([
           {
             pageNumber: mushafPage,
-            verses: pageData.ayahs,
+            verses: filteredAyahs,
             juz: pageData.juz,
             hizbQuarter: pageData.hizbQuarter,
           },
@@ -215,7 +222,9 @@ export default function LirePage() {
       const nextPageNumber = lastPage + 1;
       const pageData = await fetchPageWithTranslation(nextPageNumber);
       
-      if (!pageData.ayahs || pageData.ayahs.length === 0) {
+      const filteredAyahs = pageData.ayahs.filter((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
+      
+      if (filteredAyahs.length === 0) {
         setReachedSurahEnd(true);
         return;
       }
@@ -226,7 +235,7 @@ export default function LirePage() {
           ...prev,
           {
             pageNumber: nextPageNumber,
-            verses: pageData.ayahs,
+            verses: filteredAyahs,
             juz: pageData.juz,
             hizbQuarter: pageData.hizbQuarter,
           },
