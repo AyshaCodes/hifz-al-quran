@@ -13,11 +13,29 @@ interface SurahSidebarProps {
 
 type Tab = 'sourates' | 'juz';
 
+// Page de début de chaque juz (données fixes du Mushaf Uthmani)
+const JUZ_START_PAGES: Record<number, number> = {
+  1: 1, 2: 22, 3: 42, 4: 62, 5: 82, 6: 102, 7: 121, 8: 142, 9: 162, 10: 182,
+  11: 201, 12: 222, 13: 242, 14: 262, 15: 282, 16: 302, 17: 322, 18: 342,
+  19: 362, 20: 382, 21: 402, 22: 422, 23: 442, 24: 462, 25: 482, 26: 502,
+  27: 522, 28: 542, 29: 562, 30: 582,
+};
+
+// Première sourate de chaque juz (numéro de sourate)
+const JUZ_FIRST_SURAH: Record<number, number> = {
+  1: 1, 2: 2, 3: 2, 4: 3, 5: 4, 6: 4, 7: 5, 8: 6, 9: 7, 10: 8,
+  11: 9, 12: 10, 13: 12, 14: 15, 15: 17, 16: 18, 17: 21, 18: 23,
+  19: 25, 20: 27, 21: 29, 22: 33, 23: 36, 24: 39, 25: 41, 26: 46,
+  27: 51, 28: 58, 29: 67, 30: 78,
+};
+
 const JUZ_LIST = Array.from({ length: 30 }, (_, i) => {
   const juzNum = i + 1;
-  // First surah of each juz
-  const firstSurah = SURAHS.find((s) => s.juz === juzNum) ?? SURAHS[0];
-  return { juz: juzNum, firstSurah };
+  const firstSurahNum = JUZ_FIRST_SURAH[juzNum];
+  const firstSurah = SURAHS.find((s) => s.number === firstSurahNum) ?? SURAHS[0];
+  // Sourates qui débutent dans ce juz (approximation visuelle)
+  const surahsInJuz = SURAHS.filter((s) => s.juz === juzNum);
+  return { juz: juzNum, firstSurah, surahsInJuz, startPage: JUZ_START_PAGES[juzNum] };
 });
 
 export default function SurahSidebar({
@@ -178,9 +196,8 @@ export default function SurahSidebar({
               );
             })
           ) : (
-            filteredJuz.map(({ juz, firstSurah }) => {
+            filteredJuz.map(({ juz, firstSurah, surahsInJuz }) => {
               const isActive = selectedJuz === juz;
-              const surahsInJuz = SURAHS.filter((s) => s.juz === juz);
               return (
                 <button
                   key={juz}
@@ -211,7 +228,9 @@ export default function SurahSidebar({
                       Juz {juz}
                     </p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">
-                      {surahsInJuz.map((s) => s.nameTranslit).join(', ')}
+                      {surahsInJuz.length > 0
+                        ? surahsInJuz.map((s) => s.nameTranslit).join(', ')
+                        : `Commence p. ${JUZ_START_PAGES[juz]}`}
                     </p>
                   </div>
                 </button>
