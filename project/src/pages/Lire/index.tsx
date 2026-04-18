@@ -7,7 +7,6 @@ import { getCurrentTargetPage } from '../../lib/hifzSchedule';
 import {
   ApiPageVerse,
   fetchSurahFromNewAPI,
-  fetchSurahWithTranslation,
   fetchPageWithTranslation,
   fetchSurahForMushafPage,
   fetchFirstPageForSurah,
@@ -91,7 +90,7 @@ export default function LirePage() {
       // Utiliser la nouvelle API sans rate limit
       const data = await fetchSurahFromNewAPI(num);
       if (signal?.aborted) return;
-      setVerses(data);
+      setVerses(data.map((v) => ({ ...v, translation: v.translation ?? '' })));
     } catch (err) {
       if (signal?.aborted) return;
       console.error('Error loading surah:', err);
