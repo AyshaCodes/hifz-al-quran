@@ -1,7 +1,6 @@
 // Proxy CORS temporaire pour le développement
 const PROXY = 'https://api.allorigins.win/raw?url=';
 const BASE_URL = '/api/v1';
-const NEW_API_BASE = 'https://quranapi.pages.dev/api';
 
 // Cache simple en mémoire pour éviter les requêtes répétées
 const cache = new Map<string, { data: any; timestamp: number }>();
@@ -62,7 +61,12 @@ export interface ApiVerse {
   number: number;
   numberInSurah: number;
   text: string;
+  translation?: string;
   audio?: string;
+  surahNumber?: number;
+  juz?: number;
+  hizbQuarter?: number;
+  page?: number;
 }
 
 export interface ApiPageVerse extends ApiVerse {
@@ -85,72 +89,50 @@ export async function fetchSurahFromNewAPI(surahNumber: number): Promise<ApiVers
     throw new Error(`Invalid surah number: ${surahNumber}`);
   }
   
-  // Données factices pour les sourates principales - solution temporaire
-  const mockData: { [key: number]: string[] } = {
-    1: [
-      "In the name of Allah, the Entirely Merciful, the Especially Merciful.",
-      "All praise is due to Allah, Lord of the worlds",
-      "The Entirely Merciful, the Especially Merciful",
-      "Sovereign of the Day of Recompense",
-      "It is You we worship and You we ask for help",
-      "Guide us to the straight path",
-      "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray."
-    ],
-    2: [
-      "Alif, Lam, Meem",
-      "This is the Book about which there is no doubt, a guidance for those conscious of Allah",
-      "Who believe in the unseen, establish prayer, and spend from what We have provided them",
-      "And who believe in what was revealed to you and what was revealed before you and of the Hereafter they are certain [in faith]",
-      "Those are upon guidance from their Lord, and it is those who are the successful"
-    ],
-    3: [
-      "Alif, Lam, Meem",
-      "There is no deity except Allah - the Ever-Living, the Sustainer of existence",
-      "He has sent down upon you the Book in truth, confirming what was before it",
-      "And He revealed the Torah and the Gospel",
-      "Previously, as guidance for the people, and He revealed the Qur'an"
-    ]
-  };
-
   try {
-    // Essayer l'API directe sans proxy
-    const response = await fetch(`${NEW_API_BASE}/${surahNumber}.json`);
-    if (response.ok) {
-      const data = await response.json();
-      if (data.arabic1 && Array.isArray(data.arabic1)) {
-        return data.arabic1.map((text: string, index: number) => ({
-          number: index + 1,
-          numberInSurah: index + 1,
-          text,
-          translation: '',
-          surahNumber,
-          juz: Math.ceil((index + 1) / 20),
-          hizbQuarter: Math.ceil((index + 1) / 5),
-          page: Math.floor((index + 1) / 6) + 1,
-        }));
-      }
+    // Utiliser les fichiers JSON statiques hébergés sur jsdelivr (pas de CORS)
+    const [arResponse, frResponse] = await Promise.all([
+      fetch('https://cdn.jsdelivr.net/npm/quran-json@3.0.0/dist/data/quran_ar.json'),
+      fetch('https://cdn.jsdelivr.net/npm/quran-json@3.0.0/dist/data/quran_fr.json')
+    ]);
+    
+    const arabicData = await arResponse.json();
+    const frenchData = await frResponse.json();
+    
+    const surahAr = arabicData.surahs.find((s: any) => s.index === surahNumber);
+    const surahFr = frenchData.surahs.find((s: any) => s.index === surahNumber);
+    
+    if (!surahAr || !surahFr) {
+      throw new Error(`Surah ${surahNumber} not found`);
     }
+    
+    // Combiner les versets arabe et français
+    return surahAr.verses.map((v: any, i: number) => ({
+      number: v.index,
+      numberInSurah: v.indexInSurah,
+      text: v.text,
+      translation: surahFr?.verses[i]?.text || '',
+      surahNumber,
+      juz: Math.ceil((v.index + 1) / 20),
+      hizbQuarter: Math.ceil((v.index + 1) / 5),
+      page: Math.floor((v.index + 1) / 6) + 1,
+    }));
   } catch (error) {
-    console.warn('API failed, using mock data:', error);
+    console.error('Error loading quran data:', error);
+    // Fallback simple si jsdelivr échoue
+    return [
+      {
+        number: 1,
+        numberInSurah: 1,
+        text: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
+        translation: 'Au nom d\'Allah, le Tout Miséricordieux, le Très Miséricordieux',
+        surahNumber,
+        juz: 1,
+        hizbQuarter: 1,
+        page: 1,
+      }
+    ];
   }
-
-  // Fallback avec données factices
-  const verses = mockData[surahNumber] || [
-    `Surah ${surahNumber} - Verse 1 (Mock data)`,
-    `Surah ${surahNumber} - Verse 2 (Mock data)`,
-    `Surah ${surahNumber} - Verse 3 (Mock data)`
-  ];
-
-  return verses.map((text, index) => ({
-    number: index + 1,
-    numberInSurah: index + 1,
-    text,
-    translation: '',
-    surahNumber,
-    juz: Math.ceil((index + 1) / 20),
-    hizbQuarter: Math.ceil((index + 1) / 5),
-    page: Math.floor((index + 1) / 6) + 1,
-  }));
 }
 
 export async function fetchSurahWithTranslation(surahNumber: number, reciterId = 'ar.alafasy') {

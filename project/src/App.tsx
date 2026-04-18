@@ -7,7 +7,7 @@ import HifzChoice from './pages/hifz';
 import HifzAppCustom from './pages/hifz/CustomProgramme/HifzApp';
 import GuidedSetup from './pages/hifz/GuidedProgramme/GuidedSetup';
 import GuidedDashboard from './pages/hifz/GuidedProgramme/GuidedDashboard';
-import LirePage from './pages/Lire/index';
+import LirePage from './pages/Lire';
 import Signets from './pages/Signets';
 import Ressources from './pages/Ressources';
 import Contact from './pages/Contact';
