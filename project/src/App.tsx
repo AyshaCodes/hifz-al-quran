@@ -1,11 +1,11 @@
-// Fix Vercel deployment - updated imports paths - v2
+// App.tsx
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import { useDarkMode } from './hooks/useDarkMode';
 import Home from './pages/Home';
-import HifzChoice from './pages/hifz/index';
-import HifzAppCustom from './pages/hifz/CustomProgramme/HifzApp';
+import HifzChoice from './pages/hifz/index';  // index.tsx à la racine de hifz
+import HifzApp from './pages/hifz/CustomProgramme/HifzApp';  // programme personnalisé
 import GuidedSetup from './pages/hifz/GuidedProgramme/GuidedSetup';
 import GuidedDashboard from './pages/hifz/GuidedProgramme/GuidedDashboard';
 import LirePage from './pages/Lire/index';
@@ -27,10 +27,9 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/lire" element={<LirePage />} />
             <Route path="/hifz" element={<HifzChoice />} />
-            <Route path="/hifz/custom" element={<HifzAppCustom />} />   
+            <Route path="/hifz/custom" element={<HifzApp />} />
             <Route path="/hifz/guided" element={<GuidedSetup />} />
             <Route path="/hifz/guided/dashboard" element={<GuidedDashboard />} />
-            <Route path="/hifz/dashboard" element={<GuidedDashboard />} />
             <Route path="/signets" element={<Signets />} />
             <Route path="/ressources" element={<Ressources />} />
             <Route path="/contact" element={<Contact />} />
@@ -42,4 +41,3 @@ export default function App() {
     </div>
   );
 }
-

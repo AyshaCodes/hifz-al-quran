@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { QuestionnaireData } from '../../types/hifz';
+import { QuestionnaireData } from '../../../types/hifz';
 import Stepper from '../shared/Stepper';
 import Step1Situation from './Step1Situation';
 import Step2Memorized from './Step2Memorized';
