@@ -295,7 +295,10 @@ export default function LirePage() {
 
   const handleSelectSurah = (surahNumber: number) => {
     if (surahNumber === selectedSurah) return;
-    navigate(`/lire?surah=${surahNumber}&mode=${readMode}`);
+    skipAutoPageRef.current = false; // laisser le recalcul auto se faire
+    setSelectedSurah(surahNumber);
+    setLecturePages([]);
+    setReachedSurahEnd(false);
   };
 
   const handleSelectPage = (page: number) => {
