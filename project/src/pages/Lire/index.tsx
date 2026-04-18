@@ -1,6 +1,6 @@
 import { Menu } from 'lucide-react';
 import { useCallback, useEffect, useState, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter } from '../../hooks/useRouter';
 import { SURAHS } from '../../data/surahs';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { getCurrentTargetPage } from '../../lib/hifzSchedule';
@@ -32,8 +32,7 @@ interface MushafPageData {
 }
 
 export default function LirePage() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { navigate, searchParams } = useRouter();
   const [selectedSurah, setSelectedSurah] = useState(1);
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(true);

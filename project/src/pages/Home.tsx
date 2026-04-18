@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   BookOpen, Star, ChevronRight, Moon, UserRound, TrendingUp,
-  BellRing, ArrowRight, BarChart3, Target, Clock, Award, Zap,
+  BellRing, ArrowRight, Award, Zap,
   Shield, Volume2, Sparkles, Gem
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from '../hooks/useRouter';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { UserProfile, DailyProgress } from '../types';
 import { getCurrentTargetPage, getTodayStr, getDailyMemoGoal } from '../lib/hifzSchedule';
@@ -64,7 +64,7 @@ const calculateProgressPercentage = (profile: UserProfile, progressData: DailyPr
 
 // ------------------------- Composant principal -------------------------
 export default function Home() {
-  const navigate = useNavigate();
+  const { navigate } = useRouter();
   const [profile] = useLocalStorage<UserProfile | null>('hifz-profile', null);
   const [progress] = useLocalStorage<DailyProgress[]>('hifz-progress', []);
   const [dailyVerse, setDailyVerse] = useState(quranicVerses[0]);

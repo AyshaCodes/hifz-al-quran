@@ -1,6 +1,6 @@
 import { Moon, Sun, Menu, X, BookOpen } from 'lucide-react';
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useRouter } from '../hooks/useRouter';
 
 interface HeaderProps {
   isDark: boolean;
@@ -17,8 +17,7 @@ const navItems = [
 
 export default function Header({ isDark, onToggleDark }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { path: currentPath, navigate } = useRouter();
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -52,7 +51,7 @@ export default function Header({ isDark, onToggleDark }: HeaderProps) {
                 key={path}
                 onClick={() => handleNav(path)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  location.pathname === path
+                  currentPath === path
                     ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-beige-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
                 }`}
@@ -89,7 +88,7 @@ export default function Header({ isDark, onToggleDark }: HeaderProps) {
                 key={path}
                 onClick={() => handleNav(path)}
                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  location.pathname === path
+                  currentPath === path
                     ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-beige-100 dark:hover:bg-gray-800'
                 }`}

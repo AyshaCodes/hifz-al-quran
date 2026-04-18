@@ -25,7 +25,7 @@ function App() {
   }, [path]);
 
   useEffect(() => {
-    if (!path || path === '/' || path === '') {
+    if (!path || path === '') {
       navigate('/');
     }
   }, [path, navigate]);

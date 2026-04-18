@@ -1,10 +1,10 @@
 import { Bookmark, BookmarkCheck, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from '../hooks/useRouter';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Bookmark as BookmarkType } from '../types';
 
 export default function Signets() {
-  const navigate = useNavigate();
+  const { navigate } = useRouter();
   const [bookmarks, setBookmarks] = useLocalStorage<BookmarkType[]>('hifz-bookmarks', []);
 
   const removeBookmark = (surahNumber: number, verseNumber: number) => {

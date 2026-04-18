@@ -1,7 +1,9 @@
 import { Mail, MessageSquare, Send, User, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from '../hooks/useRouter';
 
 export default function Contact() {
+  const { navigate } = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -91,7 +93,7 @@ export default function Contact() {
             <button
               onClick={() => {
                 setIsSubmitted(false);
-                window.location.href = '/';
+                navigate('/');
               }}
               className="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
