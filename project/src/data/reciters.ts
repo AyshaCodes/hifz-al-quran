@@ -3,7 +3,6 @@
 export const READ_RECITERS = [
   { id: 'ar.alafasy', name: 'Mishary Rashid Al-Afasy', shortName: 'Mishary Al-Afasy' },
   { id: 'ar.husary', name: 'Sheikh Husary', shortName: 'Sheikh Husary' },
-  { id: 'ar.saadghamdi', name: 'Saad Al-Ghamdi', shortName: 'Saad Al-Ghamdi' },
   { id: 'ar.abdulsamad', name: 'Abdul Basit Abdul Samad', shortName: 'Abdul Basit' },
 ] as const;
 
