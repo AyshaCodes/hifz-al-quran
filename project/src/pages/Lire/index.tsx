@@ -62,6 +62,8 @@ export default function LirePage() {
   // Ref pour annuler les requêtes
   const abortControllerRef = useRef<AbortController | null>(null);
   const currentSurahRef = useRef(selectedSurah);
+  // Quand true, le useEffect "mise à jour de mushafPage" ne recalcule pas la page
+  const skipAutoPageRef = useRef(false);
 
   // Lire le paramètre surah depuis l'URL et initialiser l'état
   useEffect(() => {
@@ -138,6 +140,10 @@ export default function LirePage() {
   // Mise à jour de mushafPage lorsque la sourate change (en mode lecture)
   useEffect(() => {
     if (readMode !== 'lecture') return;
+    if (skipAutoPageRef.current) {
+      skipAutoPageRef.current = false;
+      return;
+    }
     let cancelled = false;
     const updatePage = async () => {
       try {
@@ -150,10 +156,8 @@ export default function LirePage() {
       }
     };
     updatePage();
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedSurah, readMode]); // Déclenché quand la sourate change en mode lecture
+    return () => { cancelled = true; };
+  }, [selectedSurah, readMode]);
 
   // Chargement de la page du Mushaf
   useEffect(() => {
@@ -295,10 +299,15 @@ export default function LirePage() {
   };
 
   const handleSelectPage = (page: number) => {
+    skipAutoPageRef.current = true;
     setMushafPage(Math.min(604, Math.max(1, page)));
     setLecturePages([]);
     setReachedSurahEnd(false);
     setReadMode('lecture');
+    // Mettre à jour selectedSurah avec la sourate de cette page
+    fetchSurahForMushafPage(page)
+      .then((surahNum) => setSelectedSurah(surahNum))
+      .catch(() => {});
   };
 
   useEffect(() => {
