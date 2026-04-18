@@ -1,87 +1,36 @@
-// Proxy CORS temporaire pour le développement
-const PROXY = 'https://api.allorigins.win/raw?url=';
-const BASE_URL = '/api/quran';
-
-// Cache simple en mémoire pour éviter les requêtes répétées
-const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-function getCacheKey(endpoint: string, params?: string): string {
-  return `${endpoint}${params ? `_${params}` : ''}`;
-}
-
-function getFromCache(key: string): any | null {
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.data;
-  }
-  cache.delete(key);
-  return null;
-}
-
-function setCache(key: string, data: any): void {
-  cache.set(key, { data, timestamp: Date.now() });
-}
-
+// Utilisation de l'API directe par défaut pour éviter les problèmes de proxy
+const DIRECT_API = 'https://api.alquran.cloud/v1';
 
 // Retry optimisé pour gérer les erreurs 429 et CORS
-async function fetchWithRetry(url: string, maxRetries = 2): Promise<Response> {
+async function fetchWithRetry(path: string, maxRetries = 3): Promise<Response> {
+  // On essaie d'abord l'API directe car elle est plus fiable que le proxy local
+  const url = `${DIRECT_API}${path}`;
+  
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const response = await fetch(url);
       
-      // Si c'est une erreur 429, on attend moins longtemps
       if (response.status === 429) {
-        if (attempt === maxRetries) throw new Error('Rate limit exceeded after retries');
-        const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff
+        const waitTime = Math.pow(2, attempt) * 1000;
         await new Promise(resolve => setTimeout(resolve, waitTime));
         continue;
       }
       
       if (response.ok) return response;
       
-      // Pour les erreurs CORS, on essaie direct
-      if (response.status === 0 || response.type === 'opaque') {
-        console.warn('CORS detected, trying direct API...');
-        const directUrl = url.replace(PROXY, '');
-        const directResponse = await fetch(directUrl);
-        if (directResponse.ok) return directResponse;
+      // Fallback vers le proxy /api/quran si on est sur Vercel et que le direct échoue
+      if (attempt === maxRetries && typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+        const proxyRes = await fetch(`/api/quran${path}`);
+        if (proxyRes.ok) return proxyRes;
       }
       
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}`);
     } catch (error) {
       if (attempt === maxRetries) throw error;
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
-  throw new Error('Max retries exceeded');
-}
-
-export interface ApiVerse {
-  number: number;
-  numberInSurah: number;
-  text: string;
-  translation?: string;
-  audio?: string;
-  surahNumber?: number;
-  juz?: number;
-  hizbQuarter?: number;
-  page?: number;
-}
-
-export interface ApiPageVerse extends ApiVerse {
-  surahNumber: number;
-  translation: string;
-  juz: number;
-  hizbQuarter: number;
-}
-
-export interface ApiSurah {
-  number: number;
-  name: string;
-  englishName: string;
-  numberOfAyahs: number;
-  ayahs: ApiVerse[];
+  throw new Error('Fetch failed');
 }
 
 export async function fetchSurahFromNewAPI(surahNumber: number): Promise<ApiVerse[]> {
@@ -95,13 +44,9 @@ export async function fetchSurahFromNewAPI(surahNumber: number): Promise<ApiVers
 
   try {
     const [arabicRes, frenchRes] = await Promise.all([
-      fetchWithRetry(`${BASE_URL}/surah/${surahNumber}/ar.uthmani`),
-      fetchWithRetry(`${BASE_URL}/surah/${surahNumber}/fr.hamidullah`),
+      fetchWithRetry(`/surah/${surahNumber}/ar.uthmani`),
+      fetchWithRetry(`/surah/${surahNumber}/fr.hamidullah`),
     ]);
-
-    if (!arabicRes.ok || !frenchRes.ok) {
-      throw new Error('Failed to fetch surah');
-    }
 
     const arabicData = await arabicRes.json();
     const frenchData = await frenchRes.json();
@@ -124,18 +69,7 @@ export async function fetchSurahFromNewAPI(surahNumber: number): Promise<ApiVers
     return result;
   } catch (error) {
     console.error('Error loading surah data:', error);
-    return [
-      {
-        number: 1,
-        numberInSurah: 1,
-        text: '\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650',
-        translation: "Au nom d'Allah, le Tout Misericordieux, le Tres Misericordieux",
-        surahNumber,
-        juz: 1,
-        hizbQuarter: 1,
-        page: 1,
-      },
-    ];
+    throw error; // On laisse le composant gérer l'erreur
   }
 }
 
@@ -148,16 +82,11 @@ export async function fetchSurahWithTranslation(surahNumber: number, reciterId =
   const cached = getFromCache(cacheKey);
   if (cached) return cached;
   
-  // Requêtes parallèles pour la rapidité
   const [arabicRes, frenchRes, audioRes] = await Promise.all([
-    fetchWithRetry(`${BASE_URL}/surah/${surahNumber}`),
-    fetchWithRetry(`${BASE_URL}/surah/${surahNumber}/fr.hamidullah`),
-    fetchWithRetry(`${BASE_URL}/surah/${surahNumber}/${reciterId}`),
+    fetchWithRetry(`/surah/${surahNumber}`),
+    fetchWithRetry(`/surah/${surahNumber}/fr.hamidullah`),
+    fetchWithRetry(`/surah/${surahNumber}/${reciterId}`),
   ]);
-
-  if (!arabicRes.ok || !frenchRes.ok) {
-    throw new Error('Failed to fetch surah data');
-  }
 
   const arabicData = await arabicRes.json();
   const frenchData = await frenchRes.json();
@@ -188,15 +117,10 @@ export async function fetchPageWithTranslation(pageNumber: number) {
   const cached = getFromCache(cacheKey);
   if (cached) return cached;
   
-  // Requêtes parallèles pour la rapidité
   const [arabicRes, frenchRes] = await Promise.all([
-    fetchWithRetry(`${BASE_URL}/page/${pageNumber}/ar.uthmani`),
-    fetchWithRetry(`${BASE_URL}/page/${pageNumber}/fr.hamidullah`),
+    fetchWithRetry(`/page/${pageNumber}/ar.uthmani`),
+    fetchWithRetry(`/page/${pageNumber}/fr.hamidullah`),
   ]);
-
-  if (!arabicRes.ok || !frenchRes.ok) {
-    throw new Error('Failed to fetch mushaf page');
-  }
 
   const arabicData = await arabicRes.json();
   const frenchData = await frenchRes.json();
@@ -225,31 +149,15 @@ export async function fetchPageWithTranslation(pageNumber: number) {
 }
 
 export async function fetchSurahForMushafPage(pageNumber: number): Promise<number> {
-  if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > 604) {
-    throw new Error(`Invalid page number: ${pageNumber}`);
-  }
-  
-  const res = await fetch(`${BASE_URL}/page/${pageNumber}/ar.uthmani`);
-  if (!res.ok) {
-    throw new Error('Failed to fetch page surah');
-  }
+  const res = await fetchWithRetry(`/page/${pageNumber}/ar.uthmani`);
   const data = await res.json();
-  const firstAyah = data?.data?.ayahs?.[0];
-  return firstAyah?.surah?.number ?? 1;
+  return data?.data?.ayahs?.[0]?.surah?.number ?? 1;
 }
 
 export async function fetchFirstPageForSurah(surahNumber: number): Promise<number> {
-  if (!Number.isInteger(surahNumber) || surahNumber < 1 || surahNumber > 114) {
-    throw new Error(`Invalid surah number: ${surahNumber}`);
-  }
-  
-  const res = await fetch(`${BASE_URL}/surah/${surahNumber}/ar.uthmani`);
-  if (!res.ok) {
-    throw new Error('Failed to fetch surah first page');
-  }
+  const res = await fetchWithRetry(`/surah/${surahNumber}/ar.uthmani`);
   const data = await res.json();
-  const firstAyah = data?.data?.ayahs?.[0];
-  return firstAyah?.page ?? 1;
+  return data?.data?.ayahs?.[0]?.page ?? 1;
 }
 
 /**

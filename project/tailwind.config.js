@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -10,17 +11,17 @@ export default {
       },
       colors: {
         primary: {
-          50: '#f0f9f1',
-          100: '#dcf1df',
-          200: '#bbe3c3',
-          300: '#8fcd9d',
-          400: '#5fab71',
-          500: '#3e8e52',
-          600: '#2d6a4f',
-          700: '#265b44',
-          800: '#214938',
-          900: '#1c3d30',
-          950: '#0f211a',
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#14532d',
+          950: '#052e16',
         },
         beige: {
           50: '#fdfbf7',
