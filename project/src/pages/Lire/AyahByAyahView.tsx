@@ -146,7 +146,7 @@ export default function AyahByAyahView({
                   </div>
 
                   <p
-                    className="font-arabic text-xl sm:text-2xl text-center text-gray-900 dark:text-gray-50 leading-[2.5] mb-8"
+                    className="font-arabic text-lg sm:text-xl text-center text-gray-900 dark:text-gray-50 leading-[3] mb-8 font-normal"
                     style={{ direction: 'rtl' }}
                   >
                     {displayArabic}
@@ -154,7 +154,7 @@ export default function AyahByAyahView({
 
                   <div className="w-16 h-px bg-stone-100 dark:bg-gray-800 mx-auto mb-8 rounded-full" />
 
-                  <p className="font-amiri text-base text-gray-600 dark:text-gray-400 leading-relaxed italic text-center max-w-2xl mx-auto">
+                  <p className="font-amiri text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed italic text-center max-w-2xl mx-auto">
                     {verse.translation}
                   </p>
                 </article>

@@ -119,7 +119,7 @@ export default function Home() {
             </span>
           </motion.div>
 
-          <motion.h1 initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }} className="font-arabic text-5xl md:text-7xl text-white drop-shadow-2xl mb-4 leading-tight">
+          <motion.h1 initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }} className="font-arabic text-4xl md:text-6xl text-white drop-shadow-2xl mb-4 leading-tight font-normal">
             حِفْظُ القُرْآنِ
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }} className="font-amiri text-2xl md:text-3xl text-stone-200 mb-6 drop-shadow-lg">
@@ -152,10 +152,10 @@ export default function Home() {
       <div className="max-w-4xl mx-auto px-4 -mt-20 relative z-20">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="premium-card p-10 text-center">
           <p className="text-xs uppercase tracking-[0.3em] font-bold text-primary-600 dark:text-primary-400 mb-6">✨ Verset du jour</p>
-          <p className="font-arabic text-3xl md:text-4xl text-gray-800 dark:text-gray-100 leading-relaxed mb-8" dir="rtl">{dailyVerse.arabic}</p>
+          <p className="font-arabic text-xl sm:text-2xl text-gray-800 dark:text-gray-100 leading-relaxed mb-8 font-normal" dir="rtl">{dailyVerse.arabic}</p>
           <div className="w-24 h-1 bg-gradient-to-r from-transparent via-primary-200 dark:via-primary-800 to-transparent mx-auto mb-8 rounded-full" />
-          <p className="font-amiri text-xl text-gray-700 dark:text-gray-300 leading-relaxed italic">« {dailyVerse.french} »</p>
-          <p className="text-sm font-medium text-stone-400 dark:text-stone-500 mt-6 tracking-widest">— {dailyVerse.ref}</p>
+          <p className="font-amiri text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed italic">« {dailyVerse.french} »</p>
+          <p className="text-xs font-medium text-stone-400 dark:text-stone-500 mt-6 tracking-widest">— {dailyVerse.ref}</p>
         </motion.div>
       </div>
 
