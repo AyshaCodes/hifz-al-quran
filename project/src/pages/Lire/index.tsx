@@ -54,8 +54,6 @@ export default function LirePage() {
   const [memorizingSurahNumber, setMemorizingSurahNumber] = useState<number | null>(null);
 
   const fromHifz = searchParams.get('from') === 'hifz';
-  const targetPageParam = Number(searchParams.get('page') ?? '0');
-  const targetPage = Number.isFinite(targetPageParam) && targetPageParam > 0 ? targetPageParam : null;
   const quickPages = (searchParams.get('pages') ?? '')
     .split(',')
     .map((p) => Number(p))
@@ -119,24 +117,23 @@ export default function LirePage() {
     };
   }, [selectedSurah, loadSurah]);
 
-  // Initialisation depuis targetPage (paramètre URL)
+  // Initialisation depuis targetPage (paramètre URL) — une seule fois au montage
+  const initializedFromUrl = useRef(false);
   useEffect(() => {
-    if (targetPage) {
-      setMushafPage(Math.min(604, Math.max(1, targetPage)));
-      let cancelled = false;
-      fetchSurahForMushafPage(targetPage)
+    if (initializedFromUrl.current) return;
+    const pageParam = Number(searchParams.get('page') ?? '0');
+    const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : null;
+    if (page) {
+      initializedFromUrl.current = true;
+      setMushafPage(Math.min(604, Math.max(1, page)));
+      fetchSurahForMushafPage(page)
         .then((surahNum) => {
-          if (!cancelled && surahNum !== selectedSurah) {
-            setSelectedSurah(surahNum);
-            setReadMode('lecture');
-          }
+          setSelectedSurah(surahNum);
+          setReadMode('lecture');
         })
         .catch(() => {});
-      return () => {
-        cancelled = true;
-      };
     }
-  }, [targetPage]); // Ne pas inclure selectedSurah ici pour éviter boucle
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Mise à jour de mushafPage lorsque la sourate change (en mode lecture)
   useEffect(() => {
@@ -303,14 +300,6 @@ export default function LirePage() {
     setReachedSurahEnd(false);
     setReadMode('lecture');
   };
-
-  useEffect(() => {
-    if (!selectedSurah || readMode !== 'lecture') return;
-    const params = new URLSearchParams(searchParams);
-    params.set('page', String(mushafPage));
-    if (!params.get('from')) params.set('from', 'reader');
-    navigate(`/lire?${params.toString()}`, { replace: true });
-  }, [mushafPage, readMode, selectedSurah, navigate, searchParams]);
 
   useEffect(() => {
     if (!selectedSurah) return;
