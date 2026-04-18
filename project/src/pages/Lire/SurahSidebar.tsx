@@ -5,6 +5,7 @@ import { SURAHS } from '../../data/surahs';
 interface SurahSidebarProps {
   selectedSurah: number;
   onSelectSurah: (num: number) => void;
+  onSelectPage: (page: number, surahNumber: number) => void;
   isOpen: boolean;
   onClose: () => void;
   closeOnSelect?: boolean;
@@ -41,6 +42,7 @@ const JUZ_LIST = Array.from({ length: 30 }, (_, i) => {
 export default function SurahSidebar({
   selectedSurah,
   onSelectSurah,
+  onSelectPage,
   isOpen,
   onClose,
   closeOnSelect = true,
@@ -202,7 +204,7 @@ export default function SurahSidebar({
                 <button
                   key={juz}
                   onClick={() => {
-                    onSelectSurah(firstSurah.number);
+                    onSelectPage(JUZ_START_PAGES[juz], firstSurah.number);
                     if (closeOnSelect) onClose();
                   }}
                   className={`

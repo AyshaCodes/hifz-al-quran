@@ -294,8 +294,15 @@ export default function LirePage() {
 
   const handleSelectSurah = (surahNumber: number) => {
     if (surahNumber === selectedSurah) return;
-    // Rediriger vers la même page avec un paramètre `surah` dans l'URL
     navigate(`/lire?surah=${surahNumber}&mode=${readMode}`);
+  };
+
+  const handleSelectPage = (page: number, surahNumber: number) => {
+    setSelectedSurah(surahNumber);
+    setMushafPage(Math.min(604, Math.max(1, page)));
+    setLecturePages([]);
+    setReachedSurahEnd(false);
+    setReadMode('lecture');
   };
 
   useEffect(() => {
@@ -325,6 +332,7 @@ export default function LirePage() {
         <SurahSidebar
           selectedSurah={selectedSurah}
           onSelectSurah={handleSelectSurah}
+          onSelectPage={handleSelectPage}
           isOpen={sidebarOpen}
           onClose={() => (isMobile ? setMobileSidebarOpen(false) : setDesktopSidebarVisible(false))}
           closeOnSelect={isMobile}
