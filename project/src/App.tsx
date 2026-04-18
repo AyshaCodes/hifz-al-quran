@@ -4,10 +4,10 @@ import Footer from './components/Footer';
 import Header from './components/Header';
 import { useDarkMode } from './hooks/useDarkMode';
 import Home from './pages/Home';
-import HifzChoice from './pages/hifz/index';  // index.tsx à la racine de hifz
-import HifzApp from './pages/hifz/CustomProgramme/HifzApp';  // programme personnalisé
-import GuidedSetup from './pages/hifz/GuidedProgramme/GuidedSetup';
-import GuidedDashboard from './pages/hifz/GuidedProgramme/GuidedDashboard';
+import HifzChoice from './pages/Hifz/index';  // index.tsx à la racine de hifz
+import HifzApp from './pages/Hifz/CustomProgramme/HifzApp';  // programme personnalisé
+import GuidedSetup from './pages/Hifz/GuidedProgramme/GuidedSetup';
+import GuidedDashboard from './pages/Hifz/GuidedProgramme/GuidedDashboard';
 import LirePage from './pages/Lire/index';
 import Signets from './pages/Signets';
 import Ressources from './pages/Ressources';
