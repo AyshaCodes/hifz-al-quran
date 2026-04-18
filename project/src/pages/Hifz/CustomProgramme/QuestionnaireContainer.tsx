@@ -1,228 +1,179 @@
-import { BookOpen, Calendar, ChevronRight, Clock, Star } from 'lucide-react';
 import { useState } from 'react';
-import {
-  formatPagesFr,
-  formatTempsCourt,
-  getPagesPerDayFromMinutes,
-  TEMPS_JOUR_STEPS,
-} from '../../../lib/hifzPace';
-import { addDaysISO, getTodayStr } from '../../../lib/hifzSchedule';
-import { MemorizationQuality, UserProfile } from '../../../types';
+import { QuestionnaireData } from '../../types/hifz';
+import Stepper from '../shared/Stepper';
+import Step1Situation from './Step1Situation';
+import Step2Memorized from './Step2Memorized';
+import Step3Objective from './Step3Objective';
+import Step4Availability from './Step4Availability';
+import Step5Name from './Step5Name';
 
-interface ProfilFormProps {
-  onSubmit: (profile: UserProfile) => void;
+interface Props {
+  onSubmit: (data: QuestionnaireData) => void;
 }
 
-const MEMO_OPTIONS: {
-  value: MemorizationQuality;
-  emoji: string;
-  title: string;
-  desc: string;
-}[] = [
-  {
-    value: 'good',
-    emoji: '🟢',
-    title: 'Je me souviens bien',
-    desc: 'Révision légère : viser environ 1 Juz tous les 3 jours dans votre planning.',
-  },
-  {
-    value: 'partial',
-    emoji: '🟡',
-    title: 'Je me souviens partiellement',
-    desc: 'Révision intensive : 1 Juz par jour en cible, la moitié du temps quotidien réservée à la révision des Juz appris.',
-  },
-  {
-    value: 'forgotten',
-    emoji: '🔴',
-    title: "J'ai beaucoup oublié",
-    desc: 'Phase de consolidation : 1 mois de révision uniquement, sans nouvelle mémorisation.',
-  },
-];
+const INITIAL_DATA: QuestionnaireData = {
+  situation: null,
+  departMemorisation: 'debut',
+  juzArrive: 1,
+  qualiteMemorisation: null,
+  objectif: null,
+  nombreJuzObjectif: 5,
+  aDateObjectif: false,
+  dateObjectif: '',
+  heuresDisponibles: ['fajr'],
+  minutesParJour: 30,
+  joursParSemaine: ['L', 'M', 'Me', 'J', 'V', 'S', 'D'],
+  prenom: '',
+};
 
-export default function ProfilForm({ onSubmit }: ProfilFormProps) {
-  const [prenom, setPrenom] = useState('');
-  const [juzActuel, setJuzActuel] = useState(1);
-  const [objectif, setObjectif] = useState('');
-  const [tempsParJour, setTempsParJour] = useState<number>(30);
-  const [memorizationQuality, setMemorizationQuality] = useState<MemorizationQuality>('good');
+export default function QuestionnaireContainer({ onSubmit }: Props) {
+  const [data, setData] = useState<QuestionnaireData>(INITIAL_DATA);
+  const [currentStep, setCurrentStep] = useState(1);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!prenom.trim() || !objectif) return;
+  const isDebutant = data.situation === 'debutant';
+  const totalSteps = isDebutant ? 4 : 5;
 
-    const today = getTodayStr();
-    const revisionOnlyUntil =
-      memorizationQuality === 'forgotten' ? addDaysISO(today, 30) : undefined;
-
-    const profile: UserProfile = {
-      prenom: prenom.trim(),
-      juzActuel,
-      objectif,
-      tempsParJour,
-      createdAt: new Date().toISOString(),
-      memorizationQuality,
-      revisionOnlyUntil,
-      urgentReviewPages: [],
-    };
-    onSubmit(profile);
+  const getActualStep = (displayStep: number): number => {
+    if (isDebutant && displayStep >= 2) return displayStep + 1;
+    return displayStep;
   };
 
-  const minDate = new Date();
-  minDate.setMonth(minDate.getMonth() + 1);
-  const minDateStr = minDate.toISOString().split('T')[0];
+  const canProceed = (): boolean => {
+    const actual = getActualStep(currentStep);
+    switch (actual) {
+      case 1: return data.situation !== null;
+      case 2: return data.departMemorisation !== null && data.qualiteMemorisation !== null;
+      case 3: return data.objectif !== null;
+      case 4: return data.heuresDisponibles.length > 0 && data.joursParSemaine.length > 0;
+      case 5: return data.prenom.trim().length > 0;
+      default: return false;
+    }
+  };
 
-  const pagesPreview = getPagesPerDayFromMinutes(tempsParJour);
+  const handleFieldChange = (field: string, value: unknown) => {
+    setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleNext = () => {
+    if (currentStep < totalSteps) {
+      if (currentStep === 1 && isDebutant) {
+        setCurrentStep(2);
+      } else {
+        setCurrentStep(prev => prev + 1);
+      }
+    } else {
+      onSubmit(data);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) setCurrentStep(prev => prev - 1);
+  };
+
+  const renderStep = () => {
+    const actual = getActualStep(currentStep);
+    switch (actual) {
+      case 1:
+        return (
+          <Step1Situation
+            value={data.situation}
+            onChange={v => {
+              handleFieldChange('situation', v);
+              if (v === 'revision') handleFieldChange('objectif', 'revision');
+            }}
+          />
+        );
+      case 2:
+        return (
+          <Step2Memorized
+            data={{
+              departMemorisation: data.departMemorisation,
+              juzArrive: data.juzArrive,
+              qualiteMemorisation: data.qualiteMemorisation,
+            }}
+            onChange={handleFieldChange}
+          />
+        );
+      case 3:
+        return (
+          <Step3Objective
+            data={{
+              objectif: data.objectif,
+              nombreJuzObjectif: data.nombreJuzObjectif,
+              aDateObjectif: data.aDateObjectif,
+              dateObjectif: data.dateObjectif,
+              situation: data.situation,
+              qualiteMemorisation: data.qualiteMemorisation,
+            }}
+            onChange={handleFieldChange}
+          />
+        );
+      case 4:
+        return (
+          <Step4Availability
+            data={{
+              heuresDisponibles: data.heuresDisponibles,
+              minutesParJour: data.minutesParJour,
+              joursParSemaine: data.joursParSemaine,
+            }}
+            onChange={handleFieldChange}
+          />
+        );
+      case 5:
+        return <Step5Name prenom={data.prenom} onChange={v => handleFieldChange('prenom', v)} />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-blue-950 dark:via-gray-900 dark:to-blue-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
-        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl border border-stone-200 dark:border-stone-700 animate-slide-up">
-          <div className="bg-gradient-to-r from-green-700 to-green-600 p-8 text-center text-white">
-            <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-8 h-8 text-green-100" />
+    <div className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-blue-950 dark:via-gray-900 dark:to-blue-950 flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-start px-4 py-10 sm:py-16">
+        <div className="w-full max-w-2xl">
+          <div className="text-center mb-8">
+            <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-1 font-amiri">
+              هِفْظ
             </div>
-            <h1 className="font-arabic text-3xl mb-2">بِرْنَامَجُ الْحِفْظ</h1>
-            <p className="font-amiri text-xl text-green-100 mb-1">Programme de Mémorisation</p>
-            <p className="text-green-100 text-sm">Créez votre programme personnalisé</p>
+            <h1 className="text-base font-semibold text-stone-600 dark:text-stone-400 tracking-wide uppercase">
+              Mon Hifz — Programme personnalisé
+            </h1>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Prénom
-              </label>
-              <input
-                type="text"
-                value={prenom}
-                onChange={(e) => setPrenom(e.target.value)}
-                placeholder="Votre prénom..."
-                required
-                className="w-full px-4 py-3 bg-stone-50 dark:bg-gray-900 border border-stone-200 dark:border-stone-700 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-700 transition-all"
-              />
-            </div>
+          <Stepper currentStep={currentStep} hasMemorized={!isDebutant} />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <Star className="w-4 h-4 inline mr-1 text-green-600 dark:text-green-400" />
-                Juz actuel (là où vous en êtes)
-              </label>
-              <select
-                value={juzActuel}
-                onChange={(e) => setJuzActuel(Number(e.target.value))}
-                className="w-full px-4 py-3 bg-stone-50 dark:bg-gray-900 border border-stone-200 dark:border-stone-700 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-700 transition-all"
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-10 min-h-[360px] flex flex-col border border-stone-200 dark:border-stone-700">
+            <div className="flex-1">{renderStep()}</div>
+
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-stone-200 dark:border-stone-700">
+              <button
+                onClick={handleBack}
+                disabled={currentStep === 1}
+                className="px-4 py-2.5 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-800 font-medium transition disabled:opacity-0 disabled:pointer-events-none flex items-center gap-2"
               >
-                {Array.from({ length: 30 }, (_, i) => i + 1).map((j) => (
-                  <option key={j} value={j}>
-                    Juz {j} {j === 30 ? '(Al-Amma)' : j === 1 ? '(Al-Fatiha)' : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Retour
+              </button>
 
-            <div>
-              <p className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Comment évaluez-vous votre mémorisation des Juz déjà acquis ?
-              </p>
-              <div className="space-y-2">
-                {MEMO_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setMemorizationQuality(opt.value)}
-                    className={`w-full text-left rounded-xl border-2 p-3 transition-all ${
-                      memorizationQuality === opt.value
-                        ? 'border-green-500 bg-green-50 dark:bg-green-900/25 ring-2 ring-green-200 dark:ring-green-800'
-                        : 'border-stone-200 dark:border-stone-700 bg-stone-50/80 dark:bg-gray-800/80 hover:border-stone-300 dark:hover:border-stone-600'
-                    }`}
-                  >
-                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                      {opt.emoji} {opt.title}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                      {opt.desc}
-                    </p>
-                  </button>
-                ))}
-              </div>
-              {memorizationQuality === 'forgotten' && (
-                <div className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 p-3 text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
-                  L&apos;Ustadh conseille : consolide d&apos;abord ce que tu as, c&apos;est plus précieux
-                  que d&apos;avancer sur du fragile 🤍
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <Calendar className="w-4 h-4 inline mr-1 text-green-600 dark:text-green-400" />
-                Objectif — Date de fin souhaitée
-              </label>
-              <input
-                type="date"
-                value={objectif}
-                onChange={(e) => setObjectif(e.target.value)}
-                min={minDateStr}
-                required
-                className="w-full px-4 py-3 bg-stone-50 dark:bg-gray-900 border border-stone-200 dark:border-stone-700 rounded-xl text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-700 transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                <Clock className="w-4 h-4 inline mr-1 text-green-600 dark:text-green-400" />
-                Temps disponible par jour :{' '}
-                <span className="text-green-700 dark:text-green-400 font-semibold">
-                  {formatTempsCourt(tempsParJour)}
-                </span>
-              </label>
-              <input
-                type="range"
-                min={TEMPS_JOUR_STEPS[0]}
-                max={TEMPS_JOUR_STEPS[TEMPS_JOUR_STEPS.length - 1]}
-                step={15}
-                value={tempsParJour}
-                onChange={(e) => setTempsParJour(Number(e.target.value))}
-                className="w-full accent-green-500"
-              />
-              <div className="flex justify-between text-xs text-gray-400 mt-1">
-                {TEMPS_JOUR_STEPS.map((m) => (
-                  <span key={m} className={m === tempsParJour ? 'text-primary-600 font-semibold' : ''}>
-                    {m < 60 ? `${m}m` : m === 60 ? '1h' : m === 90 ? '1h30' : '2h'}
-                  </span>
-                ))}
-              </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-3 leading-relaxed bg-beige-50 dark:bg-gray-800/80 rounded-lg p-3 border border-beige-200 dark:border-gray-700">
-                Ce temps inclut <strong>mémorisation et révision</strong>. La révision est aussi
-                importante que la mémorisation — ne jamais l&apos;oublier.
-              </p>
-            </div>
-
-            <div className="bg-beige-50 dark:bg-gray-800 rounded-xl p-4 border border-beige-200 dark:border-gray-700">
-              <p className="text-xs text-gray-500 dark:text-gray-400 text-center leading-relaxed">
-                Avec <strong className="text-primary-600 dark:text-primary-400">{formatTempsCourt(tempsParJour)}</strong> par jour, rythme indicatif : environ{' '}
-                <strong className="text-primary-600 dark:text-primary-400">{formatPagesFr(pagesPreview)}</strong> du Mushaf par jour
-                {memorizationQuality === 'partial' ? (
-                  <>
-                    {' '}
-                    pour la <strong>nouvelle</strong> mémorisation (la moitié du temps reste pour la
-                    révision des Juz appris).
-                  </>
-                ) : memorizationQuality === 'forgotten' ? (
-                  <> pendant la phase normale — les 30 premiers jours seront consacrés à la révision.</>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="px-6 py-3 rounded-xl bg-green-700 hover:bg-green-800 text-white font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shadow-md"
+              >
+                {currentStep === totalSteps ? (
+                  <>✨ Créer mon programme personnalisé</>
                 ) : (
-                  <> (mémorisation et révision comprises dans le même créneau).</>
+                  <>
+                    Suivant
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </>
                 )}
-              </p>
+              </button>
             </div>
-
-            <button
-              type="submit"
-              className="btn-primary w-full flex items-center justify-center gap-2 text-base shadow-lg"
-            >
-              Créer mon programme
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </form>
+          </div>
         </div>
       </div>
     </div>
