@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Settings, Award, Languages } from 'lucide-react';
+import { Settings, Award, Languages, BookOpen, Target, Flame, Clock, ChevronRight } from 'lucide-react';
 import { GuidedProfile, DailyProgress } from '../../../types/hifz';
 import { getRevisionPages, getWeeklyStreak, getTodayString } from '../../../lib/revisionHelper';
 import MotivationalQuote from '../shared/MotivationalQuote';
@@ -8,7 +8,7 @@ import ProgressChart from '../shared/ProgressChart';
 import TodayTask from '../shared/TodayTask';
 import WeeklyCalendar from '../shared/WeeklyCalendar';
 import WeeklyPlan from '../shared/WeeklyPlan';
-import { BookOpen, Target, Flame, Clock } from 'lucide-react';
+import { useRouter } from '../../../hooks/useRouter';
 
 interface Props {
   profile: GuidedProfile;
@@ -34,6 +34,7 @@ const LEVEL_LABELS: Record<GuidedProfile['level'], string> = {
 };
 
 export default function GuidedDashboard({ profile, progress, onMarkDone, onAdjust, onReset }: Props) {
+  const { navigate } = useRouter();
   const today = getTodayString();
   const todayEntry = progress.find((p) => p.date === today);
   const todayDone = todayEntry?.completed ?? false;
@@ -139,6 +140,28 @@ export default function GuidedDashboard({ profile, progress, onMarkDone, onAdjus
           variant="blue"
           showTransliteration={profile.needsTransliteration}
         />
+
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileHover={{ scale: 1.01, y: -2 }}
+          whileTap={{ scale: 0.99 }}
+          onClick={() => navigate('/lire')}
+          className="w-full flex items-center justify-between p-6 rounded-2xl bg-white/80 backdrop-blur-md border-2 border-blue-100/50 shadow-xl group transition-all"
+        >
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:rotate-3 transition-transform">
+              <BookOpen size={28} />
+            </div>
+            <div className="text-left">
+              <h3 className="text-lg font-bold text-stone-800">Réviser mes sourates</h3>
+              <p className="text-sm text-stone-500">Ouvrir le Saint Coran pour ma lecture quotidienne</p>
+            </div>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
+            <ChevronRight size={20} />
+          </div>
+        </motion.button>
 
         <WeeklyCalendar progress={progress} variant="blue" />
 

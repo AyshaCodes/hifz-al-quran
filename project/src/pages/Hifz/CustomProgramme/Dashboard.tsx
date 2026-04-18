@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Award, RefreshCw } from 'lucide-react';
+import { LogOut, Award, RefreshCw, BookOpen, ChevronRight } from 'lucide-react';
 import { UserProfile, DailyProgress } from '../../../types/hifz';
 import { getRevisionPages, getWeeklyStreak, getTodayString } from '../../../lib/revisionHelper';
 import MotivationalQuote from '../shared/MotivationalQuote';
@@ -9,6 +9,7 @@ import ProgressChart from '../shared/ProgressChart';
 import TodayTask from '../shared/TodayTask';
 import WeeklyCalendar from '../shared/WeeklyCalendar';
 import WeeklyPlan from '../shared/WeeklyPlan';
+import { useRouter } from '../../../hooks/useRouter';
 
 interface Props {
   profile: UserProfile;
@@ -24,6 +25,7 @@ const QUALITY_OPTIONS: { value: 'fluent' | 'hesitant' | 'hard'; label: string; c
 ];
 
 export default function Dashboard({ profile, progress, onMarkDone, onReset }: Props) {
+  const { navigate } = useRouter();
   const [showQuality, setShowQuality] = useState(false);
   const today = getTodayString();
   const todayEntry = progress.find((p) => p.date === today);
@@ -127,6 +129,28 @@ export default function Dashboard({ profile, progress, onMarkDone, onReset }: Pr
             </motion.div>
           )}
         </AnimatePresence>
+
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileHover={{ scale: 1.01, y: -2 }}
+          whileTap={{ scale: 0.99 }}
+          onClick={() => navigate('/lire')}
+          className="w-full flex items-center justify-between p-6 rounded-2xl bg-white/80 backdrop-blur-md border-2 border-green-100/50 shadow-xl group transition-all"
+        >
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-green-600 flex items-center justify-center text-white shadow-lg shadow-green-600/20 group-hover:rotate-3 transition-transform">
+              <BookOpen size={28} />
+            </div>
+            <div className="text-left">
+              <h3 className="text-lg font-bold text-stone-800">Réviser mes sourates</h3>
+              <p className="text-sm text-stone-500">Ouvrir le Saint Coran pour ma lecture quotidienne</p>
+            </div>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 group-hover:bg-green-600 group-hover:text-white transition-all">
+            <ChevronRight size={20} />
+          </div>
+        </motion.button>
 
         <WeeklyCalendar progress={progress} variant="green" />
 
