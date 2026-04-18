@@ -31,13 +31,26 @@ const initialData: QuestionnaireData = {
 
 function canProceed(step: number, data: QuestionnaireData, hasMemorized: boolean): boolean {
   if (step === 1) return data.situation !== null;
-  if (step === 2 && hasMemorized) return data.departMemorisation !== null && data.qualiteMemorisation !== null;
-  const objStep = hasMemorized ? 3 : 2;
-  if (step === objStep) return data.objectif !== null;
-  const availStep = hasMemorized ? 4 : 3;
-  if (step === availStep) return data.joursParSemaine.length > 0;
-  const nameStep = hasMemorized ? 5 : 4;
-  if (step === nameStep) return data.prenom.trim().length > 0;
+  
+  if (hasMemorized) {
+    if (step === 2) return data.departMemorisation !== null && data.qualiteMemorisation !== null;
+    if (step === 3) {
+      if (!data.objectif) return false;
+      if (data.objectif === 'dateButoir') return !!data.dateObjectif;
+      return true;
+    }
+    if (step === 4) return data.joursParSemaine.length > 0;
+    if (step === 5) return data.prenom.trim().length > 0;
+  } else {
+    if (step === 2) {
+      if (!data.objectif) return false;
+      if (data.objectif === 'dateButoir') return !!data.dateObjectif;
+      return true;
+    }
+    if (step === 3) return data.joursParSemaine.length > 0;
+    if (step === 4) return data.prenom.trim().length > 0;
+  }
+  
   return true;
 }
 
@@ -54,10 +67,12 @@ export default function QuestionnaireContainer({ onSubmit, onBack }: Props) {
 
   const handleNext = () => {
     if (!canProceed(currentStep, data, hasMemorized)) return;
+    
     if (currentStep === 1 && !hasMemorized) {
-      setCurrentStep(3);
+      setCurrentStep(2); // On passe à l'objectif (step 2 pour débutant)
       return;
     }
+    
     if (currentStep < totalSteps) {
       setCurrentStep((s) => s + 1);
     } else {
@@ -70,27 +85,24 @@ export default function QuestionnaireContainer({ onSubmit, onBack }: Props) {
       onBack();
       return;
     }
-    if (currentStep === 3 && !hasMemorized) {
-      setCurrentStep(1);
-      return;
-    }
     setCurrentStep((s) => s - 1);
   };
 
-  const displayStep = (() => {
-    if (!hasMemorized && currentStep >= 3) return currentStep - 1;
-    return currentStep;
-  })();
+  const displayStep = currentStep;
 
   const renderStep = () => {
-    if (currentStep === 1) return <Step1Situation data={data} onChange={updateData} />;
-    if (currentStep === 2 && hasMemorized) return <Step2Memorized data={data} onChange={updateData} />;
-    if (currentStep === 3) return <Step3Objective data={data} onChange={updateData} />;
-    if (currentStep === 4) return <Step4Availability data={data} onChange={updateData} />;
-    if (currentStep === 5) return <Step5Name data={data} onChange={updateData} />;
-    if (!hasMemorized && currentStep === 2) return <Step3Objective data={data} onChange={updateData} />;
-    if (!hasMemorized && currentStep === 3) return <Step4Availability data={data} onChange={updateData} />;
-    if (!hasMemorized && currentStep === 4) return <Step5Name data={data} onChange={updateData} />;
+    if (hasMemorized) {
+      if (currentStep === 1) return <Step1Situation data={data} onChange={updateData} />;
+      if (currentStep === 2) return <Step2Memorized data={data} onChange={updateData} />;
+      if (currentStep === 3) return <Step3Objective data={data} onChange={updateData} />;
+      if (currentStep === 4) return <Step4Availability data={data} onChange={updateData} />;
+      if (currentStep === 5) return <Step5Name data={data} onChange={updateData} />;
+    } else {
+      if (currentStep === 1) return <Step1Situation data={data} onChange={updateData} />;
+      if (currentStep === 2) return <Step3Objective data={data} onChange={updateData} />;
+      if (currentStep === 3) return <Step4Availability data={data} onChange={updateData} />;
+      if (currentStep === 4) return <Step5Name data={data} onChange={updateData} />;
+    }
     return null;
   };
 

@@ -2,7 +2,7 @@ import { Mail, MessageSquare, ExternalLink, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Contact() {
-  const CONTACT_EMAIL = "contact@hifzalquran.app"; // Remplace par ton email réel
+  const CONTACT_EMAIL = "soumarehaicha@gmail.com"; // Remplace par ton email réel
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
