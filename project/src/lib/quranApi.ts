@@ -1,6 +1,6 @@
 // Proxy CORS temporaire pour le développement
 const PROXY = 'https://api.allorigins.win/raw?url=';
-const BASE_URL = '/api/v1';
+const BASE_URL = '/api/quran';
 
 // Cache simple en mémoire pour éviter les requêtes répétées
 const cache = new Map<string, { data: any; timestamp: number }>();
@@ -88,49 +88,53 @@ export async function fetchSurahFromNewAPI(surahNumber: number): Promise<ApiVers
   if (!Number.isInteger(surahNumber) || surahNumber < 1 || surahNumber > 114) {
     throw new Error(`Invalid surah number: ${surahNumber}`);
   }
-  
+
+  const cacheKey = getCacheKey('surah-new', String(surahNumber));
+  const cached = getFromCache(cacheKey);
+  if (cached) return cached;
+
   try {
-    // Utiliser les fichiers JSON statiques hébergés sur jsdelivr (pas de CORS)
-    const [arResponse, frResponse] = await Promise.all([
-      fetch('https://cdn.jsdelivr.net/npm/quran-json@3.0.0/dist/data/quran_ar.json'),
-      fetch('https://cdn.jsdelivr.net/npm/quran-json@3.0.0/dist/data/quran_fr.json')
+    const [arabicRes, frenchRes] = await Promise.all([
+      fetchWithRetry(`${BASE_URL}/surah/${surahNumber}/ar.uthmani`),
+      fetchWithRetry(`${BASE_URL}/surah/${surahNumber}/fr.hamidullah`),
     ]);
-    
-    const arabicData = await arResponse.json();
-    const frenchData = await frResponse.json();
-    
-    const surahAr = arabicData.surahs.find((s: any) => s.index === surahNumber);
-    const surahFr = frenchData.surahs.find((s: any) => s.index === surahNumber);
-    
-    if (!surahAr || !surahFr) {
-      throw new Error(`Surah ${surahNumber} not found`);
+
+    if (!arabicRes.ok || !frenchRes.ok) {
+      throw new Error('Failed to fetch surah');
     }
-    
-    // Combiner les versets arabe et français
-    return surahAr.verses.map((v: any, i: number) => ({
-      number: v.index,
-      numberInSurah: v.indexInSurah,
-      text: v.text,
-      translation: surahFr?.verses[i]?.text || '',
+
+    const arabicData = await arabicRes.json();
+    const frenchData = await frenchRes.json();
+
+    const arabicAyahs: any[] = arabicData.data.ayahs ?? [];
+    const frenchAyahs: any[] = frenchData.data.ayahs ?? [];
+
+    const result: ApiVerse[] = arabicAyahs.map((ayah: any, i: number) => ({
+      number: ayah.number,
+      numberInSurah: ayah.numberInSurah,
+      text: ayah.text,
+      translation: frenchAyahs[i]?.text ?? '',
       surahNumber,
-      juz: Math.ceil((v.index + 1) / 20),
-      hizbQuarter: Math.ceil((v.index + 1) / 5),
-      page: Math.floor((v.index + 1) / 6) + 1,
+      juz: ayah.juz ?? 0,
+      hizbQuarter: ayah.hizbQuarter ?? 0,
+      page: ayah.page ?? 0,
     }));
+
+    setCache(cacheKey, result);
+    return result;
   } catch (error) {
-    console.error('Error loading quran data:', error);
-    // Fallback simple si jsdelivr échoue
+    console.error('Error loading surah data:', error);
     return [
       {
         number: 1,
         numberInSurah: 1,
-        text: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
-        translation: 'Au nom d\'Allah, le Tout Miséricordieux, le Très Miséricordieux',
+        text: '\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650',
+        translation: "Au nom d'Allah, le Tout Misericordieux, le Tres Misericordieux",
         surahNumber,
         juz: 1,
         hizbQuarter: 1,
         page: 1,
-      }
+      },
     ];
   }
 }
