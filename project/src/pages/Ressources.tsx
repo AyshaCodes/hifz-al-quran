@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, BookOpen, Download, FileText, Calendar, Award } from 'lucide-react';
 
-const PDF_LINK = "https://drive.google.com/file/d/1h49cnLuN3Xp42tBs5bp5lskbu39qn5PZ/view?usp=sharing";
+const PDF_LINK = "https://drive.google.com/file/d/1vXZBYux35JQVb4YeOQDSuq2e1SnkwJD1/view?usp=sharing";
 const INSTAGRAM_LINK = "https://www.instagram.com/somme_de_jours/";
 
 // Animation fade-up au scroll
