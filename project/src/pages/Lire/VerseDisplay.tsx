@@ -1,4 +1,5 @@
 import { Loader2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { stripPrependedBismillahFromVerseOne } from '../../lib/bismillah';
 import { ApiPageVerse } from '../../lib/quranApi';
 import CompactSurahAudio, { CompactSurahAudioVerse } from './CompactSurahAudio';
@@ -40,24 +41,25 @@ export default function VerseDisplay({
   canLoadMore,
   loadingMore,
 }: VerseDisplayProps) {
-  const showTranslation = textMode === 'both';
-  const toArabicIndicDigits = (value: number) =>
-    value
-      .toString()
-      .split('')
-      .map((digit) => '٠١٢٣٤٥٦٧٨٩'[Number(digit)] ?? digit)
-      .join('');
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const formatAyahMarker = (ayahNumber: number) => `﴿${toArabicIndicDigits(ayahNumber)}﴾`;
-
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+  // IntersectionObserver pour charger la page suivante quand le sentinel est visible
+  useEffect(() => {
     if (!canLoadMore || loadingMore) return;
-    const target = e.currentTarget;
-    const nearBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 280;
-    if (nearBottom) {
-      onLoadNextPage();
-    }
-  };
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onLoadNextPage();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [canLoadMore, loadingMore, onLoadNextPage]);
 
   if (loading) {
     return (
@@ -130,8 +132,17 @@ export default function VerseDisplay({
     </div>
   );
 
+  const showTranslation = textMode === 'both';
+  const toArabicIndicDigits = (value: number) =>
+    value
+      .toString()
+      .split('')
+      .map((digit) => '٠١٢٣٤٥٦٧٨٩'[Number(digit)] ?? digit)
+      .join('');
+  const formatAyahMarker = (ayahNumber: number) => `﴿${toArabicIndicDigits(ayahNumber)}﴾`;
+
   return (
-    <div className="flex-1 overflow-y-auto min-h-0 bg-[#f8f6e9] dark:bg-gray-950" onScroll={handleScroll}>
+    <div className="flex-1 min-h-0 bg-[#f8f6e9] dark:bg-gray-950">
       <CompactSurahAudio
         surahNumber={surahNumber ?? 0}
         verses={audioVerses}
@@ -235,6 +246,9 @@ export default function VerseDisplay({
             <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
           </div>
         )}
+
+        {/* Sentinel pour l'IntersectionObserver */}
+        <div ref={sentinelRef} className="h-1" aria-hidden />
       </div>
     </div>
   );
