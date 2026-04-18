@@ -1,7 +1,8 @@
-import { BookOpen, Heart, Instagram } from 'lucide-react';
+import { BookOpen, Heart, Mail } from 'lucide-react';
+import { useRouter } from '../hooks/useRouter';
 
 export default function Footer() {
-  const INSTAGRAM_LINK = "https://www.instagram.com/somme_de_jours/";
+  const { navigate } = useRouter();
 
   return (
     <footer className="bg-primary-950 dark:bg-gray-950 border-t border-white/5 relative overflow-hidden">
@@ -17,36 +18,34 @@ export default function Footer() {
               </div>
               <span className="font-amiri text-2xl text-white font-bold">Hifz Al-Quran</span>
             </div>
-            <p className="text-primary-200/60 dark:text-gray-500 text-xs tracking-widest uppercase font-bold text-center md:text-left">
+            <p className="text-primary-200/60 dark:text-gray-500 text-[10px] tracking-widest uppercase font-bold text-center md:text-left">
               Votre compagnon spirituel de mémorisation
             </p>
           </div>
 
           <div className="text-center space-y-4">
-            <p className="font-arabic text-3xl text-gold-400 drop-shadow-sm">
+            <p className="font-arabic text-2xl text-gold-400 drop-shadow-sm">
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </p>
             <div className="flex flex-col items-center gap-1">
-              <p className="text-primary-100 dark:text-gray-400 text-sm font-amiri italic">
+              <p className="text-primary-100 dark:text-gray-400 text-xs font-amiri italic">
                 Qu'Allah facilite votre mémorisation
               </p>
-              <Heart className="w-4 h-4 text-gold-500 fill-gold-500 animate-pulse" />
+              <Heart className="w-3.5 h-3.5 text-gold-500 fill-gold-500 animate-pulse" />
             </div>
           </div>
 
           <div className="flex flex-col items-center md:items-end gap-6">
-            <a
-              href={INSTAGRAM_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => navigate('/contact')}
               className="px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all flex items-center gap-3 group shadow-xl"
             >
-              <Instagram className="w-5 h-5 text-gold-400 group-hover:scale-110 transition-transform" />
+              <Mail className="w-5 h-5 text-gold-400 group-hover:scale-110 transition-transform" />
               <div className="flex flex-col items-start">
-                <span className="text-[10px] uppercase tracking-widest font-bold text-primary-300">Une question ?</span>
+                <span className="text-[10px] uppercase tracking-widest font-bold text-primary-300 text-left">Une question ?</span>
                 <span className="text-sm font-semibold">Contactez-nous</span>
               </div>
-            </a>
+            </button>
             
             <div className="text-center md:text-right">
               <p className="text-primary-400 dark:text-gray-600 text-[10px] font-bold uppercase tracking-[0.2em]">

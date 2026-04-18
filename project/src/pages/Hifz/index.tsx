@@ -121,10 +121,10 @@ export default function HifzChoice({
           transition={{ delay: 0.6 }}
           className="text-center mt-16"
         >
-          <p className="font-arabic text-xl text-stone-400 mb-2">
+          <p className="font-arabic text-lg text-stone-400 mb-2">
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
           </p>
-          <p className="text-xs text-stone-400 uppercase tracking-widest">
+          <p className="text-[10px] text-stone-400 uppercase tracking-widest">
             Vos données sont sauvegardées localement
           </p>
         </motion.div>

@@ -119,7 +119,7 @@ export default function Home() {
             </span>
           </motion.div>
 
-          <motion.h1 initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }} className="font-arabic text-6xl md:text-8xl text-white drop-shadow-2xl mb-4 leading-tight">
+          <motion.h1 initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }} className="font-arabic text-5xl md:text-7xl text-white drop-shadow-2xl mb-4 leading-tight">
             حِفْظُ القُرْآنِ
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }} className="font-amiri text-2xl md:text-3xl text-stone-200 mb-6 drop-shadow-lg">
@@ -152,9 +152,9 @@ export default function Home() {
       <div className="max-w-4xl mx-auto px-4 -mt-20 relative z-20">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="premium-card p-10 text-center">
           <p className="text-xs uppercase tracking-[0.3em] font-bold text-primary-600 dark:text-primary-400 mb-6">✨ Verset du jour</p>
-          <p className="font-arabic text-4xl md:text-5xl text-gray-800 dark:text-gray-100 leading-relaxed mb-8" dir="rtl">{dailyVerse.arabic}</p>
+          <p className="font-arabic text-3xl md:text-4xl text-gray-800 dark:text-gray-100 leading-relaxed mb-8" dir="rtl">{dailyVerse.arabic}</p>
           <div className="w-24 h-1 bg-gradient-to-r from-transparent via-primary-200 dark:via-primary-800 to-transparent mx-auto mb-8 rounded-full" />
-          <p className="font-amiri text-2xl text-gray-700 dark:text-gray-300 leading-relaxed italic">« {dailyVerse.french} »</p>
+          <p className="font-amiri text-xl text-gray-700 dark:text-gray-300 leading-relaxed italic">« {dailyVerse.french} »</p>
           <p className="text-sm font-medium text-stone-400 dark:text-stone-500 mt-6 tracking-widest">— {dailyVerse.ref}</p>
         </motion.div>
       </div>
@@ -277,8 +277,8 @@ export default function Home() {
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-gold-500/10 rounded-full translate-y-48 -translate-x-48 blur-3xl" />
           
           <Sparkles className="w-16 h-16 mx-auto mb-8 text-gold-400 animate-pulse" />
-          <p className="font-arabic text-4xl md:text-5xl mb-6 leading-relaxed text-glow">رَبِّ زِدْنِي عِلْمًا</p>
-          <p className="font-amiri text-2xl italic mb-12 text-stone-200">"Seigneur, augmente mes connaissances" (20:114)</p>
+          <p className="font-arabic text-3xl md:text-4xl mb-6 leading-relaxed text-glow">رَبِّ زِدْنِي عِلْمًا</p>
+          <p className="font-amiri text-xl italic mb-12 text-stone-200">"Seigneur, augmente mes connaissances" (20:114)</p>
           <button onClick={() => navigate('/hifz')} className="relative group overflow-hidden bg-gold-500 hover:bg-gold-400 text-primary-950 font-bold py-5 px-12 rounded-full transition-all inline-flex items-center gap-3 shadow-2xl hover:shadow-gold-500/40 active:scale-95">
             <span className="relative z-10 text-lg">Démarrer mon programme</span>
             <ChevronRight className="w-6 h-6 relative z-10 group-hover:translate-x-1 transition-transform" />

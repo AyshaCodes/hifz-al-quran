@@ -183,7 +183,7 @@ export default function VerseDisplay({
 
                         {!showTranslation ? (
                           <p
-                            className="text-3xl sm:text-4xl leading-[2.2] text-gray-900 dark:text-gray-100 font-arabic"
+                            className="text-2xl sm:text-3xl leading-[2.2] text-gray-900 dark:text-gray-100 font-arabic"
                             style={{ direction: 'rtl', textAlign: 'justify' }}
                           >
                             {group.verses.map((verse) => {
@@ -195,7 +195,7 @@ export default function VerseDisplay({
                               return (
                                 <span key={verse.number} className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-default">
                                   {cleanText}{' '}
-                                  <span className="text-xl text-gold-600 dark:text-gold-400 align-middle mx-1 font-arabic">
+                                  <span className="text-lg text-gold-600 dark:text-gold-400 align-middle mx-1 font-arabic">
                                     {formatAyahMarker(verse.numberInSurah)}
                                   </span>{' '}
                                 </span>
@@ -213,15 +213,15 @@ export default function VerseDisplay({
                               return (
                                 <div key={verse.number} className="group">
                                   <p
-                                    className="text-3xl sm:text-4xl leading-[2] text-gray-900 dark:text-gray-50 font-arabic mb-4"
+                                    className="text-2xl sm:text-3xl leading-[2] text-gray-900 dark:text-gray-50 font-arabic mb-4"
                                     style={{ direction: 'rtl' }}
                                   >
                                     {cleanText}
-                                    <span className="text-xl text-gold-600 dark:text-gold-400 align-middle mx-2 font-arabic">
+                                    <span className="text-lg text-gold-600 dark:text-gold-400 align-middle mx-2 font-arabic">
                                       {formatAyahMarker(verse.numberInSurah)}
                                     </span>
                                   </p>
-                                  <p className="font-amiri text-lg text-stone-500 dark:text-stone-400 italic leading-relaxed">
+                                  <p className="font-amiri text-base text-stone-500 dark:text-stone-400 italic leading-relaxed">
                                     {verse.translation}
                                   </p>
                                   {verse !== group.verses[group.verses.length - 1] && (
