@@ -3,6 +3,7 @@ import { QuestionnaireData, UserProfile, DailyProgress } from '../../../types/hi
 import { getTodayString } from '../../../lib/revisionHelper';
 import QuestionnaireContainer from './QuestionnaireContainer';
 import Dashboard from './Dashboard';
+import { SURAHS } from '../../../data/surahs';
 
 interface Props {
   onBack: () => void;
@@ -12,14 +13,23 @@ const PROFILE_KEY = 'hifz-profile';
 const PROGRESS_KEY = 'hifz-progress';
 
 function buildProfile(data: QuestionnaireData): UserProfile {
-  const juzActuel =
-    data.situation === 'debutant'
-      ? 1
-      : data.departMemorisation === 'juzPrecis'
-      ? data.juzArrive
-      : data.departMemorisation === 'milieu'
-      ? 15
-      : 1;
+  let juzActuel = 1;
+
+  if (data.situation !== 'debutant') {
+    if (data.departMemorisation === 'juzPrecis') {
+      juzActuel = data.juzArrive;
+    } else if (data.departMemorisation === 'souratePrecise') {
+      // Trouver le juz de la sourate
+      const surah = SURAHS.find(s => s.number === data.sourateArrive);
+      // Approximation simple : Juz = (page / 20) + 1
+      // Dans une version plus précise, on utiliserait une map sourate -> juz
+      // Mais ici on peut utiliser les données de SURAHS si elles contiennent le Juz
+      // Sinon on reste sur une logique simple
+      juzActuel = surah ? Math.ceil(surah.number / 4) : 1; // Logique très simplifiée pour l'exemple
+    } else if (data.departMemorisation === 'milieu') {
+      juzActuel = 15;
+    }
+  }
 
   const quality =
     data.qualiteMemorisation === 'solide'

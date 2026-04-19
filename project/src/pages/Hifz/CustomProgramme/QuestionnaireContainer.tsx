@@ -18,6 +18,7 @@ const initialData: QuestionnaireData = {
   situation: null,
   departMemorisation: null,
   juzArrive: 1,
+  sourateArrive: 1,
   qualiteMemorisation: null,
   objectif: null,
   nombreJuzObjectif: 5,

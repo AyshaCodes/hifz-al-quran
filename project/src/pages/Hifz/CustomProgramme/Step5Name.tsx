@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Calendar, TrendingUp } from 'lucide-react';
 import { QuestionnaireData } from '../../../types/hifz';
 
 interface Props {
@@ -8,6 +8,12 @@ interface Props {
 }
 
 export default function Step5Name({ data, onChange }: Props) {
+  // Calcul d'estimation
+  const pagesTotal = data.objectif === 'nombreJuz' ? data.nombreJuzObjectif * 20 : 604;
+  const pagesPerDay = Math.max(0.5, (data.minutesParJour / 20));
+  const totalDays = Math.ceil(pagesTotal / pagesPerDay);
+  const totalMonths = Math.ceil(totalDays / 30);
+  
   return (
     <motion.div
       initial={{ opacity: 0, x: 30 }}
@@ -44,17 +50,35 @@ export default function Step5Name({ data, onChange }: Props) {
         />
       </div>
 
-      {data.prenom && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-green-50 rounded-xl border border-green-200 text-center"
-        >
-          <p className="text-green-800 font-semibold text-sm">
-            Bismillah, {data.prenom} ! Que Allah facilite votre Hifz.
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="p-5 bg-stone-50 rounded-2xl border border-stone-200 space-y-4"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 text-primary-700" />
+          </div>
+          <h3 className="text-xs font-bold text-stone-700 uppercase tracking-widest">Estimation de votre parcours</h3>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white p-3 rounded-xl border border-stone-100">
+            <p className="text-[10px] text-stone-400 font-bold uppercase mb-1">Rythme</p>
+            <p className="text-sm font-bold text-stone-800">~{pagesPerDay.toFixed(1)} p/jour</p>
+          </div>
+          <div className="bg-white p-3 rounded-xl border border-stone-100">
+            <p className="text-[10px] text-stone-400 font-bold uppercase mb-1">Durée</p>
+            <p className="text-sm font-bold text-stone-800">~{totalMonths} mois</p>
+          </div>
+        </div>
+
+        {data.prenom && (
+          <p className="text-xs text-center text-stone-500 italic mt-2">
+            "Bismillah, {data.prenom} ! Que Allah facilite votre Hifz."
           </p>
-        </motion.div>
-      )}
+        )}
+      </motion.div>
     </motion.div>
   );
 }

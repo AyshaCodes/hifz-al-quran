@@ -1,7 +1,8 @@
 export interface QuestionnaireData {
   situation: 'debutant' | 'intermediaire' | 'avance' | 'revision' | null;
-  departMemorisation: 'debut' | 'milieu' | 'juzPrecis' | null;
+  departMemorisation: 'debut' | 'milieu' | 'juzPrecis' | 'souratePrecise' | null;
   juzArrive: number;
+  sourateArrive: number;
   qualiteMemorisation: 'solide' | 'partielle' | 'oubliee' | null;
   objectif: 'nombreJuz' | 'dateButoir' | 'revision' | null;
   nombreJuzObjectif: number;
