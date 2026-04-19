@@ -116,7 +116,7 @@ export default function Ressources() {
           </div>
         </motion.section>
 
-        {/* Nouveauté : Ressources Externes Enrichies */}
+        {/* Nouveauté : Ressources Externes (Bientôt disponible) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
           {EXTERNAL_RESOURCES.map((section, idx) => (
             <motion.div 
@@ -132,19 +132,18 @@ export default function Ressources() {
               </div>
               <div className="space-y-4">
                 {section.items.map(item => (
-                  <a 
+                  <div 
                     key={item.name}
-                    href={item.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block p-5 bg-white dark:bg-gray-900 rounded-2xl border border-stone-100 dark:border-white/5 shadow-sm hover:shadow-md hover:border-primary-200 dark:hover:border-primary-900/30 transition-all group"
+                    className="block p-5 bg-white dark:bg-gray-900 rounded-2xl border border-stone-100 dark:border-white/5 shadow-sm relative group"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-sm text-gray-800 dark:text-gray-200 group-hover:text-primary-600 transition-colors">{item.name}</span>
-                      <ExternalLink className="w-3.5 h-3.5 text-stone-300 group-hover:text-primary-400 transition-colors" />
+                      <span className="font-bold text-sm text-gray-800 dark:text-gray-200">{item.name}</span>
+                      <span className="text-[8px] font-bold uppercase tracking-widest text-primary-600 bg-primary-50 dark:bg-primary-900/40 px-2 py-0.5 rounded-full">
+                        Bientôt inshAllah
+                      </span>
                     </div>
                     <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{item.desc}</p>
-                  </a>
+                  </div>
                 ))}
               </div>
             </motion.div>
