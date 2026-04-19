@@ -46,11 +46,12 @@ export interface HifzProgress {
 
 export interface ProgrammeHifz {
   pagesParJour: number;
-  joursParSemaine: number;
-  dateFinPrevue: string;
-  phaseActuelle: 'memorisation' | 'revision' | 'intensif';
-  prochaineEtape: string;
   dureeEstimeeMois: number;
+  phase: 'memorisation' | 'revision' | 'revision_pure';
+  revisionPureRequise: boolean;
+  juzDepart: number;
+  pagesTotal: number;
+  pagesRestantes: number;
 }
 
 export interface GuidedProfile {

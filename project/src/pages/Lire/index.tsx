@@ -1,21 +1,18 @@
-import { Menu } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useCallback, useEffect, useState, useRef } from 'react';
-import { useRouter } from '../../hooks/useRouter';
 import { SURAHS } from '../../data/surahs';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { getCurrentTargetPage } from '../../lib/hifzSchedule';
 import {
-  ApiPageVerse,
   fetchSurahFromNewAPI,
   fetchPageWithTranslation,
-  fetchSurahForMushafPage,
   fetchFirstPageForSurah,
 } from '../../lib/quranApi';
-import { Bookmark, DailyProgress, UserProfile } from '../../types';
+import { Bookmark } from '../../types';
 import AyahByAyahView from './AyahByAyahView';
-import ReadModeToggle, { ReadMode } from './ReadModeToggle';
+import { ReadMode } from './ReadModeToggle';
 import SurahSidebar from './SurahSidebar';
 import VerseDisplay from './VerseDisplay';
+import ReadingHeader from './ReadingHeader';
 
 interface Verse {
   number: number;
@@ -26,191 +23,115 @@ interface Verse {
 
 interface MushafPageData {
   pageNumber: number;
-  verses: ApiPageVerse[];
+  verses: any[];
   juz: number;
   hizbQuarter: number;
 }
 
 export default function LirePage() {
-  const { navigate, searchParams } = useRouter();
   const [selectedSurah, setSelectedSurah] = useState(1);
   const [verses, setVerses] = useState<Verse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [lecturePages, setLecturePages] = useState<MushafPageData[]>([]);
   const [mushafPage, setMushafPage] = useState(1);
   const [pageLoading, setPageLoading] = useState(false);
   const [loadingMorePages, setLoadingMorePages] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
   const [reachedSurahEnd, setReachedSurahEnd] = useState(false);
-  const [desktopSidebarVisible, setDesktopSidebarVisible] = useState(true);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [lectureTextMode, setLectureTextMode] = useState<'arabic' | 'both'>('arabic');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [languageMode, setLanguageMode] = useState<'arabic' | 'both'>('arabic');
   const [reciterId, setReciterId] = useState('ar.alafasy');
   const [readMode, setReadMode] = useState<ReadMode>('lecture');
   const [bookmarks, setBookmarks] = useLocalStorage<Bookmark[]>('hifz-bookmarks', []);
-  const [memorizingSurahNumber, setMemorizingSurahNumber] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const fromHifz = searchParams.get('from') === 'hifz';
-  const quickPages = (searchParams.get('pages') ?? '')
-    .split(',')
-    .map((p) => Number(p))
-    .filter((p) => Number.isFinite(p) && p > 0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Ref pour annuler les requêtes
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const currentSurahRef = useRef(selectedSurah);
-  // Quand true, le useEffect "mise à jour de mushafPage" ne recalcule pas la page
-  const skipAutoPageRef = useRef(false);
-
-  // Lire le paramètre surah depuis l'URL et initialiser l'état
-  useEffect(() => {
-    const surahParam = searchParams.get('surah');
-    if (surahParam) {
-      const newSurah = parseInt(surahParam, 10);
-      if (!isNaN(newSurah) && newSurah !== selectedSurah) {
-        setSelectedSurah(newSurah);
-        // Réinitialiser les pages et autres états
-        setLecturePages([]);
-        setReachedSurahEnd(false);
-        // Nettoyer l'URL pour éviter les boucles
-        const params = new URLSearchParams(searchParams);
-        params.delete('surah');
-        navigate(`/lire?${params.toString()}`);
-      }
+  const handleSelectAyah = (ayahNumber: number) => {
+    const element = document.getElementById(`ayah-${ayahNumber}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.classList.add('ring-2', 'ring-quran-500', 'ring-opacity-50');
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-quran-500', 'ring-opacity-50');
+      }, 2000);
     }
-  }, [searchParams, selectedSurah, navigate]);
+  };
+
+  // Détecter si on est sur mobile pour fermer le sidebar par défaut
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setSidebarOpen(false);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const loadSurah = useCallback(async (num: number, signal?: AbortSignal) => {
-    setLoading(true);
-    setError(null);
     try {
-      // Utiliser la nouvelle API sans rate limit
       const data = await fetchSurahFromNewAPI(num);
       if (signal?.aborted) return;
       setVerses(data.map((v) => ({ ...v, translation: v.translation ?? '' })));
     } catch (err) {
       if (signal?.aborted) return;
-      console.error('Error loading surah:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      if (errorMessage.includes('429') || errorMessage.includes('CORS')) {
-        setError('Service temporairement indisponible. Veuillez réessayer dans quelques minutes.');
-      } else {
-        setError('Impossible de charger la sourate. Vérifiez votre connexion.');
-      }
     } finally {
-      if (!signal?.aborted) setLoading(false);
     }
   }, []);
 
-  // Charger la sourate quand elle change
   useEffect(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    if (abortControllerRef.current) abortControllerRef.current.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
-    currentSurahRef.current = selectedSurah;
     loadSurah(selectedSurah, controller.signal);
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, [selectedSurah, loadSurah]);
 
-  // Initialisation depuis targetPage (paramètre URL) — une seule fois au montage
-  const initializedFromUrl = useRef(false);
-  useEffect(() => {
-    if (initializedFromUrl.current) return;
-    const pageParam = Number(searchParams.get('page') ?? '0');
-    const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : null;
-    if (page) {
-      initializedFromUrl.current = true;
-      setMushafPage(Math.min(604, Math.max(1, page)));
-      fetchSurahForMushafPage(page)
-        .then((surahNum) => {
-          setSelectedSurah(surahNum);
-          setReadMode('lecture');
-        })
-        .catch(() => {});
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Mise à jour de mushafPage lorsque la sourate change (en mode lecture)
   useEffect(() => {
     if (readMode !== 'lecture') return;
-    if (skipAutoPageRef.current) {
-      skipAutoPageRef.current = false;
-      return;
-    }
     let cancelled = false;
     const updatePage = async () => {
       try {
         const firstPage = await fetchFirstPageForSurah(selectedSurah);
-        if (!cancelled) {
-          setMushafPage(Math.min(604, Math.max(1, firstPage)));
-        }
-      } catch (err) {
-        console.error('Erreur lors de la récupération de la première page', err);
-      }
+        if (!cancelled) setMushafPage(firstPage);
+      } catch (err) {}
     };
     updatePage();
     return () => { cancelled = true; };
   }, [selectedSurah, readMode]);
 
-  // Chargement de la page du Mushaf
   useEffect(() => {
-    if (readMode !== 'lecture') return;
-    if (!selectedSurah) return;
-    if (!mushafPage || isNaN(mushafPage)) return;
-
+    if (readMode !== 'lecture' || !selectedSurah || !mushafPage) return;
     let cancelled = false;
     const loadPage = async () => {
       setPageLoading(true);
       setPageError(null);
       setReachedSurahEnd(false);
       try {
-        console.log('Loading page:', mushafPage);
         const pageData = await fetchPageWithTranslation(mushafPage);
         if (cancelled) return;
-        
-        if (!pageData || !pageData.ayahs || pageData.ayahs.length === 0) {
-          throw new Error('Page vide ou invalide');
-        }
-
-        const filteredAyahs = pageData.ayahs.filter((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
-        
+        const filteredAyahs = pageData.ayahs.filter((ayah: any) => ayah.surahNumber === selectedSurah);
         if (filteredAyahs.length === 0) {
           setReachedSurahEnd(true);
           return;
         }
-
-        setLecturePages([
-          {
-            pageNumber: mushafPage,
-            verses: filteredAyahs,
-            juz: pageData.juz,
-            hizbQuarter: pageData.hizbQuarter,
-          },
-        ]);
+        setLecturePages([{
+          pageNumber: mushafPage,
+          verses: filteredAyahs,
+          juz: pageData.juz,
+          hizbQuarter: pageData.hizbQuarter,
+        }]);
       } catch (err) {
-        if (!cancelled) {
-          console.error('Error loading page:', err);
-          const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-          if (errorMessage.includes('429')) {
-            setPageError('Trop de requêtes. Veuillez patienter quelques secondes...');
-          } else {
-            setPageError(`Erreur : ${errorMessage}. Vérifiez votre connexion.`);
-          }
-        }
+        if (!cancelled) setPageError('Erreur de chargement de la page.');
       } finally {
         if (!cancelled) setPageLoading(false);
       }
     };
     loadPage();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [mushafPage, readMode, selectedSurah]);
 
   const loadNextLecturePage = async () => {
@@ -221,232 +142,100 @@ export default function LirePage() {
     try {
       const nextPageNumber = lastPage + 1;
       const pageData = await fetchPageWithTranslation(nextPageNumber);
-      
-      const filteredAyahs = pageData.ayahs.filter((ayah: ApiPageVerse) => ayah.surahNumber === selectedSurah);
-      
+      const filteredAyahs = pageData.ayahs.filter((ayah: any) => ayah.surahNumber === selectedSurah);
       if (filteredAyahs.length === 0) {
         setReachedSurahEnd(true);
         return;
       }
-
-      setLecturePages((prev) => {
-        if (prev.some((p) => p.pageNumber === nextPageNumber)) return prev;
-        return [
-          ...prev,
-          {
-            pageNumber: nextPageNumber,
-            verses: filteredAyahs,
-            juz: pageData.juz,
-            hizbQuarter: pageData.hizbQuarter,
-          },
-        ];
-      });
+      setLecturePages((prev) => [...prev, {
+        pageNumber: nextPageNumber,
+        verses: filteredAyahs,
+        juz: pageData.juz,
+        hizbQuarter: pageData.hizbQuarter,
+      }]);
     } catch {
-      // ignore
     } finally {
       setLoadingMorePages(false);
     }
   };
 
-  useEffect(() => {
-    const rawProfile = localStorage.getItem('hifz-profile');
-    if (!rawProfile) {
-      setMemorizingSurahNumber(null);
-      return;
-    }
-    try {
-      const profile = JSON.parse(rawProfile) as UserProfile;
-      const rawProgress = localStorage.getItem('hifz-progress');
-      const progress: DailyProgress[] = rawProgress ? JSON.parse(rawProgress) : [];
-      const page = getCurrentTargetPage(profile, progress);
-      fetchSurahForMushafPage(page)
-        .then((surahNum) => setMemorizingSurahNumber(surahNum))
-        .catch(() => setMemorizingSurahNumber(null));
-    } catch {
-      setMemorizingSurahNumber(null);
-    }
-  }, []);
-
-  useEffect(() => {
-    const syncViewport = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (mobile) setMobileSidebarOpen(false);
-    };
-    syncViewport();
-    window.addEventListener('resize', syncViewport);
-    return () => window.removeEventListener('resize', syncViewport);
-  }, []);
-
   const handleToggleBookmark = (verse: Verse) => {
     const surah = SURAHS.find((s) => s.number === selectedSurah);
-    if (!surah) return;
-    const exists = bookmarks.some(
+    const existing = bookmarks.find(
       (b) => b.surahNumber === selectedSurah && b.verseNumber === verse.numberInSurah
     );
-    if (exists) {
-      setBookmarks(bookmarks.filter((b) => !(b.surahNumber === selectedSurah && b.verseNumber === verse.numberInSurah)));
+    if (existing) {
+      setBookmarks(bookmarks.filter((b) => b !== existing));
     } else {
-      const newBookmark: Bookmark = {
-        surahNumber: selectedSurah,
-        verseNumber: verse.numberInSurah,
-        surahName: surah.nameFrench,
-        surahNameArabic: surah.nameArabic,
-        verseText: verse.text,
-        savedAt: new Date().toISOString(),
-      };
-      setBookmarks([...bookmarks, newBookmark]);
+      setBookmarks([
+        ...bookmarks,
+        {
+          surahNumber: selectedSurah,
+          surahName: surah?.nameTranslit ?? '',
+          surahNameArabic: surah?.nameArabic ?? '',
+          verseNumber: verse.numberInSurah,
+          verseText: verse.text,
+          savedAt: new Date().toISOString(),
+        },
+      ]);
     }
   };
 
-  const currentSurah = SURAHS.find((s) => s.number === selectedSurah);
-  const sidebarOpen = isMobile ? mobileSidebarOpen : desktopSidebarVisible;
-  const toggleSidebar = () => {
-    if (isMobile) setMobileSidebarOpen((prev) => !prev);
-    else setDesktopSidebarVisible((prev) => !prev);
-  };
-
-  const handleSelectSurah = async (surahNumber: number) => {
-    if (surahNumber === selectedSurah) return;
-    
-    setLecturePages([]);
-    setReachedSurahEnd(false);
-    
-    if (readMode === 'lecture') {
-      skipAutoPageRef.current = true;
-      try {
-        const firstPage = await fetchFirstPageForSurah(surahNumber);
-        setSelectedSurah(surahNumber);
-        setMushafPage(firstPage);
-      } catch (err) {
-        console.error('Erreur lors du changement de sourate', err);
-        setSelectedSurah(surahNumber);
-      }
-    } else {
-      setSelectedSurah(surahNumber);
-    }
-  };
-
-  const handleSelectPage = async (page: number) => {
-    skipAutoPageRef.current = true;
-    const pageNum = Math.min(604, Math.max(1, page));
-    setLecturePages([]);
-    setReachedSurahEnd(false);
-    setReadMode('lecture');
-
-    try {
-      const surahNum = await fetchSurahForMushafPage(pageNum);
-      setSelectedSurah(surahNum);
-      setMushafPage(pageNum);
-    } catch (err) {
-      console.error('Erreur lors du changement de page', err);
-      setMushafPage(pageNum);
-    }
-  };
-
-  useEffect(() => {
-    if (!selectedSurah) return;
-    localStorage.setItem(
-      'lire-last-position',
-      JSON.stringify({
-        surahNumber: selectedSurah,
-        page: mushafPage,
-        readMode,
-        savedAt: new Date().toISOString(),
-      })
-    );
-  }, [selectedSurah, mushafPage, readMode]);
+  const currentJuz = lecturePages[0]?.juz ?? 1;
+  const currentHizb = Math.ceil((lecturePages[0]?.hizbQuarter ?? 1) / 4);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-blue-950 dark:via-gray-900 dark:to-blue-950">
-      <div className="relative flex flex-col lg:flex-row h-screen overflow-hidden">
+    <div className="flex flex-col bg-stone-50 dark:bg-gray-950 transition-colors duration-500">
+      {/* Tool Header (ReadingHeader) */}
+      <ReadingHeader
+        selectedSurah={selectedSurah}
+        onSelectSurah={setSelectedSurah}
+        currentPage={mushafPage}
+        currentJuz={currentJuz}
+        currentHizb={currentHizb}
+        readMode={readMode}
+        onModeChange={setReadMode}
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      />
+
+      <div className="flex min-h-[calc(100vh-128px)] relative">
+        {/* Sidebar */}
         <SurahSidebar
           selectedSurah={selectedSurah}
-          onSelectSurah={handleSelectSurah}
-          onSelectPage={handleSelectPage}
+          onSelectSurah={setSelectedSurah}
+          onSelectPage={setMushafPage}
+          onSelectAyah={handleSelectAyah}
           isOpen={sidebarOpen}
-          onClose={() => (isMobile ? setMobileSidebarOpen(false) : setDesktopSidebarVisible(false))}
+          onClose={() => setSidebarOpen(false)}
           closeOnSelect={isMobile}
-          memorizingSurahNumber={memorizingSurahNumber}
         />
 
-        <div className="flex-1 min-w-0 flex flex-col h-screen overflow-y-auto">
-          {fromHifz && (
-            <div className="px-4 py-2 bg-green-800 text-white text-sm flex flex-wrap items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => navigate('/hifz')}
-                className="font-medium hover:underline flex items-center gap-1"
-              >
-                ← Retour à Mon Hifz — Page {mushafPage} en cours
-              </button>
-              {quickPages.length > 1 && (
-                <div className="flex flex-wrap items-center gap-1 text-xs">
-                  {quickPages.map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => handleSelectPage(p)}
-                      className={`px-2 py-0.5 rounded-full transition ${
-                        p === mushafPage ? 'bg-white text-green-800' : 'bg-white/20 text-white hover:bg-white/30'
-                      }`}
-                    >
-                      Page {p}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          <div className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 flex-shrink-0">
-            <div className="flex items-center gap-3 px-4 py-3">
-              <button
-                type="button"
-                onClick={toggleSidebar}
-                className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 transition"
-                title={sidebarOpen ? 'Cacher la sidebar' : 'Afficher la sidebar'}
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-              {currentSurah && (
-                <div>
-                  <h1 className="font-semibold text-gray-800 dark:text-gray-100">
-                    {currentSurah.nameTranslit}
-                  </h1>
-                  <p className="text-xs text-stone-500 dark:text-stone-400">
-                    {currentSurah.nameFrench} · {currentSurah.verses} versets
-                  </p>
-                </div>
-              )}
-            </div>
+        {/* Content Area */}
+        <main className="flex-1 flex flex-col relative bg-stone-50 dark:bg-gray-950 transition-colors duration-500 overflow-y-auto scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-white/10 hover:scrollbar-thumb-stone-300 dark:hover:scrollbar-thumb-white/20">
+          {/* Progress bar at the top of content */}
+          <div className="h-0.5 w-full bg-stone-200 dark:bg-white/5 sticky top-0 z-40">
+            <div 
+              className="absolute top-0 left-0 h-full bg-primary-500 transition-all duration-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]"
+              style={{ width: `${(mushafPage / 604) * 100}%` }}
+            />
           </div>
 
-          <ReadModeToggle mode={readMode} onModeChange={setReadMode} />
-
-          <div className="py-6 px-4">
+          <div ref={containerRef} className="flex-1">
             {readMode === 'lecture' ? (
               <VerseDisplay
                 surahNumber={selectedSurah}
                 pages={lecturePages}
                 loading={pageLoading}
                 error={pageError}
-                textMode={lectureTextMode}
-                onTextModeChange={setLectureTextMode}
-                audioVerses={verses}
+                textMode={languageMode}
+                onTextModeChange={setLanguageMode}
+                audioVerses={verses.map(v => ({ ...v, audio: '' }))} 
                 reciterId={reciterId}
                 onReciterChange={setReciterId}
                 onLoadNextPage={loadNextLecturePage}
-                canLoadMore={
-                  !reachedSurahEnd &&
-                  (lecturePages[lecturePages.length - 1]?.pageNumber ?? mushafPage) < 604
-                }
+                canLoadMore={!reachedSurahEnd && !loadingMorePages}
                 loadingMore={loadingMorePages}
               />
-            ) : loading || error ? (
-              <div className="flex items-center justify-center py-20 text-stone-500 text-sm">
-                {loading ? 'Chargement de la sourate...' : error}
-              </div>
             ) : (
               <AyahByAyahView
                 surahNumber={selectedSurah}
@@ -458,7 +247,25 @@ export default function LirePage() {
               />
             )}
           </div>
-        </div>
+
+          {/* Floating Navigation Buttons */}
+          <div className="absolute bottom-4 sm:bottom-8 right-4 sm:right-8 flex flex-col gap-2 sm:gap-3 z-20">
+            <button
+              onClick={() => setMushafPage(Math.max(1, mushafPage - 1))}
+              className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-md border border-stone-200 dark:border-white/10 text-stone-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-stone-50 dark:hover:bg-[#2a2a2a] hover:border-primary-500/50 transition-all shadow-xl group active:scale-95"
+              title="Page précédente"
+            >
+              <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
+            <button
+              onClick={() => setMushafPage(Math.min(604, mushafPage + 1))}
+              className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-md border border-stone-200 dark:border-white/10 text-stone-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-stone-50 dark:hover:bg-[#2a2a2a] hover:border-primary-500/50 transition-all shadow-xl group active:scale-95"
+              title="Page suivante"
+            >
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-y-0.5 transition-transform" />
+            </button>
+          </div>
+        </main>
       </div>
     </div>
   );

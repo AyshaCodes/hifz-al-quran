@@ -4,7 +4,6 @@ import { Bookmark as BookmarkType } from '../../types';
 import { buildVerseAudioUrl } from '../../lib/quranApi';
 import { stripPrependedBismillahFromVerseOne } from '../../lib/bismillah';
 import CompactSurahAudio, { CompactSurahAudioHandle } from './CompactSurahAudio';
-import SurahIntro from './SurahIntro';
 
 interface Verse {
   number: number;
@@ -62,7 +61,7 @@ export default function AyahByAyahView({
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-stone-50/50 dark:bg-gray-950/50">
+    <div className="flex-1 flex flex-col min-h-0 bg-stone-50 dark:bg-gray-950 transition-colors duration-500">
       <audio
         ref={audioRef}
         onEnded={() => {
@@ -73,7 +72,7 @@ export default function AyahByAyahView({
         onPause={() => setIsPlaying(false)}
       />
 
-      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
+      <div className="sticky top-0 z-20">
         <CompactSurahAudio
           ref={compactSurahAudioRef}
           surahNumber={surahNumber}
@@ -81,12 +80,14 @@ export default function AyahByAyahView({
           reciterId={reciterId}
           onReciterChange={onReciterChange}
           otherAudioRef={audioRef}
-          toolbarClassName="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-stone-200/50 dark:border-white/5"
+          toolbarClassName="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-stone-200 dark:border-white/5"
         />
-        <SurahIntro surahNumber={surahNumber} />
+      </div>
+
+      <div className="flex-1 overflow-y-visible">
 
         <div className="max-w-4xl mx-auto px-4 py-12">
-          <div className="space-y-6">
+          <div className="space-y-8">
             {verses.map((verse) => {
               const displayArabic = stripPrependedBismillahFromVerseOne(
                 surahNumber,
@@ -99,62 +100,63 @@ export default function AyahByAyahView({
               return (
                 <article 
                   key={verse.number} 
-                  className={`premium-card p-8 transition-all duration-500 ${
-                    isCurrent ? 'ring-2 ring-primary-500/50 bg-primary-50/30 dark:bg-primary-900/10 shadow-xl scale-[1.02]' : 'hover:scale-[1.01]'
+                  id={`ayah-${verse.numberInSurah}`}
+                  className={`bg-white dark:bg-gray-900/50 p-6 sm:p-10 rounded-[1.5rem] sm:rounded-[2rem] transition-all duration-500 border border-stone-200 dark:border-white/5 scroll-mt-32 shadow-sm dark:shadow-2xl ${
+                    isCurrent ? 'ring-2 ring-primary-500/50 bg-primary-50 dark:bg-[#1a1a1a] scale-[1.02]' : 'hover:scale-[1.01] group'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-4 mb-8">
-                    <span className="px-3 py-1 rounded-full bg-stone-100 dark:bg-gray-800 text-[10px] font-bold text-stone-500 dark:text-stone-400 tracking-widest uppercase">
+                  <div className="flex items-center justify-between gap-4 mb-8 sm:mb-12">
+                    <span className="px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-stone-50 dark:bg-white/5 text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-gray-600 tracking-[0.1em] sm:tracking-[0.2em] uppercase border border-stone-100 dark:border-white/5">
                       Verset {verseRef}
                     </span>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <button
                         type="button"
                         onClick={() => handlePlayVerse(verse)}
-                        className={`p-2.5 rounded-xl transition-all duration-300 ${
+                        className={`p-2.5 sm:p-3 rounded-xl transition-all duration-500 ${
                           isCurrent && isPlaying 
-                            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20' 
-                            : 'bg-stone-100 dark:bg-gray-800 text-stone-600 dark:text-stone-400 hover:text-primary-600 dark:hover:text-primary-400'
+                            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20 scale-110' 
+                            : 'bg-stone-50 dark:bg-white/5 text-stone-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-white hover:bg-white/10'
                         }`}
                         title="Lire le verset"
                       >
                         {isCurrent && isPlaying ? (
-                          <Pause className="w-5 h-5" />
+                          <Pause className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
                         ) : (
-                          <Play className="w-5 h-5" />
+                          <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                         )}
                       </button>
 
                       <button
                         type="button"
                         onClick={() => onToggleBookmark({ ...verse, text: displayArabic })}
-                        className={`p-2.5 rounded-xl transition-all duration-300 ${
+                        className={`p-2.5 sm:p-3 rounded-xl transition-all duration-500 ${
                           isBookmarked(verse.numberInSurah)
-                            ? 'bg-gold-100 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400'
-                            : 'bg-stone-100 dark:bg-gray-800 text-stone-600 dark:text-stone-400 hover:text-gold-500'
+                            ? 'bg-gold-100 dark:bg-gold-500/10 text-gold-600 dark:text-gold-400 border border-gold-200 dark:border-gold-500/20 scale-110 shadow-lg shadow-gold-500/10'
+                            : 'bg-stone-50 dark:bg-white/5 text-stone-400 dark:text-gray-500 hover:text-gold-500 hover:bg-white/10'
                         }`}
                         title={isBookmarked(verse.numberInSurah) ? 'Retirer le signet' : 'Ajouter un signet'}
                       >
                         {isBookmarked(verse.numberInSurah) ? (
-                          <BookmarkCheck className="w-5 h-5" />
+                          <BookmarkCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                         ) : (
-                          <Bookmark className="w-5 h-5" />
+                          <Bookmark className="w-4 h-4 sm:w-5 sm:h-5" />
                         )}
                       </button>
                     </div>
                   </div>
 
                   <p
-                    className="font-arabic text-lg sm:text-xl text-center text-gray-900 dark:text-gray-50 leading-[3.5] mb-10 font-normal"
-                    style={{ direction: 'rtl', wordSpacing: '0.1em' }}
+                    className="font-amiri text-2xl sm:text-4xl lg:text-5xl text-center text-stone-800 dark:text-gray-100 leading-[3] sm:leading-[4] mb-8 sm:mb-12 font-normal group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+                    style={{ direction: 'rtl', wordSpacing: '0.25em' }}
                   >
                     {displayArabic}
                   </p>
 
-                  <div className="w-16 h-px bg-stone-100 dark:bg-gray-800 mx-auto mb-10 rounded-full" />
+                  <div className="w-24 sm:w-32 h-px bg-stone-100 dark:bg-white/5 mx-auto mb-8 sm:mb-12 rounded-full" />
 
-                  <p className="font-amiri text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-[2] italic text-center max-w-2xl mx-auto tracking-wide">
+                  <p className="font-amiri text-sm sm:text-base lg:text-lg text-stone-500 dark:text-gray-400 leading-[1.8] sm:leading-[2] italic text-center max-w-2xl mx-auto tracking-wide opacity-80 group-hover:opacity-100 transition-opacity px-2">
                     {verse.translation}
                   </p>
                 </article>

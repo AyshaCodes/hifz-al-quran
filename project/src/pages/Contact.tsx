@@ -1,146 +1,169 @@
-import { Mail, MessageSquare, ExternalLink } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { Mail, Send, User, MessageSquare, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Contact() {
-  const CONTACT_EMAIL = "soumarehaicha@gmail.com"; // Remplace par ton email réel
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [resultMessage, setResultMessage] = useState('');
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setStatus('loading');
+    
+    const formData = new FormData(event.currentTarget);
+    formData.append('access_key', '9796d525-70a1-4467-8910-638e49f8c1f5');
+    formData.append('subject', 'Nouveau message de Hifz Al Quran');
+    formData.append('from_name', 'Hifz Al Quran App');
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setStatus('success');
+        setResultMessage('Votre message a été envoyé avec succès. Nous vous répondrons dès que possible.');
+        event.currentTarget.reset();
+      } else {
+        setStatus('error');
+        setResultMessage(data.message || 'Une erreur est survenue lors de l\'envoi.');
+      }
+    } catch (err) {
+      setStatus('error');
+      setResultMessage('Impossible de contacter le serveur. Veuillez vérifier votre connexion.');
+    }
+  };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 via-white to-stone-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      <div className="section-container max-w-5xl">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="section-title">Contact</h1>
-          <p className="section-subtitle max-w-2xl mx-auto">
-            Une question, une suggestion ou besoin d'aide ? Nous sommes là pour vous accompagner dans votre voyage spirituel.
+    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-stone-50 dark:bg-gray-950 transition-colors duration-500">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-xl w-full"
+      >
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold text-stone-800 dark:text-white mb-4">Contactez-nous</h1>
+          <p className="text-stone-500 dark:text-gray-400 max-w-sm mx-auto">
+            Une question, une suggestion ou besoin d'aide ? Notre équipe est à votre écoute.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Informations de contact */}
-          <div className="space-y-10">
-            <div>
-              <h2 className="font-amiri text-2xl text-gray-800 dark:text-gray-100 mb-8 border-l-4 border-primary-500 pl-4">
-                Restons en contact
-              </h2>
-              
-              <div className="space-y-8">
-                <div className="flex items-start gap-5">
-                  <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-stone-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-7 h-7 text-primary-600 dark:text-primary-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">
-                      Par email
-                    </h3>
-                    <p className="text-stone-500 dark:text-stone-400 text-sm leading-relaxed">
-                      Cliquez sur le bouton pour nous envoyer un email directement depuis votre messagerie.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-5">
-                  <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-stone-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
-                    <MessageSquare className="w-7 h-7 text-primary-600 dark:text-primary-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-1">
-                      Sur les réseaux
-                    </h3>
-                    <p className="text-stone-500 dark:text-stone-400 text-sm mb-3 leading-relaxed">
-                      Suivez-nous sur Instagram pour des conseils et l'actualité du programme.
-                    </p>
-                    <a
-                      href="https://www.instagram.com/somme_de_jours/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 font-bold hover:underline"
-                    >
-                      @hifz.al.quran
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* FAQ rapide */}
-            <div className="pt-6">
-              <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-6">
-                Questions fréquentes
-              </h3>
-              <div className="space-y-4">
-                <div className="premium-card p-5 border-none shadow-md">
-                  <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-2 text-sm">
-                    Le programme est-il vraiment gratuit ?
-                  </h4>
-                  <p className="text-stone-500 dark:text-stone-400 text-xs leading-relaxed">
-                    Oui ! Le PDF et l'application sont entièrement gratuits pour vous accompagner dans votre Hifz.
-                  </p>
-                </div>
-                <div className="premium-card p-5 border-none shadow-md">
-                  <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-2 text-sm">
-                    Puis-je l'utiliser sans l'application ?
-                  </h4>
-                  <p className="text-stone-500 dark:text-stone-400 text-xs leading-relaxed">
-                    Absolument ! Le PDF contient tout ce qu'il vous faut pour commencer immédiatement.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action directe Email */}
-          <div className="lg:sticky lg:top-24">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="premium-card p-10 shadow-xl relative overflow-hidden text-center"
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/5 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
-              
-              <div className="relative z-10">
-                <div className="w-20 h-20 bg-primary-100 dark:bg-primary-900/30 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-primary-600/10">
-                  <Mail className="w-10 h-10 text-primary-600 dark:text-primary-400" />
-                </div>
-                
-                <h2 className="font-amiri text-3xl text-gray-800 dark:text-gray-100 mb-4">
-                  Envoyez-nous un email
-                </h2>
-                <p className="text-stone-500 dark:text-stone-400 mb-10 leading-relaxed max-w-xs mx-auto">
-                  Nous répondons généralement en moins de 24 heures, inshallah.
-                </p>
-                
-                <a
-                  href={`mailto:${CONTACT_EMAIL}?subject=Contact depuis l'application Hifz Al-Quran`}
-                  className="btn-premium w-full justify-center py-5 text-lg group shadow-xl hover:shadow-primary-600/20"
+        <div className="bg-white dark:bg-gray-900 shadow-xl dark:shadow-2xl rounded-3xl overflow-hidden border border-stone-100 dark:border-white/5">
+          <div className="p-8 sm:p-10">
+            <AnimatePresence mode="wait">
+              {status === 'success' ? (
+                <motion.div 
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-10"
                 >
-                  Ouvrir ma messagerie
-                  <ExternalLink className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                </a>
+                  <div className="w-20 h-20 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle2 className="w-10 h-10 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-stone-800 dark:text-white mb-2">Merci !</h3>
+                  <p className="text-stone-500 dark:text-gray-400 mb-8">{resultMessage}</p>
+                  <button 
+                    onClick={() => setStatus('idle')}
+                    className="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-primary-600/20"
+                  >
+                    Envoyer un autre message
+                  </button>
+                </motion.div>
+              ) : (
+                <form key="form" onSubmit={onSubmit} className="space-y-6">
+                  {/* Nom */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-stone-400 dark:text-gray-500 uppercase tracking-widest ml-1">Nom complet</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-primary-600 transition-colors">
+                        <User className="w-5 h-5" />
+                      </div>
+                      <input 
+                        type="text" 
+                        name="name" 
+                        placeholder="Votre nom" 
+                        required 
+                        className="w-full pl-12 pr-4 py-4 bg-stone-50 dark:bg-black/20 border border-stone-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:text-white placeholder-stone-300 dark:placeholder-gray-700 transition-all" 
+                      />
+                    </div>
+                  </div>
 
-                <div className="mt-8 pt-8 border-t border-stone-100 dark:border-white/5">
-                  <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-2">
-                    Directement à :
-                  </p>
-                  <p className="text-primary-600 dark:text-primary-400 font-medium">
-                    {CONTACT_EMAIL}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-stone-400 dark:text-gray-500 uppercase tracking-widest ml-1">Email</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-primary-600 transition-colors">
+                        <Mail className="w-5 h-5" />
+                      </div>
+                      <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="votre@email.com" 
+                        required 
+                        className="w-full pl-12 pr-4 py-4 bg-stone-50 dark:bg-black/20 border border-stone-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:text-white placeholder-stone-300 dark:placeholder-gray-700 transition-all" 
+                      />
+                    </div>
+                  </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="mt-8 text-center"
-            >
-              <p className="text-sm text-stone-400 italic">
-                "Celui qui facilite la tâche à quelqu'un dans la difficulté, Allah lui facilite la tâche dans cette vie et dans l'autre."
-              </p>
-            </motion.div>
+                  {/* Message */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-stone-400 dark:text-gray-500 uppercase tracking-widest ml-1">Message</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-6 text-stone-400 group-focus-within:text-primary-600 transition-colors">
+                        <MessageSquare className="w-5 h-5" />
+                      </div>
+                      <textarea 
+                        name="message" 
+                        placeholder="Comment pouvons-nous vous aider ?" 
+                        rows={5} 
+                        required 
+                        className="w-full pl-12 pr-4 py-4 bg-stone-50 dark:bg-black/20 border border-stone-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:text-white placeholder-stone-300 dark:placeholder-gray-700 transition-all resize-none" 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Honeypot Spam Protection (hidden) */}
+                  <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
+
+                  {/* Error Message */}
+                  {status === 'error' && (
+                    <motion.div 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl border border-red-100 dark:border-red-900/30 text-sm"
+                    >
+                      <AlertCircle className="w-5 h-5 shrink-0" />
+                      <p>{resultMessage}</p>
+                    </motion.div>
+                  )}
+
+                  {/* Submit Button */}
+                  <button 
+                    type="submit" 
+                    disabled={status === 'loading'}
+                    className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-stone-300 dark:disabled:bg-gray-800 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2 group active:scale-[0.98]"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Envoi en cours...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                        <span>Envoyer le message</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </AnimatePresence>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

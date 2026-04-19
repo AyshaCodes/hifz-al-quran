@@ -1,9 +1,9 @@
 import { Loader2, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { stripPrependedBismillahFromVerseOne } from '../../lib/bismillah';
 import { ApiPageVerse } from '../../lib/quranApi';
 import CompactSurahAudio, { CompactSurahAudioVerse } from './CompactSurahAudio';
-import SurahIntro from './SurahIntro';
 
 interface MushafPageData {
   pageNumber: number;
@@ -63,12 +63,12 @@ export default function VerseDisplay({
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center py-20 min-h-0 bg-stone-50 dark:bg-gray-950">
+      <div className="flex-1 flex items-center justify-center py-20 min-h-0 bg-[#0a0a0a]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl green-gradient flex items-center justify-center animate-spin shadow-lg shadow-primary-600/20">
-            <Loader2 className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 rounded-2xl bg-primary-500/20 flex items-center justify-center animate-spin shadow-lg shadow-primary-500/10">
+            <Loader2 className="w-8 h-8 text-primary-500" />
           </div>
-          <p className="text-stone-500 dark:text-stone-400 font-medium animate-pulse">Chargement de la sourate...</p>
+          <p className="text-gray-500 font-medium animate-pulse">Chargement...</p>
         </div>
       </div>
     );
@@ -76,13 +76,13 @@ export default function VerseDisplay({
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center py-20 min-h-0 bg-stone-50 dark:bg-gray-950">
-        <div className="premium-card p-10 text-center max-w-md mx-4">
-          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-            <X className="w-8 h-8 text-red-600 dark:text-red-400" />
+      <div className="flex-1 flex items-center justify-center py-20 min-h-0 bg-[#0a0a0a]">
+        <div className="bg-[#1a1a1a] p-10 text-center max-w-md mx-4 rounded-2xl border border-white/5">
+          <div className="w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <X className="w-8 h-8 text-red-500" />
           </div>
-          <p className="text-xl font-bold text-gray-800 dark:text-white mb-2">Oups ! Une erreur est survenue</p>
-          <p className="text-stone-500 dark:text-stone-400 leading-relaxed">{error}</p>
+          <p className="text-xl font-bold text-white mb-2">Oups !</p>
+          <p className="text-gray-400 leading-relaxed">{error}</p>
         </div>
       </div>
     );
@@ -142,104 +142,121 @@ export default function VerseDisplay({
   const formatAyahMarker = (ayahNumber: number) => `﴿${toArabicIndicDigits(ayahNumber)}﴾`;
 
   return (
-    <div className="flex-1 min-h-0 bg-stone-50 dark:bg-gray-950/50 custom-scrollbar overflow-y-auto">
-      <CompactSurahAudio
-        surahNumber={surahNumber ?? 0}
-        verses={audioVerses}
-        reciterId={reciterId}
-        onReciterChange={onReciterChange}
-        leadingControls={textModeToggle}
-        toolbarClassName="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-stone-200/50 dark:border-white/5"
-      />
+    <div className="flex-1 min-h-0 bg-stone-50 dark:bg-gray-950 transition-colors duration-500">
+      <div className="sticky top-0 z-20">
+        <CompactSurahAudio
+          surahNumber={surahNumber ?? 0}
+          verses={audioVerses}
+          reciterId={reciterId}
+          onReciterChange={onReciterChange}
+          leadingControls={textModeToggle}
+          toolbarClassName="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-stone-200 dark:border-white/5"
+        />
+      </div>
 
-      {surahNumber && <SurahIntro surahNumber={surahNumber} />}
-
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        {pages.map((page) => {
-          const pageSurahGroups = groupPageVersesBySurah(page.verses);
-          return (
-            <div key={page.pageNumber} className="mb-12">
-              <div className="premium-card p-8 sm:p-10 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between mb-8 border-b border-stone-100 dark:border-white/5 pb-4">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">
-                    Juz {page.juz} • Hizb {Math.ceil(page.hizbQuarter / 4)}
-                  </span>
-                  <span className="px-4 py-1 rounded-full bg-primary-50 dark:bg-primary-900/30 text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest">
-                    Page {page.pageNumber}
-                  </span>
-                </div>
-                
-                <div className="space-y-10">
-                  {pageSurahGroups.map((group) => {
-                    return (
-                      <div key={`${page.pageNumber}-${group.surahNumber}-${group.verses[0]?.number ?? 0}`}>
-                        <div className="flex items-center gap-4 mb-6">
-                          <div className="h-px flex-1 bg-stone-100 dark:bg-white/5" />
-                          <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
-                            Sourate {group.surahNumber}
-                          </p>
-                          <div className="h-px flex-1 bg-stone-100 dark:bg-white/5" />
-                        </div>
-
-                        {!showTranslation ? (
-                          <p
-                            className="text-lg sm:text-xl leading-[3.5] text-gray-900 dark:text-gray-100 font-arabic font-normal"
-                            style={{ direction: 'rtl', textAlign: 'justify', wordSpacing: '0.2em' }}
-                          >
-                            {group.verses.map((verse) => {
-                              const cleanText = stripPrependedBismillahFromVerseOne(
-                                verse.surahNumber,
-                                verse.numberInSurah,
-                                verse.text
-                              );
-                              return (
-                                <span key={verse.number} className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-default">
-                                  {cleanText}{' '}
-                                  <span className="text-sm text-gold-600 dark:text-gold-400 align-middle mx-1 font-arabic opacity-60">
-                                    {formatAyahMarker(verse.numberInSurah)}
-                                  </span>{' '}
-                                </span>
-                              );
-                            })}
-                          </p>
-                        ) : (
-                          <div className="space-y-16">
-                            {group.verses.map((verse) => {
-                              const cleanText = stripPrependedBismillahFromVerseOne(
-                                verse.surahNumber,
-                                verse.numberInSurah,
-                                verse.text
-                              );
-                              return (
-                                <div key={verse.number} className="group">
-                                  <p
-                                    className="text-lg sm:text-xl leading-[3] text-gray-900 dark:text-gray-50 font-arabic font-normal mb-8"
-                                    style={{ direction: 'rtl' }}
-                                  >
-                                    {cleanText}
-                                    <span className="text-sm text-gold-600 dark:text-gold-400 align-middle mx-3 font-arabic opacity-60">
-                                      {formatAyahMarker(verse.numberInSurah)}
-                                    </span>
-                                  </p>
-                                  <p className="font-amiri text-xs sm:text-sm text-stone-500 dark:text-stone-400 italic leading-[2] tracking-wide">
-                                    {verse.translation}
-                                  </p>
-                                  {verse !== group.verses[group.verses.length - 1] && (
-                                    <div className="w-12 h-px bg-stone-100 dark:bg-white/5 mt-8 mx-auto" />
-                                  )}
-                                </div>
-                              );
-                            })}
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <AnimatePresence mode="wait">
+          {pages.map((page) => {
+            const pageSurahGroups = groupPageVersesBySurah(page.verses);
+            return (
+              <motion.div
+                key={page.pageNumber}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                className="mb-8 sm:mb-16"
+              >
+                <div className="bg-white dark:bg-gray-900/50 p-6 sm:p-16 rounded-[1.5rem] sm:rounded-[2rem] shadow-sm dark:shadow-2xl border border-stone-200 dark:border-white/5 relative overflow-hidden transition-colors duration-500">
+                  <div className="flex items-center justify-between mb-8 sm:mb-12 border-b border-stone-100 dark:border-white/5 pb-6 sm:pb-8">
+                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-stone-400 dark:text-gray-600">
+                      Juz {page.juz} • Hizb {Math.ceil(page.hizbQuarter / 4)}
+                    </span>
+                    <span className="px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary-50 dark:bg-primary-500/5 text-[9px] sm:text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest border border-primary-100 dark:border-primary-500/10">
+                      Page {page.pageNumber}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-12 sm:space-y-16">
+                    {pageSurahGroups.map((group) => {
+                      return (
+                        <div key={`${page.pageNumber}-${group.surahNumber}-${group.verses[0]?.number ?? 0}`}>
+                          <div className="flex items-center gap-4 sm:gap-6 mb-8 sm:mb-12">
+                            <div className="h-px flex-1 bg-stone-100 dark:bg-white/5" />
+                            <p className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-gray-700 uppercase tracking-[0.15em] sm:tracking-[0.25em] bg-white dark:bg-gray-900 px-3 sm:px-4">
+                              Sourate {group.surahNumber}
+                            </p>
+                            <div className="h-px flex-1 bg-stone-100 dark:bg-white/5" />
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+
+                          {!showTranslation ? (
+                            <p
+                              className="text-2xl sm:text-4xl lg:text-5xl leading-[3.5] sm:leading-[5] text-stone-800 dark:text-gray-100 font-amiri font-normal"
+                              style={{ direction: 'rtl', textAlign: 'justify', wordSpacing: '0.3em' }}
+                            >
+                              {group.verses.map((verse) => {
+                                const cleanText = stripPrependedBismillahFromVerseOne(
+                                  verse.surahNumber,
+                                  verse.numberInSurah,
+                                  verse.text
+                                );
+                                return (
+                                 <span 
+                                   key={verse.number} 
+                                   id={`ayah-${verse.numberInSurah}`}
+                                   className="hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-300 cursor-default inline scroll-mt-32 rounded transition-all"
+                                 >
+                                   {cleanText}{' '}
+                                   <span className="text-2xl text-gold-600/40 dark:text-gold-500/30 align-middle mx-2 font-amiri select-none">
+                                     {formatAyahMarker(verse.numberInSurah)}
+                                   </span>{' '}
+                                 </span>
+                               );
+                               })}
+                            </p>
+                          ) : (
+                            <div className="space-y-24">
+                              {group.verses.map((verse) => {
+                                const cleanText = stripPrependedBismillahFromVerseOne(
+                                  verse.surahNumber,
+                                  verse.numberInSurah,
+                                  verse.text
+                                );
+                                return (
+                                  <div 
+                                    key={verse.number} 
+                                    id={`ayah-${verse.numberInSurah}`}
+                                    className="group text-center scroll-mt-32 p-4 rounded-xl transition-all"
+                                  >
+                                    <p
+                                      className="text-2xl sm:text-3xl lg:text-4xl leading-[3] sm:leading-[4] text-stone-800 dark:text-gray-100 font-amiri font-normal mb-8 sm:mb-12 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                                      style={{ direction: 'rtl', wordSpacing: '0.3em' }}
+                                    >
+                                      {cleanText}
+                                      <span className="text-xl text-gold-600/40 dark:text-gold-500/30 align-middle mx-4 sm:mx-6 font-amiri select-none">
+                                        {formatAyahMarker(verse.numberInSurah)}
+                                      </span>
+                                    </p>
+                                    <p className="font-amiri text-sm sm:text-lg lg:text-xl text-stone-500 dark:text-gray-400 italic leading-[1.8] sm:leading-[2] tracking-wide max-w-3xl mx-auto opacity-70 group-hover:opacity-100 transition-opacity px-2">
+                                      {verse.translation}
+                                    </p>
+                                    {verse !== group.verses[group.verses.length - 1] && (
+                                      <div className="w-32 sm:w-48 h-px bg-stone-100 dark:bg-white/5 mt-12 sm:mt-20 mx-auto" />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
 
         {canLoadMore && (
           <div ref={sentinelRef} className="py-12 flex justify-center">

@@ -62,7 +62,7 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-stone-50 dark:bg-gray-950 transition-colors duration-500">
       <Header isDark={isDark} onToggleDark={toggleDark} />
       <main className="flex-1">
         {renderContent()}

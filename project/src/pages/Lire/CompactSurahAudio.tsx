@@ -37,7 +37,7 @@ const CompactSurahAudio = forwardRef<CompactSurahAudioHandle, CompactSurahAudioP
       onReciterChange,
       leadingControls,
       otherAudioRef,
-      toolbarClassName = 'bg-[#f8f6e9]/92 dark:bg-gray-950/92',
+      toolbarClassName = 'bg-[#121212]/95',
     },
     ref
   ) {
@@ -166,46 +166,46 @@ const CompactSurahAudio = forwardRef<CompactSurahAudioHandle, CompactSurahAudioP
 
     return (
       <>
-        <div className="sticky top-0 z-30 w-full shadow-[0_1px_0_rgba(0,0,0,0.06)] dark:shadow-[0_1px_0_rgba(255,255,255,0.06)]">
-          <div className="h-[4px] w-full bg-beige-300/95 dark:bg-gray-700/95">
+        <div className="sticky top-0 z-30 w-full shadow-[0_1px_0_rgba(255,255,255,0.03)]">
+          <div className="h-[2px] w-full bg-white/5">
             <div
-              className="h-full bg-primary-600 dark:bg-primary-500 transition-[width] duration-150 ease-linear"
+              className="h-full bg-primary-500 transition-[width] duration-150 ease-linear"
               style={{ width: `${Math.min(100, surahProgressPercent)}%` }}
             />
           </div>
           <div
-            className={`flex items-center justify-end gap-2 sm:gap-3 px-3 sm:px-4 py-2 backdrop-blur-[6px] border-b border-beige-300/60 dark:border-gray-700/60 ${toolbarClassName}`}
+            className={`flex items-center justify-between sm:justify-end gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 backdrop-blur-[10px] border-b border-white/5 ${toolbarClassName}`}
           >
             {leadingControls}
             <div
-              className="flex items-center gap-0 shrink-0 rounded-xl border border-beige-300/90 dark:border-gray-600 bg-white/95 dark:bg-gray-900/95 px-1.5 py-1 shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
+              className="flex items-center gap-0 shrink-0 rounded-xl border border-stone-200 dark:border-white/5 bg-stone-100/50 dark:bg-black/20 px-1 sm:px-1.5 py-0.5 sm:py-1"
               title="Lecture audio de la sourate"
             >
               <button
                 type="button"
                 onClick={handlePlayPause}
                 disabled={disabled}
-                className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary-500/15 dark:bg-primary-400/20 text-primary-700 dark:text-primary-300 hover:bg-primary-500/25 dark:hover:bg-primary-400/30 disabled:opacity-35 disabled:pointer-events-none transition-colors"
+                className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary-600/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 hover:bg-primary-600/20 dark:hover:bg-primary-500/30 disabled:opacity-35 disabled:pointer-events-none transition-colors"
                 aria-label={isPlaying ? 'Pause' : 'Lire la sourate'}
               >
-                {isPlaying ? <Pause className="w-4 h-4" fill="currentColor" /> : <Volume2 className="w-4 h-4" />}
+                {isPlaying ? <Pause className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" /> : <Volume2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
               </button>
-              <div className="w-px h-6 bg-beige-200 dark:bg-gray-600 mx-0.5 shrink-0" aria-hidden />
+              <div className="w-px h-4 sm:h-5 bg-stone-200 dark:bg-white/10 mx-1 shrink-0" aria-hidden />
               <div className="relative pr-0.5" ref={menuRef}>
                 <button
                   type="button"
                   onClick={() => setMenuOpen((o) => !o)}
-                  className="flex items-center gap-1 text-xs sm:text-[13px] text-gray-700 dark:text-gray-200 font-medium hover:text-gray-900 dark:hover:text-white max-w-[148px] sm:max-w-[200px] py-1 pl-1"
+                  className="flex items-center gap-1 text-[9px] sm:text-[11px] text-stone-500 dark:text-gray-400 font-bold uppercase tracking-wider hover:text-stone-800 dark:hover:text-white max-w-[100px] xs:max-w-[148px] sm:max-w-[200px] py-1 pl-1"
                   aria-expanded={menuOpen}
                   aria-haspopup="listbox"
                   aria-label="Choisir le récitateur"
                 >
                   <span className="truncate">{currentReciter.shortName}</span>
-                  <ChevronDown className="w-4 h-4 shrink-0 opacity-70" />
+                  <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 opacity-70" />
                 </button>
                 {menuOpen && (
                   <ul
-                    className="absolute right-0 top-full mt-1 py-1 min-w-[220px] rounded-md border border-beige-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md z-50 text-[11px]"
+                    className="absolute right-0 top-full mt-2 py-1 min-w-[200px] rounded-xl border border-white/10 bg-[#1e1e1e] shadow-2xl z-50 text-[11px]"
                     role="listbox"
                   >
                     {READ_RECITERS.map((r) => (
@@ -214,10 +214,10 @@ const CompactSurahAudio = forwardRef<CompactSurahAudioHandle, CompactSurahAudioP
                           type="button"
                           role="option"
                           aria-selected={r.id === reciterId}
-                          className={`w-full text-left px-3 py-1.5 hover:bg-beige-100 dark:hover:bg-gray-800 ${
+                          className={`w-full text-left px-4 py-2 hover:bg-white/5 transition-colors ${
                             r.id === reciterId
-                              ? 'text-primary-600 dark:text-primary-400 font-medium'
-                              : ''
+                              ? 'text-primary-400 font-bold'
+                              : 'text-gray-400'
                           }`}
                           onClick={() => {
                             onReciterChange(r.id);
