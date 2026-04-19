@@ -191,8 +191,8 @@ export default function VerseDisplay({
 
                           {!showTranslation ? (
                             <p
-                              className="text-2xl sm:text-4xl lg:text-5xl leading-[3.5] sm:leading-[5] text-stone-800 dark:text-gray-100 font-amiri font-normal"
-                              style={{ direction: 'rtl', textAlign: 'justify', wordSpacing: '0.3em' }}
+                              className="text-2xl sm:text-4xl lg:text-5xl leading-[4] sm:leading-[6] text-stone-800 dark:text-gray-100 font-amiri font-normal"
+                              style={{ direction: 'rtl', textAlign: 'justify', wordSpacing: '0.6em' }}
                             >
                               {group.verses.map((verse) => {
                                 const cleanText = stripPrependedBismillahFromVerseOne(
