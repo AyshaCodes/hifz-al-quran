@@ -44,8 +44,7 @@ export default function Dashboard({ profile, progress, onMarkDone, onReset }: Pr
   const streak = getWeeklyStreak(progress);
   const revisionPages = getRevisionPages(progress, today);
 
-  // Un rythme plus réaliste : environ 60 minutes par page pour une mémorisation de qualité
-  const pagesPerDay = Math.max(0.5, Math.round((profile.tempsParJour / 60) * 2) / 2);
+  const pagesPerDay = profile.pagesParJour || 1;
   const daysPerWeek = profile.objectif ? 5 : 5;
 
   const statCards = buildCustomStatCards(
@@ -73,9 +72,15 @@ export default function Dashboard({ profile, progress, onMarkDone, onReset }: Pr
             <h1 className="text-2xl font-bold text-stone-800">
               Assalamu Alaikum, {profile.prenom}
             </h1>
-            <p className="text-sm text-stone-500 mt-0.5">
-              {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-stone-500">
+                {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+              </p>
+              <span className="w-1 h-1 rounded-full bg-stone-300" />
+              <p className="text-[10px] font-bold text-primary-600 uppercase tracking-widest">
+                {profile.direction === 'fatiha-nas' ? 'Fatiha → Nas' : 'Nas → Fatiha'}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 bg-amber-100 px-3 py-1.5 rounded-full">

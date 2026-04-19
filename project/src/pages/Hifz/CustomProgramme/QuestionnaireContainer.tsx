@@ -16,6 +16,7 @@ interface Props {
 
 const initialData: QuestionnaireData = {
   situation: null,
+  direction: 'fatiha-nas',
   departMemorisation: null,
   juzArrive: 1,
   sourateArrive: 1,
@@ -26,6 +27,7 @@ const initialData: QuestionnaireData = {
   dateObjectif: '',
   heuresDisponibles: [],
   minutesParJour: 30,
+  rythmePerso: 1,
   joursParSemaine: ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'],
   prenom: '',
 };

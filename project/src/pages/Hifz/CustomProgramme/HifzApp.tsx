@@ -19,13 +19,8 @@ function buildProfile(data: QuestionnaireData): UserProfile {
     if (data.departMemorisation === 'juzPrecis') {
       juzActuel = data.juzArrive;
     } else if (data.departMemorisation === 'souratePrecise') {
-      // Trouver le juz de la sourate
       const surah = SURAHS.find(s => s.number === data.sourateArrive);
-      // Approximation simple : Juz = (page / 20) + 1
-      // Dans une version plus précise, on utiliserait une map sourate -> juz
-      // Mais ici on peut utiliser les données de SURAHS si elles contiennent le Juz
-      // Sinon on reste sur une logique simple
-      juzActuel = surah ? Math.ceil(surah.number / 4) : 1; // Logique très simplifiée pour l'exemple
+      juzActuel = surah ? Math.ceil(surah.number / 4) : 1; 
     } else if (data.departMemorisation === 'milieu') {
       juzActuel = 15;
     }
@@ -46,8 +41,10 @@ function buildProfile(data: QuestionnaireData): UserProfile {
   return {
     prenom: data.prenom || 'Frère/Sœur',
     juzActuel,
+    direction: data.direction || 'fatiha-nas',
     objectif: objectifLabel,
     tempsParJour: data.minutesParJour,
+    pagesParJour: data.rythmePerso || 1,
     createdAt: new Date().toISOString(),
     memorizationQuality: quality,
     urgentReviewPages: [],

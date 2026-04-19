@@ -1,5 +1,6 @@
 export interface QuestionnaireData {
   situation: 'debutant' | 'intermediaire' | 'avance' | 'revision' | null;
+  direction: 'fatiha-nas' | 'nas-fatiha' | null;
   departMemorisation: 'debut' | 'milieu' | 'juzPrecis' | 'souratePrecise' | null;
   juzArrive: number;
   sourateArrive: number;
@@ -10,6 +11,7 @@ export interface QuestionnaireData {
   dateObjectif: string;
   heuresDisponibles: string[];
   minutesParJour: number;
+  rythmePerso: number; // Nouveau : nombre de pages choisi par l'utilisateur
   joursParSemaine: string[];
   prenom: string;
 }
@@ -17,8 +19,10 @@ export interface QuestionnaireData {
 export interface UserProfile {
   prenom: string;
   juzActuel: number;
+  direction: 'fatiha-nas' | 'nas-fatiha';
   objectif: string;
   tempsParJour: number;
+  pagesParJour: number;
   createdAt: string;
   memorizationQuality: 'good' | 'partial' | 'forgotten';
   revisionOnlyUntil?: string;
