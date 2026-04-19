@@ -1,6 +1,6 @@
 {
-  "name": "vite-react-typescript-starter",
-  "private": true,
+  "name": "hifz-al-quran",
+  "description": "Application de mémorisation du Saint Coran",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
