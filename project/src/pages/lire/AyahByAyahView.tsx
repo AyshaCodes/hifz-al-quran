@@ -148,8 +148,8 @@ export default function AyahByAyahView({
                   </div>
 
                   <p
-                    className="font-amiri text-2xl sm:text-4xl lg:text-5xl text-center text-stone-800 dark:text-gray-100 leading-[5] sm:leading-[7.5] mb-8 sm:mb-12 font-normal group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
-                    style={{ direction: 'rtl', wordSpacing: '0.8em' }}
+                    className="font-amiri text-xl sm:text-2xl lg:text-3xl text-center text-stone-800 dark:text-gray-100 leading-[3.5] sm:leading-[4.5] mb-8 sm:mb-12 font-normal group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+                    style={{ direction: 'rtl', wordSpacing: '0.4em' }}
                   >
                     {displayArabic}
                   </p>

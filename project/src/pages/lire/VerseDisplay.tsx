@@ -191,8 +191,8 @@ export default function VerseDisplay({
 
                           {!showTranslation ? (
                             <p
-                              className="text-2xl sm:text-4xl lg:text-5xl leading-[5] sm:leading-[7.5] text-stone-800 dark:text-gray-100 font-amiri font-normal"
-                              style={{ direction: 'rtl', textAlign: 'right', wordSpacing: '0.8em' }}
+                              className="text-xl sm:text-2xl lg:text-3xl leading-[3.5] sm:leading-[4.5] text-stone-800 dark:text-gray-100 font-amiri font-normal"
+                              style={{ direction: 'rtl', textAlign: 'center', wordSpacing: '0.4em' }}
                             >
                               {group.verses.map((verse) => {
                                 const cleanText = stripPrependedBismillahFromVerseOne(
@@ -207,7 +207,7 @@ export default function VerseDisplay({
                                    className="hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-300 cursor-default inline scroll-mt-32 rounded transition-all"
                                  >
                                    {cleanText}{' '}
-                                   <span className="text-2xl text-gold-600/40 dark:text-gold-500/30 align-middle mx-2 font-amiri select-none">
+                                   <span className="text-lg text-gold-600/40 dark:text-gold-500/30 align-middle mx-2 font-amiri select-none">
                                      {formatAyahMarker(verse.numberInSurah)}
                                    </span>{' '}
                                  </span>
