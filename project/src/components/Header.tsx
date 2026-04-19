@@ -29,19 +29,19 @@ export default function Header({ isDark, onToggleDark }: HeaderProps) {
     <header className="sticky top-0 z-50 transition-all duration-500">
       <div className="absolute inset-0 bg-white/70 dark:bg-gray-950/70 backdrop-blur-xl border-b border-stone-200/50 dark:border-white/5 shadow-sm" />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 md:h-20">
           <button
             onClick={() => handleNav('/')}
-            className="flex items-center gap-3 group transition-transform hover:scale-105"
+            className="flex items-center gap-2 md:gap-3 group transition-transform hover:scale-105"
           >
-            <div className="w-11 h-11 rounded-2xl green-gradient flex items-center justify-center shadow-lg shadow-primary-600/20 rotate-3 group-hover:rotate-0 transition-all duration-500">
-              <BookOpen className="w-6 h-6 text-white" />
+            <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl green-gradient flex items-center justify-center shadow-lg shadow-primary-600/20 rotate-3 group-hover:rotate-0 transition-all duration-500">
+              <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-white" />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="font-amiri text-2xl text-primary-900 dark:text-primary-50 font-bold tracking-tight">
+              <span className="font-amiri text-xl md:text-2xl text-primary-900 dark:text-primary-50 font-bold tracking-tight">
                 Hifz Al-Quran
               </span>
-              <span className="text-[10px] text-accent-600 dark:text-accent-400 font-bold tracking-[0.2em] uppercase">
+              <span className="text-[8px] md:text-[10px] text-accent-600 dark:text-accent-400 font-bold tracking-[0.2em] uppercase">
                 حفظ القرآن
               </span>
             </div>
@@ -52,7 +52,7 @@ export default function Header({ isDark, onToggleDark }: HeaderProps) {
               <button
                 key={path}
                 onClick={() => handleNav(path)}
-                className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-500 relative ${
+                className={`px-4 lg:px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-500 relative ${
                   currentPath === path
                     ? 'text-white'
                     : 'text-stone-600 dark:text-stone-400 hover:text-primary-600 dark:hover:text-primary-400'
@@ -70,20 +70,20 @@ export default function Header({ isDark, onToggleDark }: HeaderProps) {
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={onToggleDark}
-              className="p-3 rounded-2xl bg-stone-100/50 dark:bg-white/5 text-stone-500 dark:text-stone-400 hover:text-primary-600 dark:hover:text-primary-400 border border-stone-200/50 dark:border-white/5 transition-all duration-300 hover:scale-110 active:scale-95"
+              className="p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-stone-100/50 dark:bg-white/5 text-stone-500 dark:text-stone-400 hover:text-primary-600 dark:hover:text-primary-400 border border-stone-200/50 dark:border-white/5 transition-all duration-300 hover:scale-110 active:scale-95"
               aria-label="Basculer le mode sombre"
             >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isDark ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
             </button>
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-3 rounded-2xl bg-stone-100/50 dark:bg-white/5 text-stone-500 hover:text-primary-600 border border-stone-200/50 dark:border-white/5 transition-all"
+              className="md:hidden p-2.5 rounded-xl bg-stone-100/50 dark:bg-white/5 text-stone-500 hover:text-primary-600 border border-stone-200/50 dark:border-white/5 transition-all"
             >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileOpen ? <X className="w-4 h-4 md:w-5 md:h-5" /> : <Menu className="w-4 h-4 md:w-5 md:h-5" />}
             </button>
           </div>
         </div>

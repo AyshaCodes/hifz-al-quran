@@ -167,23 +167,23 @@ export default function VerseDisplay({
                 transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
                 className="mb-8 sm:mb-16"
               >
-                <div className="bg-white dark:bg-gray-900/50 p-6 sm:p-16 rounded-[1.5rem] sm:rounded-[2rem] shadow-sm dark:shadow-2xl border border-stone-200 dark:border-white/5 relative overflow-hidden transition-colors duration-500">
-                  <div className="flex items-center justify-between mb-8 sm:mb-12 border-b border-stone-100 dark:border-white/5 pb-6 sm:pb-8">
-                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-stone-400 dark:text-gray-600">
+                <div className="bg-white dark:bg-gray-900/50 p-5 sm:p-16 rounded-[1.5rem] sm:rounded-[2rem] shadow-sm dark:shadow-2xl border border-stone-200 dark:border-white/5 relative overflow-hidden transition-colors duration-500">
+                  <div className="flex items-center justify-between mb-6 sm:mb-12 border-b border-stone-100 dark:border-white/5 pb-4 sm:pb-8">
+                    <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-stone-400 dark:text-gray-600">
                       Juz {page.juz} • Hizb {Math.ceil(page.hizbQuarter / 4)}
                     </span>
-                    <span className="px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary-50 dark:bg-primary-500/5 text-[9px] sm:text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest border border-primary-100 dark:border-primary-500/10">
+                    <span className="px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary-50 dark:bg-primary-500/5 text-[8px] sm:text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest border border-primary-100 dark:border-primary-500/10">
                       Page {page.pageNumber}
                     </span>
                   </div>
                   
-                  <div className="space-y-12 sm:space-y-16">
+                  <div className="space-y-8 sm:space-y-16">
                     {pageSurahGroups.map((group) => {
                       return (
                         <div key={`${page.pageNumber}-${group.surahNumber}-${group.verses[0]?.number ?? 0}`}>
-                          <div className="flex items-center gap-4 sm:gap-6 mb-8 sm:mb-12">
+                          <div className="flex items-center gap-3 sm:gap-6 mb-6 sm:mb-12">
                             <div className="h-px flex-1 bg-stone-100 dark:bg-white/5" />
-                            <p className="text-[9px] sm:text-[10px] font-bold text-stone-400 dark:text-gray-700 uppercase tracking-[0.15em] sm:tracking-[0.25em] bg-white dark:bg-gray-900 px-3 sm:px-4">
+                            <p className="text-[8px] sm:text-[10px] font-bold text-stone-400 dark:text-gray-700 uppercase tracking-[0.15em] sm:tracking-[0.25em] bg-white dark:bg-gray-900 px-2 sm:px-4">
                               Sourate {group.surahNumber}
                             </p>
                             <div className="h-px flex-1 bg-stone-100 dark:bg-white/5" />
@@ -191,8 +191,8 @@ export default function VerseDisplay({
 
                           {!showTranslation ? (
                             <p
-                              className="text-xl sm:text-2xl lg:text-3xl leading-[3.5] sm:leading-[4.5] text-stone-800 dark:text-gray-100 font-amiri font-normal"
-                              style={{ direction: 'rtl', textAlign: 'center', wordSpacing: '0.4em' }}
+                              className="text-xl sm:text-2xl lg:text-3xl leading-[3] sm:leading-[4.5] text-stone-800 dark:text-gray-100 font-amiri font-normal"
+                              style={{ direction: 'rtl', textAlign: 'center', wordSpacing: '0.2em' }}
                             >
                               {group.verses.map((verse) => {
                                 const cleanText = stripPrependedBismillahFromVerseOne(
@@ -207,7 +207,7 @@ export default function VerseDisplay({
                                    className="hover:text-primary-600 dark:hover:text-primary-400 transition-all duration-300 cursor-default inline scroll-mt-32 rounded transition-all"
                                  >
                                    {cleanText}{' '}
-                                   <span className="text-lg text-gold-600/40 dark:text-gold-500/30 align-middle mx-2 font-amiri select-none">
+                                   <span className="text-base sm:text-lg text-gold-600/40 dark:text-gold-500/30 align-middle mx-1.5 sm:mx-2 font-amiri select-none">
                                      {formatAyahMarker(verse.numberInSurah)}
                                    </span>{' '}
                                  </span>
@@ -215,7 +215,7 @@ export default function VerseDisplay({
                                })}
                             </p>
                           ) : (
-                            <div className="space-y-24">
+                            <div className="space-y-16 sm:space-y-24">
                               {group.verses.map((verse) => {
                                 const cleanText = stripPrependedBismillahFromVerseOne(
                                   verse.surahNumber,
@@ -226,22 +226,22 @@ export default function VerseDisplay({
                                   <div 
                                     key={verse.number} 
                                     id={`ayah-${verse.numberInSurah}`}
-                                    className="group text-center scroll-mt-32 p-4 rounded-xl transition-all"
+                                    className="group text-center scroll-mt-32 p-2 sm:p-4 rounded-xl transition-all"
                                   >
                                     <p
-                                      className="text-2xl sm:text-3xl lg:text-4xl leading-[4.5] sm:leading-[6] text-stone-800 dark:text-gray-100 font-amiri font-normal mb-8 sm:mb-12 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
-                                      style={{ direction: 'rtl', wordSpacing: '0.6em' }}
+                                      className="text-xl sm:text-3xl lg:text-4xl leading-[3.5] sm:leading-[6] text-stone-800 dark:text-gray-100 font-amiri font-normal mb-6 sm:mb-12 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                                      style={{ direction: 'rtl', wordSpacing: '0.4em' }}
                                     >
                                       {cleanText}
-                                      <span className="text-xl text-gold-600/40 dark:text-gold-500/30 align-middle mx-4 sm:mx-6 font-amiri select-none">
+                                      <span className="text-lg sm:text-xl text-gold-600/40 dark:text-gold-500/30 align-middle mx-4 sm:mx-6 font-amiri select-none">
                                         {formatAyahMarker(verse.numberInSurah)}
                                       </span>
                                     </p>
-                                    <p className="font-amiri text-sm sm:text-lg lg:text-xl text-stone-500 dark:text-gray-400 italic leading-[1.8] sm:leading-[2] tracking-wide max-w-3xl mx-auto opacity-70 group-hover:opacity-100 transition-opacity px-2">
+                                    <p className="font-amiri text-xs sm:text-lg lg:text-xl text-stone-500 dark:text-gray-400 italic leading-[1.6] sm:leading-[2] tracking-wide max-w-3xl mx-auto opacity-70 group-hover:opacity-100 transition-opacity px-2">
                                       {verse.translation}
                                     </p>
                                     {verse !== group.verses[group.verses.length - 1] && (
-                                      <div className="w-32 sm:w-48 h-px bg-stone-100 dark:bg-white/5 mt-12 sm:mt-20 mx-auto" />
+                                      <div className="w-24 sm:w-48 h-px bg-stone-100 dark:bg-white/5 mt-8 sm:mt-20 mx-auto" />
                                     )}
                                   </div>
                                 );

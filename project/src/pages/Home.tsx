@@ -119,29 +119,53 @@ export default function Home() {
             </span>
           </motion.div>
 
-          <motion.h1 initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }} className="font-arabic text-4xl md:text-6xl text-white drop-shadow-2xl mb-4 leading-tight font-normal">
+          <motion.h1 
+            initial={{ y: 20, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }} 
+            className="font-arabic text-4xl xs:text-5xl md:text-8xl text-white drop-shadow-2xl mb-6 leading-tight font-normal"
+          >
             حِفْظُ القُرْآنِ
           </motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }} className="font-amiri text-2xl md:text-3xl text-stone-200 mb-6 drop-shadow-lg">
+          <motion.p 
+            initial={{ y: 20, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
+            transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }} 
+            className="font-amiri text-2xl md:text-4xl text-stone-200 mb-10 md:mb-14 drop-shadow-lg tracking-wide"
+          >
             Votre compagnon de mémorisation
           </motion.p>
 
           {profile && userStats ? (
-            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <button onClick={() => navigate('/hifz')} className="btn-premium px-10 py-4 text-lg">
-                Continuer mon Hifz <ChevronRight className="w-5 h-5" />
+            <motion.div 
+              initial={{ y: 30, opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }} 
+              transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }} 
+              className="flex flex-col sm:flex-row gap-4 md:gap-8 justify-center items-center"
+            >
+              <button onClick={() => navigate('/hifz')} className="btn-premium w-full sm:w-auto px-10 md:px-14 py-4 md:py-5 text-lg md:text-xl justify-center group">
+                Continuer mon Hifz 
+                <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button onClick={() => navigate('/lire')} className="btn-secondary px-10 py-4 text-lg">
-                <BookOpen className="w-5 h-5" /> Lire le Coran
+              <button onClick={() => navigate('/lire')} className="btn-secondary w-full sm:w-auto px-10 md:px-14 py-4 md:py-5 text-lg md:text-xl justify-center group">
+                <BookOpen className="w-6 h-6 group-hover:scale-110 transition-transform" /> 
+                Lire le Coran
               </button>
             </motion.div>
           ) : (
-            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <button onClick={() => navigate('/hifz')} className="btn-premium px-10 py-4 text-lg">
-                Commencer mon Hifz <ChevronRight className="w-5 h-5" />
+            <motion.div 
+              initial={{ y: 30, opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }} 
+              transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }} 
+              className="flex flex-col sm:flex-row gap-4 md:gap-8 justify-center items-center"
+            >
+              <button onClick={() => navigate('/hifz')} className="btn-premium w-full sm:w-auto px-10 md:px-14 py-4 md:py-5 text-lg md:text-xl justify-center group">
+                Commencer mon Hifz 
+                <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button onClick={() => navigate('/lire')} className="btn-secondary px-10 py-4 text-lg">
-                <BookOpen className="w-5 h-5" /> Lire le Coran
+              <button onClick={() => navigate('/lire')} className="btn-secondary w-full sm:w-auto px-10 md:px-14 py-4 md:py-5 text-lg md:text-xl justify-center group">
+                <BookOpen className="w-6 h-6 group-hover:scale-110 transition-transform" /> 
+                Lire le Coran
               </button>
             </motion.div>
           )}
@@ -160,14 +184,25 @@ export default function Home() {
       </div>
 
       {/* Section Fonctionnalités */}
-      <section className="section-container">
-        <div className="text-center">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="section-title">Une expérience complète</motion.h2>
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="section-subtitle">Outils pensés pour faciliter votre mémorisation</motion.p>
+      <section className="section-container relative">
+        <div className="absolute top-0 right-0 -translate-y-1/2 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl" />
+        <div className="text-center relative z-10">
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="section-title">Une expérience complète</motion.h2>
+          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="section-subtitle">Outils pensés pour faciliter votre mémorisation</motion.p>
         </div>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-8 relative z-10">
           {features.map((f, i) => (
-            <motion.button key={f.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} whileHover={{ y: -10 }} onClick={() => navigate(f.path)} className="group premium-card p-8 text-left border-none shadow-lg">
+            <motion.button 
+              key={f.title} 
+              initial={{ opacity: 0, y: 30 }} 
+              whileInView={{ opacity: 1, y: 0 }} 
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.8 }} 
+              whileHover={{ y: -10, scale: 1.02 }} 
+              onClick={() => navigate(f.path)} 
+              className="group premium-card p-8 text-left border-none shadow-xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary-500/5 to-transparent rounded-full -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-700" />
               <div className={`w-14 h-14 rounded-2xl ${f.bgColor} flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
                 <f.icon className={`w-7 h-7 ${f.iconColor}`} />
               </div>
@@ -175,6 +210,95 @@ export default function Home() {
               <p className="text-stone-500 dark:text-stone-400 leading-relaxed">{f.desc}</p>
             </motion.button>
           ))}
+        </div>
+      </section>
+
+      {/* Nouveauté : Section Programmes */}
+      <section className="py-24 bg-white dark:bg-gray-950 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }} 
+              whileInView={{ opacity: 1, x: 0 }} 
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="flex-1 space-y-8"
+            >
+              <h2 className="section-title text-left">Choisissez votre rythme de mémorisation</h2>
+              <p className="text-stone-500 dark:text-stone-400 text-lg leading-relaxed">
+                Que vous soyez débutant ou que vous souhaitiez reprendre votre mémorisation, nous avons le programme qu'il vous faut.
+              </p>
+              <div className="space-y-6">
+                <div className="flex gap-4 p-6 rounded-3xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/30">
+                  <div className="w-12 h-12 rounded-2xl bg-primary-600 flex items-center justify-center shrink-0">
+                    <Star className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-800 dark:text-white mb-1">Programme Personnalisé</h4>
+                    <p className="text-sm text-stone-500 dark:text-stone-400">Établi selon votre niveau, vos objectifs et votre temps.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 p-6 rounded-3xl bg-gold-50 dark:bg-gold-900/20 border border-gold-100 dark:border-gold-800/30">
+                  <div className="w-12 h-12 rounded-2xl bg-gold-500 flex items-center justify-center shrink-0">
+                    <Zap className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-800 dark:text-white mb-1">Programme Guidé</h4>
+                    <p className="text-sm text-stone-500 dark:text-stone-400">Suivez un rythme structuré et progressez rapidement.</p>
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => navigate('/hifz')} className="btn-premium group">
+                Explorer les programmes <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }} 
+              whileInView={{ opacity: 1, scale: 1 }} 
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="flex-1 relative"
+            >
+              <div className="absolute inset-0 bg-primary-500/10 blur-[100px] rounded-full" />
+              <div className="relative grid grid-cols-2 gap-4">
+                <div className="space-y-4 pt-12">
+                  <div className="premium-card p-6 bg-white dark:bg-gray-900 shadow-2xl rotate-3">
+                    <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mb-4">
+                      <TrendingUp className="w-5 h-5 text-primary-600" />
+                    </div>
+                    <p className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">Progression</p>
+                    <div className="h-2 w-full bg-stone-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                      <div className="h-full w-2/3 bg-primary-500 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="premium-card p-6 bg-white dark:bg-gray-900 shadow-2xl -rotate-2">
+                    <div className="w-10 h-10 rounded-full bg-gold-100 dark:bg-gold-900/50 flex items-center justify-center mb-4">
+                      <Award className="w-5 h-5 text-gold-500" />
+                    </div>
+                    <p className="text-sm font-bold text-gray-800 dark:text-white">Nouveau badge !</p>
+                    <p className="text-[10px] text-stone-400 uppercase">Semaine en or</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="premium-card p-6 bg-white dark:bg-gray-900 shadow-2xl -rotate-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mb-4">
+                      <Moon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <p className="text-sm font-bold text-gray-800 dark:text-white">Rappel Fajr</p>
+                    <p className="text-[10px] text-stone-400 uppercase">Lecture quotidienne</p>
+                  </div>
+                  <div className="premium-card p-6 bg-white dark:bg-gray-900 shadow-2xl rotate-2">
+                    <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center mb-4">
+                      <BookOpen className="w-5 h-5 text-green-600" />
+                    </div>
+                    <p className="text-sm font-bold text-gray-800 dark:text-white">Sourate Al-Mulk</p>
+                    <p className="text-[10px] text-stone-400 uppercase">Page 562</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -279,9 +403,9 @@ export default function Home() {
           <Sparkles className="w-16 h-16 mx-auto mb-8 text-gold-400 animate-pulse" />
           <p className="font-arabic text-3xl md:text-4xl mb-6 leading-relaxed text-glow">رَبِّ زِدْنِي عِلْمًا</p>
           <p className="font-amiri text-xl italic mb-12 text-stone-200">"Seigneur, augmente mes connaissances" (20:114)</p>
-          <button onClick={() => navigate('/hifz')} className="relative group overflow-hidden bg-gold-500 hover:bg-gold-400 text-primary-950 font-bold py-5 px-12 rounded-full transition-all inline-flex items-center gap-3 shadow-2xl hover:shadow-gold-500/40 active:scale-95">
-            <span className="relative z-10 text-lg">Démarrer mon programme</span>
-            <ChevronRight className="w-6 h-6 relative z-10 group-hover:translate-x-1 transition-transform" />
+          <button onClick={() => navigate('/hifz')} className="relative group overflow-hidden bg-gold-500 hover:bg-gold-400 text-primary-950 font-bold py-3.5 md:py-5 px-8 md:px-12 rounded-full transition-all inline-flex items-center gap-2 md:gap-3 shadow-2xl hover:shadow-gold-500/40 active:scale-95">
+            <span className="relative z-10 text-base md:text-lg">Démarrer mon programme</span>
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6 relative z-10 group-hover:translate-x-1 transition-transform" />
           </button>
         </motion.div>
       </section>

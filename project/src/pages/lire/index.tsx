@@ -159,13 +159,20 @@ export default function LirePage() {
     }
   };
 
-  const handleToggleBookmark = (verse: Verse) => {
+  const handleToggleBookmark = (verse: Verse, note?: string, category?: string) => {
     const surah = SURAHS.find((s) => s.number === selectedSurah);
     const existing = bookmarks.find(
       (b) => b.surahNumber === selectedSurah && b.verseNumber === verse.numberInSurah
     );
-    if (existing) {
+    if (existing && !note && !category) {
       setBookmarks(bookmarks.filter((b) => b !== existing));
+    } else if (existing) {
+      // Update existing
+      setBookmarks(bookmarks.map(b => 
+        (b.surahNumber === selectedSurah && b.verseNumber === verse.numberInSurah)
+          ? { ...b, note: note || b.note, category: category || b.category }
+          : b
+      ));
     } else {
       setBookmarks([
         ...bookmarks,
@@ -176,6 +183,8 @@ export default function LirePage() {
           verseNumber: verse.numberInSurah,
           verseText: verse.text,
           savedAt: new Date().toISOString(),
+          note,
+          category
         },
       ]);
     }

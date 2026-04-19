@@ -58,6 +58,8 @@ export interface Bookmark {
   surahNameArabic: string;
   verseText: string;
   savedAt: string;
+  note?: string;
+  category?: string;
 }
 
 export type Page = 'home' | 'lire' | 'hifz' | 'signets';
