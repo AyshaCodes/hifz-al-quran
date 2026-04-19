@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Compass, ChevronRight, Moon } from 'lucide-react';
-import MotivationalQuote from './shared/MotivationalQuote';
+import MotivationalQuote from './Shared/MotivationalQuote';
 
 interface Props {
   onSelectCustom: () => void;

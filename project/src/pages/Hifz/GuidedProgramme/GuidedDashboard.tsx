@@ -2,12 +2,12 @@ import { motion } from 'framer-motion';
 import { Settings, Award, Languages, BookOpen, Target, Flame, Clock, ChevronRight } from 'lucide-react';
 import { GuidedProfile, DailyProgress } from '../../../types/hifz';
 import { getRevisionPages, getWeeklyStreak, getTodayString } from '../../../lib/revisionHelper';
-import MotivationalQuote from '../shared/MotivationalQuote';
-import { StatCards } from '../shared/StatCards';
-import ProgressChart from '../shared/ProgressChart';
-import TodayTask from '../shared/TodayTask';
-import WeeklyCalendar from '../shared/WeeklyCalendar';
-import WeeklyPlan from '../shared/WeeklyPlan';
+import MotivationalQuote from '../Shared/MotivationalQuote';
+import { StatCards } from '../Shared/StatCards';
+import ProgressChart from '../Shared/ProgressChart';
+import TodayTask from '../Shared/TodayTask';
+import WeeklyCalendar from '../Shared/WeeklyCalendar';
+import WeeklyPlan from '../Shared/WeeklyPlan';
 import { useRouter } from '../../../hooks/useRouter';
 
 interface Props {
