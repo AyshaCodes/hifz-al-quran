@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, BookOpen, Download, FileText, Calendar, Award, ExternalLink, Library, Music, GraduationCap } from 'lucide-react';
 
 const PDF_LINK = "https://drive.google.com/file/d/1vXZBYux35JQVb4YeOQDSuq2e1SnkwJD1/view?usp=sharing";
+const PDF_AR_LINK = "https://drive.google.com/file/d/1vDKOyZWeMdEgzzn9GZmKye89ZgpPuBkY/view?usp=sharing";
 const INSTAGRAM_LINK = "https://www.instagram.com/somme_de_jours/";
 
 const EXTERNAL_RESOURCES = [
@@ -102,17 +103,30 @@ export default function Ressources() {
               ))}
             </div>
 
-            <motion.a
-              href={PDF_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-3 bg-gold-500 hover:bg-gold-400 text-primary-950 font-bold px-10 py-5 rounded-2xl transition-all shadow-xl hover:shadow-gold-500/20 text-lg"
-            >
-              <Download className="w-6 h-6" />
-              Télécharger le PDF gratuit
-            </motion.a>
+            <div className="flex flex-wrap gap-4">
+              <motion.a
+                href={PDF_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-3 bg-gold-500 hover:bg-gold-400 text-primary-950 font-bold px-8 py-4 rounded-2xl transition-all shadow-xl hover:shadow-gold-500/20 text-base"
+              >
+                <Download className="w-5 h-5" />
+                Version Française
+              </motion.a>
+              <motion.a
+                href={PDF_AR_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 text-white font-bold px-8 py-4 rounded-2xl transition-all border border-white/20 backdrop-blur-sm shadow-xl text-base"
+              >
+                <Download className="w-5 h-5 text-gold-400" />
+                Version Arabe (العربية)
+              </motion.a>
+            </div>
           </div>
         </motion.section>
 
