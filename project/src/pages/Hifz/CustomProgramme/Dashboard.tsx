@@ -44,7 +44,8 @@ export default function Dashboard({ profile, progress, onMarkDone, onReset }: Pr
   const streak = getWeeklyStreak(progress);
   const revisionPages = getRevisionPages(progress, today);
 
-  const pagesPerDay = Math.max(1, Math.round(profile.tempsParJour / 20));
+  // Un rythme plus réaliste : environ 60 minutes par page pour une mémorisation de qualité
+  const pagesPerDay = Math.max(0.5, Math.round((profile.tempsParJour / 60) * 2) / 2);
   const daysPerWeek = profile.objectif ? 5 : 5;
 
   const statCards = buildCustomStatCards(

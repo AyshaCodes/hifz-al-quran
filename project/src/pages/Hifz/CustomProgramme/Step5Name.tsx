@@ -8,9 +8,9 @@ interface Props {
 }
 
 export default function Step5Name({ data, onChange }: Props) {
-  // Calcul d'estimation
+  // Calcul d'estimation réaliste : environ 60 minutes par page pour une mémorisation de qualité
   const pagesTotal = data.objectif === 'nombreJuz' ? data.nombreJuzObjectif * 20 : 604;
-  const pagesPerDay = Math.max(0.5, (data.minutesParJour / 20));
+  const pagesPerDay = Math.max(0.5, Math.round((data.minutesParJour / 60) * 2) / 2);
   const totalDays = Math.ceil(pagesTotal / pagesPerDay);
   const totalMonths = Math.ceil(totalDays / 30);
   
