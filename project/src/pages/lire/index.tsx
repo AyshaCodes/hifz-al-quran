@@ -13,6 +13,7 @@ import { ReadMode } from './ReadModeToggle';
 import SurahSidebar from './SurahSidebar';
 import VerseDisplay from './VerseDisplay';
 import ReadingHeader from './ReadingHeader';
+import { useRouter } from '../../hooks/useRouter';
 
 interface Verse {
   number: number;
@@ -29,7 +30,11 @@ interface MushafPageData {
 }
 
 export default function LirePage() {
-  const [selectedSurah, setSelectedSurah] = useState(1);
+  const { searchParams } = useRouter();
+  const [selectedSurah, setSelectedSurah] = useState(() => {
+    const s = searchParams.get('surah');
+    return s ? parseInt(s) : 1;
+  });
   const [verses, setVerses] = useState<Verse[]>([]);
   const [lecturePages, setLecturePages] = useState<MushafPageData[]>([]);
   const [mushafPage, setMushafPage] = useState(1);

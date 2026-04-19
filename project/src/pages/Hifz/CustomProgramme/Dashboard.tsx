@@ -171,7 +171,14 @@ export default function Dashboard({ profile, progress, onMarkDone, onReset }: Pr
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate('/lire')}
+              onClick={() => {
+                // Rediriger vers la sourate actuelle si elle existe
+                if (profile.juzActuel) {
+                  navigate(`/lire?surah=${profile.juzActuel * 4 - 3}`); // Approximation simple Juz -> Sourate
+                } else {
+                  navigate('/lire');
+                }
+              }}
               className="w-full flex items-center justify-between p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-stone-200 shadow-lg group transition-all"
             >
               <div className="flex items-center gap-4">
