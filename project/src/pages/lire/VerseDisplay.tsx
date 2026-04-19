@@ -191,8 +191,8 @@ export default function VerseDisplay({
 
                           {!showTranslation ? (
                             <p
-                              className="text-2xl sm:text-4xl lg:text-5xl leading-[4] sm:leading-[6] text-stone-800 dark:text-gray-100 font-amiri font-normal"
-                              style={{ direction: 'rtl', textAlign: 'justify', wordSpacing: '0.6em' }}
+                              className="text-2xl sm:text-4xl lg:text-5xl leading-[5] sm:leading-[7.5] text-stone-800 dark:text-gray-100 font-amiri font-normal"
+                              style={{ direction: 'rtl', textAlign: 'right', wordSpacing: '0.8em' }}
                             >
                               {group.verses.map((verse) => {
                                 const cleanText = stripPrependedBismillahFromVerseOne(
@@ -229,8 +229,8 @@ export default function VerseDisplay({
                                     className="group text-center scroll-mt-32 p-4 rounded-xl transition-all"
                                   >
                                     <p
-                                      className="text-2xl sm:text-3xl lg:text-4xl leading-[3] sm:leading-[4] text-stone-800 dark:text-gray-100 font-amiri font-normal mb-8 sm:mb-12 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
-                                      style={{ direction: 'rtl', wordSpacing: '0.3em' }}
+                                      className="text-2xl sm:text-3xl lg:text-4xl leading-[4.5] sm:leading-[6] text-stone-800 dark:text-gray-100 font-amiri font-normal mb-8 sm:mb-12 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                                      style={{ direction: 'rtl', wordSpacing: '0.6em' }}
                                     >
                                       {cleanText}
                                       <span className="text-xl text-gold-600/40 dark:text-gold-500/30 align-middle mx-4 sm:mx-6 font-amiri select-none">

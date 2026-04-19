@@ -211,7 +211,7 @@ export default function LirePage() {
         />
 
         {/* Content Area */}
-        <main className="flex-1 flex flex-col relative bg-stone-50 dark:bg-gray-950 transition-colors duration-500 overflow-y-auto scrollbar-thin scrollbar-thumb-stone-200 dark:scrollbar-thumb-white/10 hover:scrollbar-thumb-stone-300 dark:hover:scrollbar-thumb-white/20">
+        <main className="flex-1 flex flex-col relative bg-stone-50 dark:bg-gray-950 transition-colors duration-500 overflow-y-auto scroll-smooth">
           {/* Progress bar at the top of content */}
           <div className="h-0.5 w-full bg-stone-200 dark:bg-white/5 sticky top-0 z-40">
             <div 
